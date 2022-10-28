@@ -353,5 +353,6 @@ def printDeck(deck):
         print(name)
 
 printDeck(ranked[0])
-printDeck(ranked[1])
 printDeck(ranked[-1])
+printDeck(ranked[101])
+printDeck(ranked[60])
