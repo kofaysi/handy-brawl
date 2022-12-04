@@ -1,10 +1,16 @@
 #!/usr/bin/env python
+
+import itertools
+from collections import deque
+
+my_tuple = ("attack", "push", "")
+
 cards = []
 cards.append([
     [
-        [], # first one is always passive
+        [],  # first one is always passive
         [("attack", 2)],
-        [("push", 2), ("rotate", 0) ]
+        [("push", 2), ("rotate", 0)]
     ],
     [
         [("shield", 2), ("rotate", 0)],
@@ -24,7 +30,7 @@ cards.append([
 ])
 cards.append([
     [
-        [], # first one is always passive
+        [],  # first one is always passive
         [("attack", 2), ("rotate", 0)],
         [("push", 2)]
     ],
@@ -46,7 +52,7 @@ cards.append([
 ])
 cards.append([
     [
-        [], # first one is always passive
+        [],  # first one is always passive
         [("push", 2), ("rotate", 0)],
         [("pull", 2), ("rotate", 0)]
     ],
@@ -67,7 +73,7 @@ cards.append([
 ])
 cards.append([
     [
-        [("shield", 0), ("rotate", 0)], # first one is always passive
+        [("shield", 0), ("rotate", 0)],  # first one is always passive
         [("attack", 4)],
         [("push", 2)]
     ],
@@ -89,7 +95,7 @@ cards.append([
 ])
 cards.append([
     [
-        [("shield", 0), ("rotate", 0)], # first one is always passive
+        [("shield", 0), ("rotate", 0)],  # first one is always passive
         [("pull", 2), ("attack", 2)]
     ],
     [
@@ -116,9 +122,9 @@ paladin = cards
 archer = []
 archer.append([
     [
-        [("trap", 0)], # first one is always passive
+        [("trap", 0)],  # first one is always passive
         [("arch", 0), ("rotate", 0)],
-        [("push-hero", 2), ("rotate-other", 0) ]
+        [("push-hero", 2), ("rotate-other", 0)]
     ],
     [
         [("trap", 0)],
@@ -140,9 +146,9 @@ archer.append([
 ])
 archer.append([
     [
-        [("run", 0), ("rotate", 0)], # first one is always passive
+        [("run", 0), ("rotate", 0)],  # first one is always passive
         [("arch", 0), ("rotate", 0)],
-        [("pull-enemy", 2), ("rotate-other", 0), ("rotate", 0) ],
+        [("pull-enemy", 2), ("rotate-other", 0), ("rotate", 0)],
         [("attack", 1), ("rotate", 0)]
     ],
     [
@@ -163,7 +169,7 @@ archer.append([
 ])
 archer.append([
     [
-        [("run", 0), ("rotate", 0)], # first one is always passive
+        [("run", 0), ("rotate", 0)],  # first one is always passive
         [("rotate-other", 0), ("pull-enemy", 2), ("rotate", 0)],
         [("push", 1), ("rotate", 0)]
     ],
@@ -185,7 +191,7 @@ archer.append([
 ])
 archer.append([
     [
-        [("trap", 0)], # first one is always passive
+        [("trap", 0)],  # first one is always passive
         [("rotate-other", 0), ("rotate", 0)],
         [("attack", 1)],
         [("push", 1)]
@@ -210,9 +216,9 @@ archer.append([
 ])
 archer.append([
     [
-        [("run", 0), ("rotate", 0)], # first one is always passive
+        [("run", 0), ("rotate", 0)],  # first one is always passive
         [("aarch", 0), ("rotate", 0)],
-        [("pull-emeny", 1), ("rotate", 0)]
+        [("pull-enemy", 1), ("rotate", 0)]
     ],
     [
         [],
@@ -233,20 +239,22 @@ archer.append([
     ]
 ])
 
-def countMovingActions(cards):
+
+def count_moving_actions(cards):
     res = 0
     for card in cards:
         for face in card:
             for option in face:
                 for (op, value) in option:
-                    if (op == "push" or op == "pull"):
+                    if op == "push" or op == "pull":
                         res += value
-                    elif (op == "push-hero" or op == "pull-enemy"):
+                    elif op == "push-hero" or op == "pull-enemy":
                         res += value*0.75
     return res
 
-def scoreAction(action, cards, icard, iface, rec=False):
-    card = cards[icard]
+
+def score_action(action, cards, icard, iface, rec=False):
+    # card = cards[icard]
     (op, value) = action
     if op == "attack":
         return value*2
@@ -265,11 +273,11 @@ def scoreAction(action, cards, icard, iface, rec=False):
     elif op == "rotate" and not rec:
         return 0
     elif op == "rotate" and rec:
-        thisFace = scoreFace(cards, icard, iface)
-        otherFace = scoreFace(cards, icard, (iface+1)%2)
-        return (otherFace - thisFace)/4.0
+        this_face = score_face(cards, icard, iface)
+        other_face = score_face(cards, icard, (iface+1) % 2)
+        return (other_face - this_face)/4.0
     elif op == "trap":
-        return countMovingActions(cards[:icard]+cards[icard+1:])/10.0
+        return count_moving_actions(cards[:icard] + cards[icard + 1:])/10.0
     elif op == "arch":
         return 3*2+2
     elif op == "arch-other":
@@ -282,37 +290,40 @@ def scoreAction(action, cards, icard, iface, rec=False):
         return 1
     return 0
 
-def scoreOption(option, cards, icard, iface, rec=False):
-    card = cards[icard]
+
+def score_option(option, cards, icard, iface, rec=False):
+    # card = cards[icard]
     value = 0
     for action in option:
-        value += scoreAction(action, cards, icard, iface, rec)
-    #if rec:
+        value += score_action(action, cards, icard, iface, rec)
+    # if rec:
     #    print(">>", option, value)
-    return value;
+    return value
 
 
-def scoreFace(cards, icard, iface, rec=False):
+def score_face(cards, icard, iface, rec=False):
     card = cards[icard]
-    valueAct = 0
+    value_act = 0
     for option in card[iface][1:]:
-        valueAct += scoreOption(option, cards, icard, iface, rec)
-    valueAct = float(valueAct)/len(card[iface][1:]) + len(card[iface][1:])/2.0
-    valuePass = scoreOption(card[iface][0], cards, icard, iface, rec)
-    value = valueAct + valuePass
-    #if rec:
+        value_act += score_option(option, cards, icard, iface, rec)
+    value_act = float(value_act)/len(card[iface][1:]) + len(card[iface][1:])/2.0
+    value_pass = score_option(card[iface][0], cards, icard, iface, rec)
+    value = value_act + value_pass
+    # if rec:
     #    print(card[iface], value)
-    return value;
+    return value
+
 
 def countDeck(cards):
     deck = 0
     for icard in range(len(cards)):
         value = 0
         for iface in range(len(cards[icard])):
-            value += scoreFace(cards, icard, iface, True)
+            value += score_face(cards, icard, iface, True)
         print(">>>>>> %f" % value)
         deck += value
     return deck
+
 
 print("paladin %f" % countDeck(paladin))
 print("archer %f" % countDeck(archer))
@@ -324,33 +335,40 @@ print("mix %f" % countDeck([
     paladin[4]
 ]))
 
-import itertools
 
 def findsubsets(s, n):
     return list(itertools.combinations(s, n))
 
-paladin = [("P-%d"%(i+1), paladin[i]) for i in range(len(paladin))]
-archer = [("A-%d"%(i+1), archer[i]) for i in range(len(archer))]
+
+paladin = [("P-%d" % (i+1), paladin[i]) for i in range(len(paladin))]
+archer = [("A-%d" % (i+1), archer[i]) for i in range(len(archer))]
 
 possibleDecks = findsubsets(paladin + archer, 5)
 print(len(possibleDecks))
 
+
 def get_cards(deck):
     return [card for (name, card) in deck]
 
+
 ranked = [(countDeck(get_cards(deck)), deck) for deck in possibleDecks]
+
 
 # sort list with key
 def takeFirst(elem):
-    (a,b) = elem
+    (a, b) = elem
     return a
+
+
 ranked.sort(key=takeFirst)
+
 
 def printDeck(deck):
     (point, cards) = deck
     print(point)
     for (name, faces) in cards:
         print(name)
+
 
 printDeck(ranked[0])
 printDeck(ranked[-1])
