@@ -1,6 +1,6 @@
 import all_cards
 
-deck = all_cards.paladin
+deck = all_cards.warrior
 
 
 def rotate_card_vertically(c):
@@ -55,12 +55,13 @@ def deck_changed(d, d_new):
     return d[1:] != d_new[1:]
 
 
-def push_card(d, p):
+def move_card(d, p):
+    ds_new = []
+    # TODO refactor method
     for i in range(len(d)-1):
-        if d[0][0].get("type") != d[i+1][0].get("type") and d[i+1][1][1].get("health") != 0:
-            d_new = deal_damage(d, i+1)
-        return d_new
-    return d
+        if d[0][0].get("type") != d[i+1][0].get("type") and d[i+1][1][1].get("life") != "exhausted":
+            ds_new.append = deal_damage(d, i+1)
+    return ds_new
 
 
 def rotate_top_vertical(d):
@@ -87,54 +88,83 @@ def top_card_to_bottom(d):
     return d_new
 
 
-def attack_card(d, n):
-    for i in range(n-1):
-        if d[0][0].get("type") != d[i+1][0].get("type") and d[i+1][1][0].get("health") != 0:
-            d_new = deal_damage(d, i+1)
-        return d_new
+def hit_card(d, n):
+    shield_found = False
+    ds_new = []
     for i in range(n-2):
         if d[i+1][1][0].get("shield") is not None:
-            d_new = use_shield(d, i+1)
-            return d_new
+            shield_found = True
+            ds_new.append = use_shield(d, i+1)
+    if not shield_found:
+        for i in range(n - 1):
+            if d[0][0].get("type") != d[i + 1][0].get("type") and d[i + 1][1][0].get("life") != "exhausted":
+                ds_new.append = deal_damage(d, i + 1)
+    return ds_new
 
 
 def victory_status(deck):
-    status_hero = []
-    status_monster = []
+    status_hero = 0
+    status_monster = 0
     for card in deck:
         if card[0].get("type") == "hero":
-            status_hero += card[0][1].get("health")
+            status_hero += card[0][1].get("life") != "exhausted"
         else:
-            status_monster += card[0][1].get("health")
+            status_monster += card[0][1].get("life") != "exhausted"
         if status_hero == 0:
             return "lost"
         if status_monster == 0:
             return "won"
 
 
-def play_card(deck):
+def delay_card(d, p):
+    pass
 
+
+def heal(d):
+    pass
+
+
+def maneuver(d):
+    pass
+
+
+def arrow_deck(d, n):
+    pass
+
+
+def play_card(deck):
+    status = []
     switcher = {
-        "attack": lambda d, n: attack_card(d, n),
-        "push": lambda d, p: push_card(d, p),
-        "rotate_vertical": lambda d, n: rotate_top_vertical(d)
+        "hit": lambda d, a, n: hit_card(d, n),
+        "arrow": lambda d, a, n: arrow_deck(d, a.split[1]),
+        "push*": lambda d, a, p: move_card(d, a.split[1], p),
+        "pull*": lambda d, a, p: move_card(d, a.split[1], -p),
+        "delay*": lambda d, a, p: delay_card(d, a.split[1], p),
+        "quicken*": lambda d, a, p: delay_card(d, a.split[1], -p),
+        "rotate": lambda d, a, n: rotate_top_vertical(d),
+        "heal": lambda d, a, n: heal(d),
+        "maneuver": lambda d, a, n: maneuver(d),
     }
     for i, row in enumerate(deck[0][1][1:]):
         for action in row:
-            deck_new = switcher.get(action[0])(deck, action[1])
-            status = victory_status(deck_new)
-            if status is None or deck_changed(deck, deck_new) or i == len(deck[0][1][1:]):  # deck changed or the last iteration anyway
-                try:
-                    deck_new = leftShift(deck)
-                    play_card(deck_new)
-                except RecursionError as re:
-                    pass
-    return deck_new, status
+            decks_new = switcher.get(action[0])(deck, action[0], action[1])
+            if decks_new:
+                for deck_new in decks_new:
+                    status = victory_status(deck_new)
+                    if status is None and \
+                            (deck_changed(deck, deck_new) or i == len(deck_new[0][1][1:])):
+                        # no win or defeat, deck changed, or it is the last iteration anyway
+                        try:
+                            deck_new = leftShift(deck_new)
+                            play_card(deck_new)
+                        except RecursionError as re:
+                            pass
+    return status
 
 
 def print_actions(deck):
     switcher = {
-        "attack": lambda d: leftShift(d[0][1]),
+        "hit": lambda d: leftShift(d[0][1]),
         "push": lambda d: d,
         "rotate_vertical": lambda d: d
     }
