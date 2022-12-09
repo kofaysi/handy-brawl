@@ -57,22 +57,33 @@ def deck_changed(d, d_new):
 
 def push_card(d, p):
     for i in range(len(d)-1):
-        if d[0][0][0] != d[i+1][0][0] and d[i+1][1][1][0][1] != 0:
+        if d[0][0].get("type") != d[i+1][0].get("type") and d[i+1][1][1].get("health") != 0:
             d_new = deal_damage(d, i+1)
         return d_new
     return d
 
 
 def rotate_top_vertical(d):
-    return d
+    d_new = d
+    d_new[0] = rotate_card_vertically(d[0])
+    return d_new
 
 
 def use_shield(d, i):
-    return d
+    d_new = d
+
+    switcher = {
+        "rotate_horizontally": lambda c: rotate_card_horizontally(c),
+        "do_nothing": lambda c: c
+    }
+
+    action = d[i][1][0].get("shield")
+    d_new[i] = switcher.get(action)(deck[i])
+    return d_new
 
 
 def top_card_to_bottom(d):
-    d_new = []
+    d_new = leftShift(d)
     return d_new
 
 
