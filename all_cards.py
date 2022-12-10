@@ -1,4 +1,4 @@
-warrior = [[  # card 1
+cards = [[  # card 1
     dict(name="warrior", type="hero", number=1),
     [
         dict(face="A", life="healthy", feature="light"),  # first one is always passive
@@ -107,9 +107,7 @@ warrior = [[  # card 1
         [("hit", 4)],
         [("quicken", 1)]
     ]
-]]
-
-ogre = [[  # card 6
+], [  # card 6
     dict(name="ogre", type="monster", number=6),
     [
         dict(face="A", life="healthy"),  # first one is always passive
@@ -184,9 +182,7 @@ ogre = [[  # card 6
         [("heal", None), ("heal", None), ("heal", None), ("rotate", None)],
         [("pull", 5)]
     ]
-]]
-
-ranger = [[
+], [
     dict(name="ranger", type="hero", number=10),
     [
         dict(face="A", life="healthy", trap=True),  # first one is always passive
