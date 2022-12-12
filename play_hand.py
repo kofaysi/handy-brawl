@@ -62,44 +62,47 @@ def deck_changed(d, d_new):
 
 
 def move(d, i, p):
-    if i > p:
-        d_new = d[:i+1] + d[i-1:p] + d[i] + d[p-1:]
-    else:
-        d_new = d[:p] + d[i] + d[p-1:i+1] + d[i-1:]
+    d_new = d
+    d_new[i] = d[p]
+    d_new[p] = d[i]
     return d_new
 
 
-def move_card(d, t, r):
+def move_card(d, a, r):
     ds_new = []
+    try:
+        t = a.split()[1]
+    except IndexError:
+        t = "any"
     m = None
     if r > 0:
-        for i in reversed(range(r-1)):
+        for i in reversed(range(1, r+1)):
             if t == "self":
-                if d[0][0].get("type") == d[i+1][0].get("type") and d[i+1][1][1].get("life") != "exhausted":
-                    m = i + 1
+                if d[0][0].get("type") == d[i][0].get("type") and d[i][1][1].get("life") != "exhausted":
+                    m = i
                     break
             elif t == "enemy":
-                if d[0][0].get("type") != d[i+1][0].get("type") and d[i+1][1][1].get("life") != "exhausted":
-                    m = i + 1
+                if d[0][0].get("type") != d[i][0].get("type") and d[i][1][1].get("life") != "exhausted":
+                    m = i
                     break
             else:
-                if d[i+1][1][1].get("life") != "exhausted":
-                    m = i+1
+                if d[i][1][1].get("life") != "exhausted":
+                    m = i
                     break
         ds_new.append(move(d, m, 1))
     elif r < 0:
-        for i in range(r-1):
+        for i in range(1, r+1):
             if t == "self":
-                if d[0][0].get("type") == d[i+1][0].get("type") and d[i+1][1][1].get("life") != "exhausted":
-                    m = i + 1
+                if d[0][0].get("type") == d[i][0].get("type") and d[i][1][1].get("life") != "exhausted":
+                    m = i
                     break
             elif t == "enemy":
-                if d[0][0].get("type") != d[i+1][0].get("type") and d[i+1][1][1].get("life") != "exhausted":
-                    m = i + 1
+                if d[0][0].get("type") != d[i][0].get("type") and d[i][1][1].get("life") != "exhausted":
+                    m = i
                     break
             else:
-                if d[i+1][1][1].get("life") != "exhausted":
-                    m = i + 1
+                if d[i][1][1].get("life") != "exhausted":
+                    m = i
                     break
         ds_new.append(move(d, m, len(d)))
     return ds_new
@@ -132,15 +135,18 @@ def top_card_to_bottom(d):
 def hit_card(d, n):
     shield_found = False
     ds_new = []
-    for i in range(1, n-1):
-        if d[i+1][1][0].get("reaction") == "shield":
+    for i in range(1, n+1):
+        if d[i][1][0].get("reaction") == "shield":
             shield_found = True
             ds_new.append(use_shield(d, i+1))
     if not shield_found:
-        for i in range(1, n):
+        for i in range(1, n+1):
             if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
                 ds_new.append(deal_damage(d, i))
-    return ds_new
+    if ds_new:
+        return ds_new
+    else:
+        return d
 
 
 def victory_status(deck):
@@ -148,20 +154,24 @@ def victory_status(deck):
     status_monster = 0
     for card in deck:
         if card[0].get("type") == "hero":
-            status_hero += card[0][1].get("life") != "exhausted"
+            status_hero += card[1][0].get("life") != "exhausted"
         else:
-            status_monster += card[0][1].get("life") != "exhausted"
+            status_monster += card[1][0].get("life") != "exhausted"
         if status_hero == 0:
             return "lost"
         if status_monster == 0:
             return "won"
 
 
-def delay_card(d, t, p):
+def delay_card(d, a, p):
+    try:
+        t = a.split()[1]
+    except IndexError:
+        t = "any"
     ds_new = []
     m = None
     for i in range(1, len(d)):
-        for j in range(1, abs(p)):
+        for j in range(1, abs(p)+1):
             if t == "self":
                 if d[0][0].get("type") == d[i][0].get("type"):  # and d[i][1][1].get("life") != "exhausted":
                     m = i
@@ -171,7 +181,7 @@ def delay_card(d, t, p):
             else:
                 # if d[i][1][1].get("life") != "exhausted":
                 m = i
-            end_position = m-np.signum(p)*j
+            end_position = m-np.sign(p)*j
             if len(d) >= end_position >= 1:
                 ds_new.append(move(d, m, end_position))
     return ds_new
@@ -188,7 +198,7 @@ def refresh(c):
 
 def heal_deck(d):
     ds_new = []
-    for i in range(1, len(d)):
+    for i in range(1, len(d)+1):
         if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") == "exhausted":
             d_new = d
             d_new[i] = refresh(d[i])
@@ -198,23 +208,32 @@ def heal_deck(d):
 
 def maneuver_deck(d):
     ds_new = []
-    for i in range(1, len(d)):
-        if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") == "healthy":
+    for i in range(1, len(d)+1):
+        if (d[0][0].get("type") == d[i][0].get("type") and
+                d[i][1][0].get("life") == d[i][2][0].get("life") and
+                d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "wounded" and
+                d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "exhausted" and
+                d[i][1][0].get("life") == "wounded" and d[i][2][0].get("life") == "exhausted"):
             d_new = d
             d_new[i] = rotate(d[i])
             ds_new.append(d_new)
     return ds_new
 
 
-def arrow_deck(d, n):
+def arrow_deck(d, a):
+    try:
+        t = a.split()[1]
+    except IndexError:
+        t = "single"
     ds_new = []
     m = len(d)
-    for i in range(m-2, m):
+    for i in range(m-2, m + 1):
         if d[0][0].get("type") != d[i][0].get("type") and d[i][0].get("reaction") != "shield":
             d_new = deal_damage(d, i)
-        if n == "double":
-            for j in range(m - 2, m):
+        if t == "double":
+            for j in range(m - 2, m + 1):
                 if j != i and d[0][0].get("type") != d[i][0].get("type") and d[i][0].get("reaction") != "shield":
+                    # TODO check, if enemy shield on earlier position can protect also
                     d_new = deal_damage(d_new, i)
         ds_new.append(d_new)
     return ds_new
@@ -226,11 +245,11 @@ def play_card(deck):
     status = []
     switcher = {
         "hit": lambda d, a, n: hit_card(d, n),
-        "arrow": lambda d, a, n: arrow_deck(d, a.split[1]),
-        "push*": lambda d, a, r: move_card(d, a.split[1], r),
-        "pull*": lambda d, a, r: move_card(d, a.split[1], -r),
-        "delay*": lambda d, a, p: delay_card(d, a.split[1], p),
-        "quicken*": lambda d, a, p: delay_card(d, a.split[1], -p),
+        "arrow": lambda d, a, n: arrow_deck(d, a),
+        "push": lambda d, a, r: move_card(d, a, r),
+        "pull": lambda d, a, r: move_card(d, a, -r),
+        "delay": lambda d, a, p: delay_card(d, a, p),
+        "quicken": lambda d, a, p: delay_card(d, a, -p),
         "rotate": lambda d, a, n: rotate_top(d),
         "heal": lambda d, a, n: heal_deck(d),
         "maneuver": lambda d, a, n: maneuver_deck(d),
@@ -239,8 +258,9 @@ def play_card(deck):
         for action in row:
             for deck_i in decks:
                 if i == 0:
-                    decks == []
-                decks.append(switcher.get(action[0])(deck_i, action[0], action[1]))
+                    decks = []
+                action_raw = action[0]
+                decks.append(switcher.get(action_raw.split()[0])(deck_i, action_raw, action[1]))
             if decks:
                 for deck_i in decks:
                     status = victory_status(deck_i)
