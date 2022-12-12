@@ -1,5 +1,5 @@
 import all_cards
-import numpy as np
+# import numpy as np
 
 deck_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 deck = []
@@ -61,11 +61,9 @@ def deck_changed(d, d_new):
     return d[1:] != d_new[1:]
 
 
-def move(d, i, p):
-    d_new = d
-    d_new[i] = d[p]
-    d_new[p] = d[i]
-    return d_new
+def move(d_m, i, p):
+    d_m[i], d_m[p] = d_m[p], d_m[i]
+    return d_m
 
 
 def move_card(d, a, r):
@@ -146,9 +144,10 @@ def hit_card(d, n):
     if ds_new:
         return ds_new
     else:
-        return d
+        return [d]  # ds_new.append(d)
 
 
+# noinspection PyShadowingNames
 def victory_status(deck):
     status_hero = 0
     status_monster = 0
@@ -181,12 +180,17 @@ def delay_card(d, a, p):
             else:
                 # if d[i][1][1].get("life") != "exhausted":
                 m = i
-            end_position = m-np.sign(p)*j
+            if p > 0:
+                end_position = m - p * j
+            else:
+                end_position = m + p * j
             if len(d) >= end_position >= 1:
-                ds_new.append(move(d, m, end_position))
+                d_new = move(d, m, end_position)
+                ds_new.append(d_new)
     return ds_new
 
 
+# noinspection PyShadowingNames
 def refresh(c):
     card_new = None
     for card in all_cards.cards:
@@ -254,15 +258,17 @@ def play_card(deck):
         "heal": lambda d, a, n: heal_deck(d),
         "maneuver": lambda d, a, n: maneuver_deck(d),
     }
+    decks_new = []
     for i, row in enumerate(deck[0][1][1:]):
         for action in row:
+            if decks_new:
+                decks = decks_new
+                decks_new = []
             for deck_i in decks:
-                if i == 0:
-                    decks = []
                 action_raw = action[0]
-                decks.append(switcher.get(action_raw.split()[0])(deck_i, action_raw, action[1]))
-            if decks:
-                for deck_i in decks:
+                decks_new.extend(switcher.get(action_raw.split()[0])(deck_i, action_raw, action[1]))
+            if decks_new:
+                for deck_i in decks_new:
                     status = victory_status(deck_i)
                     if status is None and \
                             (deck_changed(deck, deck_i) or i == len(deck[0][1][1:])):
