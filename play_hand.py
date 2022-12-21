@@ -55,7 +55,7 @@ def leftShift(tup, n=1):  # by default, the top card goes to the bottom of the d
 def deal_damage(d, i):
     if not check_cards_unique(d):
         pass
-    d_new = d
+    d_new = d[:]
     if d[i][1][0].get("life") == "healthy":
         expected_life = "wounded"
     else:
@@ -96,8 +96,6 @@ def swap(d, i, j):
         d[j:i] = leftShift(d[j:i], len(d[i:j]))
     return d
 
-    return d
-
 
 def move_card(d, a, r):
     if not check_cards_unique(d):
@@ -110,32 +108,32 @@ def move_card(d, a, r):
     m = None
     if r > 0:
         for i in reversed(range(1, r+1)):
-            if t == "self":
-                if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
-                    m = i
-                    break
-            elif t == "enemy":
-                if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
-                    m = i
-                    break
-            else:
-                if d[i][1][0].get("life") != "exhausted":
+            if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
+                if t == "self":
+                    if d[0][0].get("type") == d[i][0].get("type"):
+                        m = i
+                        break
+                elif t == "enemy":
+                    if d[0][0].get("type") != d[i][0].get("type"):
+                        m = i
+                        break
+                else:
                     m = i
                     break
         if m:
             ds_new.append(swap(d, m, 1))
     elif r < 0:
         for i in range(1, abs(r)+1):
-            if t == "self":
-                if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
-                    m = i
-                    break
-            elif t == "enemy":
-                if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
-                    m = i
-                    break
-            else:
-                if d[i][1][0].get("life") != "exhausted":
+            if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
+                if t == "self":
+                    if d[0][0].get("type") == d[i][0].get("type"):
+                        m = i
+                        break
+                elif t == "enemy":
+                    if d[0][0].get("type") != d[i][0].get("type"):
+                        m = i
+                        break
+                else:
                     m = i
                     break
         if m:
@@ -149,7 +147,7 @@ def move_card(d, a, r):
 def rotate_top(d):
     if not check_cards_unique(d):
         pass
-    d_new = d
+    d_new = d[:]
     d_new[0] = rotate(d[0])
     ds_new = [d_new]
     return ds_new
@@ -158,7 +156,7 @@ def rotate_top(d):
 def use_shield(d, i):
     if not check_cards_unique(d):
         pass
-    d_new = d
+    d_new = d[:]
 
     switcher = {
         "rotate": lambda c: rotate(c)
@@ -184,8 +182,10 @@ def hit_card(d, n):
         pass
     shield_found = False
     ds_new = []
+    if n == 0:  # substitute for the infinite hit range
+        n = len(d)-1
     for i in range(1, n+1):
-        if d[i][1][0].get("reaction") == "shield":
+        if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("reaction") == "shield":
             shield_found = True
             d_new = use_shield(d[:], i)
             if not check_cards_unique(d_new):
@@ -214,22 +214,17 @@ def get_unique_items(list):
 
 # noinspection PyShadowingNames
 def victory_status(deck):
-    status_hero = 0
-    status_monster = 0
+    status = dict(hero=0, monster=0)
     score = dict(healthy=1, wounded=0.5, exhausted=0)
     for card in deck:
         card_score = score.get(card[1][0].get("life"))
         if card[0].get("type") == "hero":
-            status_hero += card_score
+            temp_score = status.get("hero") + card_score
+            status.update(hero=temp_score)
         else:
-            status_monster += card_score
-    if status_monster == 0:
-        status = (status_hero - status_monster, "hero won, monster lost")
-    elif status_hero == 0:
-        status = (status_hero - status_monster, "hero lost, monster won")
-    else:
-        status = (status_hero - status_monster, None)
-    return status_hero, status_monster
+            temp_score = status.get("monster") + card_score
+            status.update(monster=temp_score)
+    return status
 
 
 def delay_card(d, a, p):
@@ -273,7 +268,7 @@ def heal_deck(d):
     ds_new = []
     for i in range(1, len(d)-1):
         if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") == "exhausted":
-            d_new = d
+            d_new = d[:]
             d_new[i] = refresh(d[i])
             ds_new.append(d_new)
             if not check_cards_unique(d_new):
@@ -288,11 +283,11 @@ def maneuver_deck(d):
     ds_new = []
     for i in range(1, len(d)+1):
         if (d[0][0].get("type") == d[i][0].get("type") and
-                d[i][1][0].get("life") == d[i][2][0].get("life") and
-                d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "wounded" and
-                d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "exhausted" and
-                d[i][1][0].get("life") == "wounded" and d[i][2][0].get("life") == "exhausted"):
-            d_new = d
+                (d[i][1][0].get("life") == d[i][2][0].get("life") or
+                 (d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "wounded") or
+                 (d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "exhausted") or
+                 (d[i][1][0].get("life") == "wounded" and d[i][2][0].get("life") == "exhausted"))):
+            d_new = d[:]
             d_new[i] = rotate(d[i])
             ds_new.append(d_new)
     return ds_new
@@ -365,8 +360,9 @@ def play_card(deck):
             decks_new_i = get_unique_items(decks_new_i[:])
             if len(decks_new_i) == 1:
                 pass
-            if len(decks_new_i) > 1 and deck in decks_new_i:
-                decks_new_i.remove(deck)
+            decks_new_i = [i for i in decks_new_i if i != deck]
+            if len(decks_new_i) == 0:
+                decks_new_i.append(deck)
         decks_new.extend(decks_new_i)
 
         for deck_i in decks_new:
@@ -375,13 +371,12 @@ def play_card(deck):
             else:
                 global_list.append(deck_i)
 
-
         if decks_new:
             for deck_i in decks_new:
-                stati = victory_status(deck_i)
+                status = victory_status(deck_i)
                 deck_i_id = get_deck_setup(deck_i)
                 deck_id = get_deck_setup(deck)
-                if (stati[0] != 0 and stati[1] != 0) and deck_changed(deck, deck_i):
+                if status.get("hero") != 0 and status.get("monster") != 0:
                     # no win or defeat, and deck changed, or it is the last action row iteration anyway
                     try:
                         deck_i = leftShift(deck_i)
@@ -390,10 +385,10 @@ def play_card(deck):
                         pass
                         # TODO correct the deck rotation by -1
                         deck_i_id = get_deck_setup(deck_i)
-                        print(stati, ":", deck_i_id)
+                        print(deck_i_id, ":", status, "recursion overflow")
                         # print("For deck", deck_i_id, "status:", status, "the max depth of recursion has been reached...")
-                elif stati[0] == 0 or stati[1] == 0:
-                    print(stati, ":", deck_i_id)
+                elif status.get("hero") == 0 or status.get("monster") == 0:
+                    print(deck_i_id, ":", status)
 
 
 def get_deck_setup(d):
