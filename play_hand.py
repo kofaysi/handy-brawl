@@ -85,20 +85,22 @@ def deck_changed(d, d_new):
     return d[1:] != d_new[1:]
 
 
-def swap(d, i, j):
+def move_card_to_position(d, i, j):
     if not check_cards_unique(d):
         pass
 #     d[i], d[j] = d[j], d[i]
     # # TODO check the code
     if i < j:
-        d[i:j] = leftShift(d[i:j])
+        d[i:j+1] = leftShift(d[i:j+1])
     else:
-        d[j:i] = leftShift(d[j:i], len(d[i:j]))
+        d[j:i+1] = leftShift(d[j:i+1], len(d[j:i+1])-1)
     return d
 
 
 def move_card(d, a, r):
     if not check_cards_unique(d):
+        pass
+    if get_deck_hash(d) == '7D3A8A4B9A5B1A6C2B':
         pass
     ds_new = []
     if ' ' in a:
@@ -106,38 +108,30 @@ def move_card(d, a, r):
     else:
         t = "any"
     m = None
-    if r > 0:
+    if r < 0:
         for i in reversed(range(1, r+1)):
+            m = None
             if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
-                if t == "self":
-                    if d[0][0].get("type") == d[i][0].get("type"):
-                        m = i
-                        break
-                elif t == "enemy":
-                    if d[0][0].get("type") != d[i][0].get("type"):
-                        m = i
-                        break
-                else:
+                if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
                     m = i
-                    break
-        if m:
-            ds_new.append(swap(d, m, 1))
-    elif r < 0:
+                elif t == "enemy" and d[0][0].get("type") != d[i][0].get("type"):
+                    m = i
+                elif t == "any":
+                    m = i
+            if m:
+                ds_new.append(move_card_to_position(d[:], m, 1))
+    elif r > 0:
         for i in range(1, abs(r)+1):
+            m = None
             if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
-                if t == "self":
-                    if d[0][0].get("type") == d[i][0].get("type"):
-                        m = i
-                        break
-                elif t == "enemy":
-                    if d[0][0].get("type") != d[i][0].get("type"):
-                        m = i
-                        break
-                else:
+                if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
                     m = i
-                    break
-        if m:
-            ds_new.append(swap(d[:], m, len(d)-1))
+                elif t == "enemy" and d[0][0].get("type") != d[i][0].get("type"):
+                    m = i
+                elif t == "any":
+                    m = i
+            if m:
+                ds_new.append(move_card_to_position(d[:], m, len(d)))
     if ds_new:
         return ds_new
     else:
@@ -198,11 +192,7 @@ def hit_card(d, n):
                 if not check_cards_unique(d_new):
                     pass
                 ds_new.append(d_new)
-    if ds_new:
-        return ds_new
-    else:
-        return [d]  # ds_new.append(d)
-
+    return ds_new
 
 def get_unique_items(list):
     unique = []
@@ -213,9 +203,13 @@ def get_unique_items(list):
 
 
 # noinspection PyShadowingNames
-def victory_status(deck):
-    status = dict(hero=0, monster=0)
+def get_status(deck_var):
+    status = dict(hero=0.0, monster=0.0)
     score = dict(healthy=1, wounded=0.5, exhausted=0)
+    if isinstance(deck_var, str):
+        deck = get_deck(deck_var[:])
+    else:
+        deck = deck_var[:]
     for card in deck:
         card_score = score.get(card[1][0].get("life"))
         if card[0].get("type") == "hero":
@@ -228,30 +222,33 @@ def victory_status(deck):
 
 
 def delay_card(d, a, p):
+    if get_deck_hash(d) == '3C8D1D2D9C5B6C4D7C':
+        pass
     if ' ' in a:
         t = a.split()[1]
     else:
         t = "any"
     ds_new = []
-    m = None
+    delay_range = range(1, abs(p)+1)
+    if p < 0:
+        delay_range = [-i for i in list(delay_range)]
     for i in range(1, len(d)):
-        for j in range(1, abs(p)+1):
+        for j in delay_range:
+            m = None
             if t == "self":
                 if d[0][0].get("type") == d[i][0].get("type"):  # and d[i][1][1].get("life") != "exhausted":
-                    m = i
+                    m = j
             elif t == "enemy":
                 if d[0][0].get("type") != d[i][0].get("type"):  # and d[i][1][1].get("life") != "exhausted":
-                    m = i
+                    m = j
             else:
                 # if d[i][1][1].get("life") != "exhausted":
-                m = i
-            if p > 0:
-                end_position = m + j
-            else:
-                end_position = m - j
-            if len(d) > end_position >= 1:
-                d_new = swap(d[:], m, end_position)
-                ds_new.append(d_new)
+                m = j
+            if m:
+                end_position = m + i
+                if len(d) > end_position >= 1:
+                    d_new = move_card_to_position(d[:], i, end_position)
+                    ds_new.append(d_new)
     return ds_new
 
 
@@ -336,66 +333,95 @@ def play_card(deck):
         "maneuver": lambda d, a, n: maneuver_deck(d),
     }
     decks_new = []
+    decks_new_i = []
     for i, row in enumerate(deck[0][1][1:]):
-        decks = [deck]
-        decks_new_i = []
+        # TODO monsters shall not run next row unless no results achieved in the first run
+        decks = [deck[:]]
         decks_new_j = []
         for j, action in enumerate(row):
-            if j > 0:
-                decks = decks_new
+            if j > 0 and decks_new_j:
+                decks = decks_new_j[:]
                 decks_new_j = []
             for deck_j in decks:
+                #deck_j_sign = get_deck_hash(deck_j)
                 if not check_cards_unique(deck_j):
                     pass
                 action_raw = action[0]
-                decks_new_j = switcher.get(action_raw.split()[0])(deck_j[:], action_raw, action[1])
-                if len(decks_new_j) == 9:
+                deck_j_hash = get_deck_hash(deck_j)
+                if deck_j_hash == '5D9C6C4D7C3D2C8D1C':
                     pass
-                for d in decks_new_j:
-                    if not check_cards_unique(d):
+                decks_new_j = switcher.get(action_raw.split()[0])(deck_j[:], action_raw, action[1])
+                duplicates = [deck for deck in decks_new_j if decks_new_j.count(deck) > 1]
+                if len(duplicates):
+                    pass
+                # for deck_new_j in decks_new_j:
+                #    deck_new_j[0].update("history") += int(''.join(deck_j_sign), 16)
+                # TODO allow None (no deck, the action had no effect, could not be validly executed) switcher output and deal with it accordingly
+                for deck_new_j in decks_new_j:
+                    deck_new_j_hash = get_deck_hash(deck_new_j)
+                    if deck_new_j_hash == '5D9C6C4D7C3D2C8D1C':
                         pass
-                decks_new_i.extend(decks_new_j)
+                    if not check_cards_unique(deck_new_j):
+                        pass
+            decks_new_j = get_unique_items(decks_new_j[:])
+            decks_new_j = [i for i in decks_new_j if deck_changed(i, deck)]
+            if len(decks_new_j) == 0:
+                decks_new_j.append(deck)
+        decks_new_i.extend(decks_new_j)
 
-            # remove duplicates and remove the original deck, if others could be created
-            decks_new_i = get_unique_items(decks_new_i[:])
-            if len(decks_new_i) == 1:
-                pass
-            decks_new_i = [i for i in decks_new_i if i != deck]
-            if len(decks_new_i) == 0:
-                decks_new_i.append(deck)
+        # remove duplicates and remove the original deck, if others could be created
+        decks_new_i = get_unique_items(decks_new_i[:])
+        decks_new_i = [i for i in decks_new_i if deck_changed(i, deck)]
+        if len(decks_new_i) == 0:
+            decks_new_i.append(deck)
         decks_new.extend(decks_new_i)
 
         for deck_i in decks_new:
-            if deck_i in global_list:
+            deck_i_hash = get_deck_hash(leftShift(deck_i[:]))
+            deck_hash = get_deck_hash(deck)
+            if deck_i_hash in global_decks_list:
                 decks_new.remove(deck_i)
             else:
-                global_list.append(deck_i)
+                global_decks_list[deck_i_hash] = deck_hash
 
         if decks_new:
             for deck_i in decks_new:
-                status = victory_status(deck_i)
-                deck_i_id = get_deck_setup(deck_i)
-                deck_id = get_deck_setup(deck)
+                deck_i = leftShift(deck_i)
+                status = get_status(deck_i)
+                deck_i_hash = get_deck_hash(deck_i)
+                deck_id = get_deck_hash(deck)
                 if status.get("hero") != 0 and status.get("monster") != 0:
                     # no win or defeat, and deck changed, or it is the last action row iteration anyway
                     try:
-                        deck_i = leftShift(deck_i)
                         play_card(deck_i)
                     except RecursionError as re:
                         pass
                         # TODO correct the deck rotation by -1
-                        deck_i_id = get_deck_setup(deck_i)
-                        print(deck_i_id, ":", status, "recursion overflow")
-                        # print("For deck", deck_i_id, "status:", status, "the max depth of recursion has been reached...")
+                        print(deck_i_hash, ":", status, "recursion overflow")
                 elif status.get("hero") == 0 or status.get("monster") == 0:
-                    print(deck_i_id, ":", status)
+                    print(deck_i_hash, ":", status, 'start deck:', get_game(deck_i_hash)[-1], 'length of game:', len(get_game(deck_i_hash)))
 
 
-def get_deck_setup(d):
+def get_deck_hash(d):
     d_id = []
     for card in d:
         d_id.append(str(card[0].get("number")) + card[1][0].get("face"))
-    return d_id
+    return ''.join(d_id)
+
+
+def get_game(d_hash):
+    game_hash = []
+    d_i_hash = d_hash[:]
+    key_found = True
+    game_hash.append(d_i_hash)
+    while key_found:
+        d_prev_hash = global_decks_list.get(d_i_hash)
+        if d_prev_hash:
+            game_hash.append(d_prev_hash)
+            d_i_hash = d_prev_hash[:-2] + d_prev_hash[-2:]
+        else:
+            key_found = False
+    return game_hash
 
 
 def print_actions(deck):
@@ -412,8 +438,9 @@ def print_actions(deck):
             return switcher.get(action[0])(deck)
 
 
-def get_deck(d_items):
+def get_deck(d_hash):
     deck = []
+    d_items = [d_hash[i:i + 2] for i in range(0, len(d_hash), 2)]
     for number_face in d_items:
         for card in all_cards.cards:
             number = int(number_face[:-1])
@@ -424,10 +451,10 @@ def get_deck(d_items):
     return deck
 
 
-deck_items = ["1A", "6A", "2A", "7A", "3A", "8A", "4A", "9A", "5A"]
-deck = get_deck(deck_items)
+deck_hash = '1A6A2A7A3A8A4A9A5A'
+deck = get_deck(deck_hash)
 
-global_list = []
+global_decks_list = dict()
 
 print(deck[0])
 play_card(deck)
