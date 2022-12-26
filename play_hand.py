@@ -374,7 +374,7 @@ def play_card(deck):
                 #    deck_new_j[0].update("history") += int(''.join(deck_j_sign), 16)
                 # TODO allow None (no deck, the action had no effect, could not be validly executed) switcher output and deal with it accordingly
                 for deck_new_j in decks_new_j:
-                    if get_deck_hash(deck_new_j) == '1C5D9C6C4D7C3D2C8D':
+                    if get_deck_hash(deck_new_j) == '9C2C3C4D6A7D8A5D1C':
                         pass
                     if not check_cards_unique(deck_new_j):
                         pass
