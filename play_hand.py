@@ -358,8 +358,7 @@ def play_card(deck):
                 #    deck_new_j[0].update("history") += int(''.join(deck_j_sign), 16)
                 # TODO allow None (no deck, the action had no effect, could not be validly executed) switcher output and deal with it accordingly
                 for deck_new_j in decks_new_j:
-                    deck_new_j_hash = get_deck_hash(deck_new_j)
-                    if deck_new_j_hash == '5D9C6C4D7C3D2C8D1C':
+                    if get_deck_hash(deck_new_j) == '1C5D9C6C4D7C3D2C8D':
                         pass
                     if not check_cards_unique(deck_new_j):
                         pass
@@ -376,23 +375,39 @@ def play_card(deck):
             decks_new_i.append(deck)
         decks_new.extend(decks_new_i)
 
+        decks_remove = []
         for deck_i in decks_new:
+            if get_deck_hash(deck_i) == '1C5D9C6C4D7C3D2C8D':
+                pass
             deck_i_hash = get_deck_hash(leftShift(deck_i[:]))
+            if deck_i_hash == '5D9C6C4D7C3D2C8D1C':
+                pass
             deck_hash = get_deck_hash(deck)
+            if get_deck_hash(deck_i[:]) == '1C5D9C6C4D7C3D2C8D':
+                pass
             if deck_i_hash in global_decks_list:
-                decks_new.remove(deck_i)
+                if deck_i_hash == '5D9C6C4D7C3D2C8D1C':
+                    pass
+                decks_remove.append(deck_i)
             else:
+                if deck_i_hash == '5D9C6C4D7C3D2C8D1C':
+                    pass
                 global_decks_list[deck_i_hash] = deck_hash
+
+        for deck_i in decks_remove:
+            decks_new.remove(deck_i)
 
         if decks_new:
             for deck_i in decks_new:
-                deck_i = leftShift(deck_i)
+                deck_i = leftShift(deck_i[:])
                 status = get_status(deck_i)
                 deck_i_hash = get_deck_hash(deck_i)
                 deck_id = get_deck_hash(deck)
                 if status.get("hero") != 0 and status.get("monster") != 0:
                     # no win or defeat, and deck changed, or it is the last action row iteration anyway
                     try:
+                        if get_deck_hash(deck_i) == '5D9C6C4D7C3D2C8D1C':
+                            pass
                         play_card(deck_i)
                     except RecursionError as re:
                         pass
