@@ -190,6 +190,8 @@ def hit_card(d, n):
     ds_new = []
     if n == 0:  # substitute for the infinite hit range
         n = len(d)-1
+    if n > len(d)-1:
+        n = len(d)-1
     for i in reversed(range(1, n+1)):
         if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("reaction") == "shield":
             shield_found = True
@@ -366,7 +368,7 @@ def play_card(deck):
                     pass
                 action_raw = action[0]
                 deck_j_hash = get_deck_hash(deck_j)
-                if deck_j_hash == '5D9C6C4D7C3D2C8D1C':
+                if deck_j_hash == '5B1A6C2B3A7A8B4D9C':
                     pass
                 decks_new_j = switcher.get(action_raw.split()[0])(deck_j[:], action_raw, action[1])
                 duplicates = [deck for deck in decks_new_j if decks_new_j.count(deck) > 1]
@@ -381,16 +383,16 @@ def play_card(deck):
                     if not check_cards_unique(deck_new_j):
                         pass
             decks_new_j = get_unique_items(decks_new_j[:])
-            decks_new_j = [i for i in decks_new_j if deck_changed(i, deck)]
-            if len(decks_new_j) == 0:
-                decks_new_j.append(deck)
+            # decks_new_j = [i for i in decks_new_j if deck_changed(i, deck) or j == len(row)]
+#            if len(decks_new_j) == 0:
+#                decks_new_j.append(deck)
         decks_new_i.extend(decks_new_j)
 
         # remove duplicates and remove the original deck, if others could be created
         decks_new_i = get_unique_items(decks_new_i[:])
-        decks_new_i = [i for i in decks_new_i if deck_changed(i, deck)]
-        if len(decks_new_i) == 0:
-            decks_new_i.append(deck)
+        # decks_new_i = [i for i in decks_new_i if deck_changed(i, deck)]
+        # if len(decks_new_i) == 0:
+        #    decks_new_i.append(deck)
         decks_new.extend(decks_new_i)
 
         decks_remove = []
@@ -433,7 +435,8 @@ def play_card(deck):
                         print(deck_i_hash, ":", status, "recursion overflow")
                 elif status.get("hero") == 0 or status.get("monster") == 0:
                     print(len(global_decks_list), ":", deck_i_hash, ":", status, 'start deck:', get_game(deck_i_hash)[-1], 'length of game:', len(get_game(deck_i_hash)))
-
+                    if status.get("monster") == 0:
+                        pass
 
 def get_deck_hash(d):
     d_id = []
@@ -485,12 +488,9 @@ def get_deck(d_hash):
 
 
 deck_hash = '1A6A2A7A3A8A4A9A5A'
+# deck_hash = '1A7A'
 deck = get_deck(deck_hash)
 
 global_decks_list = dict()
 
-print(deck[0])
 play_card(deck)
-
-new_card = flip(deck[0])
-print(new_card)
