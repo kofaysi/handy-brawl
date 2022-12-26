@@ -112,12 +112,17 @@ def move_card(d, a, r):
     if r < 0:
         for i in reversed(range(1, r+1)):
             m = None
-            if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
-                if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
+            if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
+                m = i
+            elif t == "enemy" and \
+                d[0][0].get("type") != d[i][0].get("type") and \
+                (d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy"):
+                m = i
+            elif t == "any":
+                if d[0][0].get("type") != d[i][0].get("type") and \
+                (d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy"):
                     m = i
-                elif t == "enemy" and d[0][0].get("type") != d[i][0].get("type"):
-                    m = i
-                elif t == "any":
+                elif d[0][0].get("type") == d[i][0].get("type"):
                     m = i
             if m:
                 ds_new.append(move_card_to_position(d[:], m, 1))
@@ -126,12 +131,14 @@ def move_card(d, a, r):
     elif r > 0:
         for i in range(1, abs(r)+1):
             m = None
-            if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
-                if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
+            if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
+                m = i
+            elif t == "enemy" and d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("feature") != "heavy":
+                m = i
+            elif t == "any":
+                if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("feature") != "heavy":
                     m = i
-                elif t == "enemy" and d[0][0].get("type") != d[i][0].get("type"):
-                    m = i
-                elif t == "any":
+                elif [0][0].get("type") == d[i][0].get("type"):
                     m = i
             if m:
                 ds_new.append(move_card_to_position(d[:], m, len(d)))
