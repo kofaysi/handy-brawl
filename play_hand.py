@@ -113,15 +113,21 @@ def move_card(d, a, r):
     if r < 0:
         for i in reversed(range(1, r+1)):
             m = None
-            if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
+            if d[i][1][0].get("feature") != "heavy":
                 if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
                     m = i
-                elif t == "enemy" and d[0][0].get("type") != d[i][0].get("type"):
+                elif t == "enemy" and \
+                        d[0][0].get("type") != d[i][0].get("type") and \
+                        d[i][1][0].get("life") != "exhausted":
                     m = i
-                elif t == "any":
+                elif t == "any" and \
+                        not (d[0][0].get("type") != d[i][0].get("type") and
+                             d[i][1][0].get("life") != "exhausted"):
                     m = i
             if m:
                 ds_new.append(move_card_to_position(d[:], m, 1))
+                if d[0][0].get("type") == "monster":
+                    break
     elif r > 0:
         for i in range(1, abs(r)+1):
             m = None
@@ -134,6 +140,8 @@ def move_card(d, a, r):
                     m = i
             if m:
                 ds_new.append(move_card_to_position(d[:], m, len(d)))
+                if d[0][0].get("type") == "monster":
+                    break
     if ds_new:
         return ds_new
     else:
@@ -180,13 +188,15 @@ def hit_card(d, n):
     ds_new = []
     if n == 0:  # substitute for the infinite hit range
         n = len(d)-1
-    for i in range(1, n+1):
+    for i in reversed(range(1, n+1)):
         if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("reaction") == "shield":
             shield_found = True
             d_new = use_shield(d[:], i)
             if not check_cards_unique(d_new):
                 pass
             ds_new.append(d_new)
+            if d[0][0].get("type") == "monster":
+                break
     if not shield_found:
         for i in range(1, n+1):
             if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
@@ -194,6 +204,8 @@ def hit_card(d, n):
                 if not check_cards_unique(d_new):
                     pass
                 ds_new.append(d_new)
+                if d[0][0].get("type") == "monster":
+                    break
     return ds_new
 
 def get_unique_items(list):
@@ -272,6 +284,8 @@ def heal_deck(d):
             ds_new.append(d_new)
             if not check_cards_unique(d_new):
                 pass
+            if d[0][0].get("type") == "monster":
+                break
     if ds_new:
         return ds_new
     else:
@@ -416,7 +430,7 @@ def play_card(deck):
                         # TODO correct the deck rotation by -1
                         print(deck_i_hash, ":", status, "recursion overflow")
                 elif status.get("hero") == 0 or status.get("monster") == 0:
-                    print(deck_i_hash, ":", status, 'start deck:', get_game(deck_i_hash)[-1], 'length of game:', len(get_game(deck_i_hash)))
+                    print(len(global_decks_list), ":", deck_i_hash, ":", status, 'start deck:', get_game(deck_i_hash)[-1], 'length of game:', len(get_game(deck_i_hash)))
 
 
 def get_deck_hash(d):
