@@ -83,7 +83,6 @@ def deck_changed(d, d_new):
         pass
     if not check_cards_unique(d_new):
         pass
-
     return d[1:] != d_new[1:]
 
 
@@ -113,16 +112,12 @@ def move_card(d, a, r):
     if r < 0:
         for i in reversed(range(1, r+1)):
             m = None
-            if d[i][1][0].get("feature") != "heavy":
+            if d[i][1][0].get("life") != "exhausted" or d[i][1][0].get("feature") != "heavy":
                 if t == "self" and d[0][0].get("type") == d[i][0].get("type"):
                     m = i
-                elif t == "enemy" and \
-                        d[0][0].get("type") != d[i][0].get("type") and \
-                        d[i][1][0].get("life") != "exhausted":
+                elif t == "enemy" and d[0][0].get("type") != d[i][0].get("type"):
                     m = i
-                elif t == "any" and \
-                        not (d[0][0].get("type") != d[i][0].get("type") and
-                             d[i][1][0].get("life") != "exhausted"):
+                elif t == "any":
                     m = i
             if m:
                 ds_new.append(move_card_to_position(d[:], m, 1))
@@ -278,7 +273,7 @@ def heal_deck(d):
         pass
     ds_new = []
     for i in range(1, len(d)-1):
-        if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") == "exhausted":
+        if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") == "wounded":
             d_new = d[:]
             d_new[i] = refresh(d[i])
             ds_new.append(d_new)
