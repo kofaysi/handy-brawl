@@ -61,8 +61,8 @@ def deal_damage(d, i):
     else:
         expected_life = "exhausted"
     for j in range(1, 5):
-        if deck[i][j][0].get("life") == expected_life:
-            expected_face = deck[i][j][0].get("face")
+        if d[i][j][0].get("life") == expected_life:
+            expected_face = d[i][j][0].get("face")
             break
     expected_card = rotate_card_to_face(d[i][:], expected_face)
     d_new[i] = expected_card
@@ -73,6 +73,8 @@ def deal_damage(d, i):
     #     d_new[i] = flip(d[i])
     # else:
     #    d_new[i] = rotate_flip(d[i])
+    if d == d_new:
+        pass
     return d_new
 
 
