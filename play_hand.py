@@ -1,5 +1,4 @@
 import all_cards
-# import numpy as np
 
 
 def rotate_card_to_face(c, f):
@@ -35,6 +34,7 @@ def leftShift(tup, n=1):  # by default, the top card goes to the bottom of the d
         return tuple()
     return tup[n:] + tup[0:n]
 
+
 # def push(hand_of_cards, card_to_push, steps_to_push):
 #     print()
 
@@ -53,9 +53,9 @@ def leftShift(tup, n=1):  # by default, the top card goes to the bottom of the d
 
 
 def deal_damage(d, i):
+    expected_face = ''
     if not check_cards_unique(d):
         pass
-    d_new = d[:]
     if d[i][1][0].get("life") == "healthy":
         expected_life = "wounded"
     else:
@@ -65,17 +65,9 @@ def deal_damage(d, i):
             expected_face = d[i][j][0].get("face")
             break
     expected_card = rotate_card_to_face(d[i][:], expected_face)
+    d_new = d[:]
     d_new[i] = expected_card
-    # test_card = rotate(d[i][:])
-    # if d[i][1][0].get("life") == "wounded":
-    #     d_new[i] = rotate(d[i])
-    # elif flip(d[i])[1][0].get("life") == "wounded":
-    #     d_new[i] = flip(d[i])
-    # else:
-    #    d_new[i] = rotate_flip(d[i])
-    if d == d_new:
-        pass
-    return d_new
+    return d_new  # if d != d_new else []
 
 
 def deck_changed(d, d_new):
@@ -89,12 +81,11 @@ def deck_changed(d, d_new):
 def move_card_to_position(d, i, j):
     if not check_cards_unique(d):
         pass
-#     d[i], d[j] = d[j], d[i]
-    # # TODO check the code
+    # TODO check the code
     if i < j:
-        d[i:j+1] = leftShift(d[i:j+1])
+        d[i:j + 1] = leftShift(d[i:j + 1])
     else:
-        d[j:i+1] = leftShift(d[j:i+1], len(d[j:i+1])-1)
+        d[j:i + 1] = leftShift(d[j:i + 1], len(d[j:i + 1]) - 1)
     return d
 
 
@@ -108,27 +99,29 @@ def move_card(d, a, r):
         t = a.split()[1]
     else:
         t = "any"
+    move_range = range(1, min(abs(r) + 1, len(d)))
     if r < 0:
-        move_range = reversed(range(1, abs(r) + 1))
-    else:
-        move_range = range(1, r + 1)
-        for i in move_range:
-            m = None
-            if (t == "self" or t == "any") and d[0][0].get("type") == d[i][0].get("type"):
-                m = i
-            elif (t == "enemy" or t == "any") and \
-                d[0][0].get("type") != d[i][0].get("type") and \
-                d[i][1][0].get("feature") != "heavy":
-                if r < 0 and d[i][1][0].get("life") != "exhausted":
-                    m = i
-            if m:
-                if r < 0:
-                    ds_new.append(move_card_to_position(d[:], m, 1))
-                if r > 0:
-                    ds_new.append(move_card_to_position(d[:], m, len(d)))
-                if d[0][0].get("type") == "monster":
-                    break
-    return ds_new
+        move_range = reversed(move_range)
+    for i in move_range:
+        if (
+                (t == "self" or t == "any") and
+                d[0][0].get("type") == d[i][0].get("type")
+        ) or (
+                (
+                        (
+                                (t == "enemy" or t == "any") and
+                                d[0][0].get("type") != d[i][0].get("type") and
+                                d[i][1][0].get("feature") != "heavy"
+                        ) and
+                        r < 0 and
+                        d[i][1][0].get("life") != "exhausted"
+                )
+        ):
+            end_position = 1 if r < 1 else len(d) - 1
+            ds_new.append(move_card_to_position(d[:], i, end_position))
+            if d[0][0].get("type") == "monster":
+                break
+    return ds_new if ds_new != d else []
 
 
 def rotate_top(d):
@@ -169,11 +162,9 @@ def hit_card(d, n):
         pass
     shield_found = False
     ds_new = []
-    if n == 0:  # substitute for the infinite hit range
-        n = len(d)-1
-    if n > len(d)-1:
-        n = len(d)-1
-    for i in reversed(range(1, n+1)):
+    if n == 0 or n > len(d) - 1:  # 0 is a substitute for the infinite hit range
+        n = len(d) - 1
+    for i in reversed(range(1, n + 1)):
         if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("reaction") == "shield":
             shield_found = True
             d_new = use_shield(d[:], i)
@@ -183,7 +174,7 @@ def hit_card(d, n):
             if d[0][0].get("type") == "monster":
                 break
     if not shield_found:
-        for i in range(1, n+1):
+        for i in range(1, n + 1):
             if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
                 d_new = deal_damage(d[:], i)
                 if not check_cards_unique(d_new):
@@ -193,9 +184,10 @@ def hit_card(d, n):
                     break
     return ds_new
 
-def get_unique_items(list):
+
+def get_unique_items(items):
     unique = []
-    for item in list:
+    for item in items:
         if item not in unique:
             unique.append(item)
     return unique
@@ -228,25 +220,21 @@ def delay_card(d, a, p):
     else:
         t = "any"
     ds_new = []
-    delay_range = range(1, abs(p)+1)
+    delay_range = list(range(1, abs(p) + 1))
     if p < 0:
-        delay_range = [-i for i in list(delay_range)]
+        delay_range = [-i for i in delay_range]
     for i in range(1, len(d)):
         for j in delay_range:
-            m = None
-            if t == "self":
-                if d[0][0].get("type") == d[i][0].get("type"):  # and d[i][1][1].get("life") != "exhausted":
-                    m = j
-            elif t == "enemy":
-                if d[0][0].get("type") != d[i][0].get("type"):  # and d[i][1][1].get("life") != "exhausted":
-                    m = j
-            else:
-                # if d[i][1][1].get("life") != "exhausted":
-                m = j
-            if m:
+            if (
+                    (t == "self" or t == "any") and
+                    d[0][0].get("type") == d[i][0].get("type")
+            ) or (
+                    (t == "enemy" or t == "any") and
+                    d[0][0].get("type") != d[i][0].get("type")
+            ):
                 if p < 0:
-                    m = -m
-                end_position = i + m
+                    j = -j
+                end_position = i + j
                 if len(d) > end_position >= 1:
                     d_new = move_card_to_position(d[:], i, end_position)
                     ds_new.append(d_new)
@@ -278,7 +266,7 @@ def heal_deck(d):
 
 def maneuver_deck(d):
     ds_new = []
-    for i in range(1, len(d)+1):
+    for i in range(1, len(d) + 1):
         if (d[0][0].get("type") == d[i][0].get("type") and
                 (d[i][1][0].get("life") == d[i][2][0].get("life") or
                  (d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "wounded") or
@@ -297,14 +285,15 @@ def arrow_deck(d, a):
         t = "single"
     ds_new = []
     m = len(d)
-    for i in range(m-2, m + 1):
+    d_new = []
+    for i in range(m - 2, m + 1):
         if d[0][0].get("type") != d[i][0].get("type") and d[i][0].get("reaction") != "shield":
             d_new = deal_damage(d, i)
-        if t == "double":
-            for j in range(m - 2, m + 1):
-                if j != i and d[0][0].get("type") != d[i][0].get("type") and d[i][0].get("reaction") != "shield":
-                    # TODO check, if enemy shield on earlier position can protect also
-                    d_new = deal_damage(d_new, i)
+            if t == "double":
+                for j in range(m - 2, m + 1):
+                    if j != i and d[0][0].get("type") != d[i][0].get("type") and d[i][0].get("reaction") != "shield":
+                        # TODO check, if enemy shield on earlier position can protect also
+                        d_new = deal_damage(d_new, i)
         ds_new.append(d_new)
     return ds_new
 
@@ -319,8 +308,6 @@ def check_cards_unique(d):
 
 
 def play_card(deck):
-    decks = [deck]
-    status = []
     switcher = {
         "hit": lambda d, a, n: hit_card(d, n),
         "arrow": lambda d, a, n: arrow_deck(d, a),
@@ -332,9 +319,8 @@ def play_card(deck):
         "heal": lambda d, a, n: heal_deck(d),
         "maneuver": lambda d, a, n: maneuver_deck(d),
     }
-    decks_new = []
     decks_new_i = []
-    decks_new_j_prev_nonchanged_rows = []
+    decks_new_j_prev_unchanged_rows = []
     for i, row in enumerate(deck[0][1][1:]):
         # TODO monsters shall not run next row unless no results achieved in the first run
         decks = [deck[:]]
@@ -344,7 +330,7 @@ def play_card(deck):
                 decks = decks_new_j[:]
                 decks_new_j = []
             for deck_j in decks:
-                #deck_j_sign = get_deck_hash(deck_j)
+                # deck_j_sign = get_deck_hash(deck_j)
                 if not check_cards_unique(deck_j):
                     pass
                 action_raw = action[0]
@@ -357,7 +343,8 @@ def play_card(deck):
                     pass
                 # for deck_new_j in decks_new_j:
                 #    deck_new_j[0].update("history") += int(''.join(deck_j_sign), 16)
-                # TODO allow None (no deck, the action had no effect, could not be validly executed) switcher output and deal with it accordingly
+                # TODO allow None (no deck, the action had no effect, could not be validly executed) switcher output and
+                # deal with it accordingly
                 for deck_new_j in decks_new_j:
                     if get_deck_hash(deck_new_j) == '9C2C3C4D6A7D8A5D1C':
                         pass
@@ -365,8 +352,8 @@ def play_card(deck):
                         pass
             decks_new_j = get_unique_items(decks_new_j[:])
             # decks_new_j = [i for i in decks_new_j if deck_changed(i, deck) or j == len(row)]
-#            if len(decks_new_j) == 0:
-#                decks_new_j.append(deck)
+        #            if len(decks_new_j) == 0:
+        #                decks_new_j.append(deck)
 
         decks_new_j_changed = [deck_changed(i, deck) for i in decks_new_j]
         if True in decks_new_j_changed:
@@ -376,10 +363,10 @@ def play_card(deck):
             if deck[0][0].get('type') == 'monster':
                 break
         else:
-            decks_new_j_prev_nonchanged_rows.extend(decks_new_j)
+            decks_new_j_prev_unchanged_rows.extend(decks_new_j)
             if i == len(deck[0][1][1:]) - 1:
                 if deck[0][0].get('type') == 'monster' or not decks_new_i:
-                    decks_new_i = get_unique_items(decks_new_j_prev_nonchanged_rows[:])
+                    decks_new_i = get_unique_items(decks_new_j_prev_unchanged_rows[:])
 
         # remove duplicates and remove the original deck, if others could be created
 
@@ -407,11 +394,16 @@ def play_card(deck):
                         print(deck_i_new_hash, ":", status, "recursion overflow")
                 elif status.get("hero") == 0 or status.get("monster") == 0:
                     game_deck_i_new = get_game(deck_i_new_hash)
-                    print(len(global_decks_list), ":", deck_i_new_hash, ":", status, 'start deck:', game_deck_i_new[-1], 'length of game:', len(game_deck_i_new)-1)
+                    print(len(global_decks_list), ":",
+                          deck_i_new_hash, ":",
+                          status,
+                          'start deck:', game_deck_i_new[-1],
+                          'length of game:', len(game_deck_i_new) - 1)
                     if status.get("monster") == 0:
                         pass
     else:
         pass
+
 
 def get_deck_hash(d):
     d_id = []
@@ -463,9 +455,9 @@ def get_deck(d_hash):
 
 
 # deck_hash = '1A6A2A7A3A8A4A9A5A'
-deck_hash = '1A6A2A8A'
-deck = get_deck(deck_hash)
+deck_hash = '1A6A2A8A3A'
+deck_start = get_deck(deck_hash)
 
 global_decks_list = dict()
 
-play_card(deck)
+play_card(deck_start)
