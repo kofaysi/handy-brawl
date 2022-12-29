@@ -27,7 +27,7 @@ def rotate_flip(c):
     return flip(rotate(c))
 
 
-def leftShift(tup, n=1):  # by default, the top card goes to the bottom of the deck
+def back_shift(tup, n=1):  # by default, the top card goes to the bottom of the deck
     try:
         n = n % len(tup)
     except ZeroDivisionError:
@@ -119,11 +119,10 @@ def move_deck(d, a, r):
 def move_card(d, i, j):
     if not check_cards_unique(d):
         pass
-    # TODO check the code
     if i < j:
-        d[i:j + 1] = leftShift(d[i:j + 1])
+        d[i:j + 1] = back_shift(d[i:j + 1])
     else:
-        d[j:i + 1] = leftShift(d[j:i + 1], len(d[j:i + 1]) - 1)
+        d[j:i + 1] = back_shift(d[j:i + 1], len(d[j:i + 1]) - 1)
     return d
 
 
@@ -266,12 +265,11 @@ def arrow_deck(d, a):
     m = len(d)
     d_new = []
     for i in range(m - 2, m + 1):
-        if d[0][0].get("type") != d[i][0].get("type") and d[i][0].get("reaction") != "shield":
+        if d[0][0].get("type") != d[i][0].get("type"):  # and d[i][0].get("reaction") != "shield":
             d_new = hit_card(d, i)
             if t == "double":
                 for j in range(m - 2, m + 1):
-                    if j != i and d[0][0].get("type") != d[i][0].get("type") and d[i][0].get("reaction") != "shield":
-                        # TODO check, if enemy shield on earlier position can protect also
+                    if j != i and d[0][0].get("type") != d[i][0].get("type"):  # and d[i][0].get("reaction") != "shield":
                         d_new = hit_card(d_new, i)
         ds_new.append(d_new)
     return ds_new
@@ -327,7 +325,6 @@ def play_card(deck):
     decks_new_i = []
     decks_new_j_prev_unchanged_rows = []
     for i, row in enumerate(deck[0][1][1:]):
-        # TODO monsters shall not run next row unless no results achieved in the first run
         decks = [deck[:]]
         decks_new_j = []
         for j, action in enumerate(row):
@@ -346,10 +343,6 @@ def play_card(deck):
                 duplicates = [deck for deck in decks_new_j if decks_new_j.count(deck) > 1]
                 if len(duplicates):
                     pass
-                # for deck_new_j in decks_new_j:
-                #    deck_new_j[0].update("history") += int(''.join(deck_j_sign), 16)
-                # TODO allow None (no deck, the action had no effect, could not be validly executed) switcher output and
-                # deal with it accordingly
                 for deck_new_j in decks_new_j:
                     if get_deck_hash(deck_new_j) == '9C2C3C4D6A7D8A5D1C':
                         pass
@@ -389,7 +382,7 @@ def play_card(deck):
 
     if decks_new:
         for deck_i in decks_new:
-            deck_i_new = leftShift(deck_i[:])
+            deck_i_new = back_shift(deck_i[:])
             deck_i_new_hash = get_deck_hash(deck_i_new)
             status = get_status(deck_i)
             if deck_i_new_hash not in global_decks_list and deck_i_new_hash != get_deck_hash(deck_start):
@@ -413,8 +406,10 @@ def play_card(deck):
         pass
 
 
-# deck_hash = '1A6A2A7A3A8A4A9A5A'
-deck_start_hash = '1A6A2A8A3A'
+# deck_start_hash = '1A6A2A7A3A8A4A9A5A'
+# deck_start_hash = '6A7A8A9A1A2A3A4A5A'
+deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+# deck_start_hash = '1A6A2A8A3A'
 deck_start = create_deck(deck_start_hash)
 
 global_decks_list = dict()
