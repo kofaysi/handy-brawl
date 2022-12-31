@@ -1,4 +1,5 @@
-import all_cards
+import cards
+import handybrawl
 
 
 def rotate_card_to_face(c, f):
@@ -21,10 +22,6 @@ def flip(c):
 
 def rotate(c):
     return [c[0], c[2], c[1], c[4], c[3]]
-
-
-def rotate_flip(c):
-    return flip(rotate(c))
 
 
 def back_shift(tup, n=1):  # by default, the top card goes to the bottom of the deck
@@ -286,7 +283,7 @@ def create_deck(d_hash):
     deck = []
     d_items = [d_hash[i:i + 2] for i in range(0, len(d_hash), 2)]
     for number_face in d_items:
-        for card in all_cards.cards:
+        for card in cards.cards:
             number = int(number_face[:-1])
             face = number_face[-1]
             if card[0].get("number") == number:
@@ -411,6 +408,8 @@ def play_card(deck):
 deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 # deck_start_hash = '1A6A2A8A3A'
 deck_start = create_deck(deck_start_hash)
+
+testdeck = handybrawl.create_deck(deck_start_hash)
 
 global_decks_list = dict()
 
