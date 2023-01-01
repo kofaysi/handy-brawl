@@ -140,6 +140,8 @@ def rotate_top_card(d):
 def hit_deck(d, n):
     if not check_cards_unique(d):
         pass
+    if get_deck_hash(d) == '6D5A9A2C':
+        pass
     shield_found = False
     ds_new = []
     if n == 0 or n > len(d) - 1:  # 0 is a substitute for the infinite hit range

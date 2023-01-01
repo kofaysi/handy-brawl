@@ -45,7 +45,11 @@ def play_card(deck):
                     pass
                 action_raw = action[0]
                 deck_j_hash = hb.get_deck_hash(deck_j)
-                if deck_j_hash == '6A8A2A1B':
+                if deck_j_hash == '9B2B6D5C':
+                    pass
+                if deck_j_hash == '2D6D5C9A':
+                    pass
+                if deck_j_hash == '6D5A9A2C':
                     pass
                 decks_new_j = switcher.get(action_raw.split()[0])(deck_j[:], action_raw, action[1])
                 duplicates = [deck for deck in decks_new_j if decks_new_j.count(deck) > 1]
@@ -127,5 +131,5 @@ decks_list = dict()
 play_card(deck_start)
 
 for key, value in decks_list.items():   # iter on both keys and values
-    if key.endswith('5A') or key.startswith('5A'):
+    if key.startswith('5C'):
         print(key, value)
