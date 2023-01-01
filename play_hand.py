@@ -1,5 +1,5 @@
 import cards
-import handybrawl
+import handybrawl as hb
 
 
 def rotate_card_to_face(c, f):
@@ -279,20 +279,21 @@ def get_deck_hash(d):
     return ''.join(d_id)
 
 
-def create_deck(d_hash):
-    deck = []
-    d_items = [d_hash[i:i + 2] for i in range(0, len(d_hash), 2)]
-    for number_face in d_items:
-        for card in cards.cards:
-            number = int(number_face[:-1])
-            face = number_face[-1]
-            if card[0].get("number") == number:
-                c_new = rotate_card_to_face(card[:], face)
-                deck.append(c_new)
-    return deck
+# def create_deck(d_hash):
+#     deck = []
+#     d_items = [d_hash[i:i + 2] for i in range(0, len(d_hash), 2)]
+#     for number_face in d_items:
+#         for card in cards.cards:
+#             number = int(number_face[:-1])
+#             face = number_face[-1]
+#             if card[0].get("number") == number:
+#                 c_new = rotate_card_to_face(card[:], face)
+#                 deck.append(c_new)
+#     return deck
 
 
 def recreate_game(d_hash):
+    global global_decks_list
     game_hash = []
     d_i_hash = d_hash[:]
     key_found = True
@@ -308,6 +309,7 @@ def recreate_game(d_hash):
 
 
 def play_card(deck):
+    global global_decks_list
     switcher = {
         "hit": lambda d, a, n: hit_deck(d, n),
         "arrow": lambda d, a, n: arrow_deck(d, a),
@@ -409,7 +411,7 @@ deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 # deck_start_hash = '1A6A2A8A3A'
 deck_start = create_deck(deck_start_hash)
 
-testdeck = handybrawl.create_deck(deck_start_hash)
+testdeck.create_deck(deck_start_hash)
 
 global_decks_list = dict()
 
