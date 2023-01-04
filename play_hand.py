@@ -108,6 +108,7 @@ def play_card(deck):
                           status,
                           'start deck:', game_deck_i_new[-1],
                           'length of game:', len(game_deck_i_new) - 1)
+                    # print("hb.rotate_card_to_face", ":", hb.rotate_card_to_face.call_count)
                     if status.get("monster") == 0:
                         pass
     else:
@@ -116,9 +117,9 @@ def play_card(deck):
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
-# deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 # deck_start_hash = '1A6A2A8A3A'
-deck_start_hash = '9b2b6d5c'
+# deck_start_hash = '9b2b6d5c'
 
 deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
 
