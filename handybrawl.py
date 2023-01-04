@@ -3,13 +3,18 @@ functions to manipulate the deck according to the Handy Brawl game project
 """
 
 
+import re
+
+
 class CountCalls:
     def __init__(self, func):
         self._count = 0
         self._func = func
-    def __call__( self, *args, **kwargs):
+
+    def __call__(self, *args, **kwargs):
         self._count += 1
-        return self._func(*args,**kwargs)
+        return self._func(*args, **kwargs)
+
     @property
     def call_count(self):
         return self._count
@@ -56,12 +61,9 @@ def back_shift(tup, n=1):  # by default, the top card goes to the bottom of the 
 
 @CountCalls
 def check_cards_unique(d):
-    for i1, c1 in enumerate(d):
-        for i2, c2 in enumerate(d):
-            if i1 != i2:
-                if c1[0].get("number") == c2[0].get("number"):
-                    return False
-    return True
+    d_hash = get_deck_hash(d)
+    d_numbers = re.sub(r"[a-zA-Z]+", ' ', d_hash).strip().split(' ')
+    return len(set(d_numbers)) == len(d)
 
 
 @CountCalls
@@ -164,13 +166,13 @@ def rotate_top_card(d):
 def hit_deck(d, n):
     if not check_cards_unique(d):
         pass
-    shield_found = False
+    # shield_found = False
     ds_new = []
     if n == 0 or n > len(d) - 1:  # 0 is a substitute for the infinite hit range
         n = len(d) - 1
     for i in reversed(range(1, n + 1)):
         if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("reaction") == "shield":
-            shield_found = True
+            # shield_found = True
             d_new = use_shield(d[:], i)
             if not check_cards_unique(d_new):
                 pass
@@ -318,13 +320,15 @@ def get_deck_hash(d):
 
 @CountCalls
 def create_deck(d_hash, cards):
-    deck = []
-    d_items = [d_hash[i:i + 2] for i in range(0, len(d_hash), 2)]
-    for number_face in d_items:
-        for card in cards:
-            number = int(number_face[:-1])
-            face = number_face[-1]
-            if card[0].get("number") == number:
-                c_new = rotate_card_to_face(card[:], face.upper())
-                deck.append(c_new)
+    d_numbers = re.sub(r"[a-zA-Z]+", ' ', d_hash).strip().split(' ')
+    d_numbers = [int(i) for i in d_numbers]
+    d_faces = re.sub(r"\d+", ' ', d_hash).strip().split(' ')
+    deck = [[]]*len(d_faces)
+    for card in cards:
+        try:
+            i = d_numbers.index(card[0].get("number"))
+            c_new = rotate_card_to_face(card[:], d_faces[i].upper())
+            deck[i] = c_new
+        except ValueError:
+            pass
     return deck
