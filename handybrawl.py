@@ -312,9 +312,7 @@ def arrow_deck(d, a):
 
 @CountCalls
 def get_deck_hash(d):
-    d_id = []
-    for card in d:
-        d_id.append(str(card[0].get("number")) + card[1][0].get("face"))
+    d_id = [str(card[0].get("number")) + card[1][0].get("face") for card in d]
     return ''.join(d_id)
 
 
