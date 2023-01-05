@@ -1,3 +1,6 @@
+"""
+List of all cards ordered by the number of the cards
+"""
 cards = [[  # card 1
     dict(name="warrior", type="hero", number=1),
     [
@@ -36,7 +39,7 @@ cards = [[  # card 1
         dict(face="C", life="exhausted"),
         [("quicken", 2)],
         [("delay", 2)]
-        
+
     ],
     [
         dict(face="D", life="wounded"),

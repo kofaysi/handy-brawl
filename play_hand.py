@@ -99,7 +99,7 @@ def play_card(deck):
                     # no win or defeat, and deck changed, or it is the last action row iteration anyway
                     try:
                         play_card(deck_i_new[:])
-                    except RecursionError as re:
+                    except RecursionError:
                         print(deck_i_new_hash, ":", status, "recursion overflow")
                 elif status.get("hero") == 0 or status.get("monster") == 0:
                     game_deck_i_new = recreate_game(deck_i_new_hash)

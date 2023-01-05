@@ -6,6 +6,22 @@ functions to manipulate the deck according to the Handy Brawl game project
 import re
 
 
+SUFFIXES = {1: 'st', 2: 'nd', 3: 'rd'}
+
+
+def ordinal(num):
+    """
+    https://codereview.stackexchange.com/questions/41298/producing-ordinal-numbers
+    """
+    # I'm checking for 10-20 because those are the digits that
+    # don't follow the normal counting scheme.
+    if 10 <= num % 100 <= 20:
+        suffix = 'th'
+    else:
+        # the second parameter is a default.
+        suffix = SUFFIXES.get(num % 10, 'th')
+    return str(num) + suffix
+
 class CountCalls:
     def __init__(self, func):
         self._count = 0
@@ -20,7 +36,7 @@ class CountCalls:
         return self._count
 
 
-@CountCalls
+# @CountCalls
 def rotate_card_to_face(c, f):
     c_new = c
     face_current = c_new[1][0].get("face")
@@ -35,22 +51,22 @@ def rotate_card_to_face(c, f):
     return c_new
 
 
-@CountCalls
+# @CountCalls
 def flip(c):
     return [c[0], c[3], c[4], c[1], c[2]]
 
 
-@CountCalls
+# @CountCalls
 def rotate(c):
     return [c[0], c[2], c[1], c[4], c[3]]
 
 
-@CountCalls
+# @CountCalls
 def rotate_flip(c):
     return flip(rotate(c))
 
 
-@CountCalls
+# @CountCalls
 def back_shift(tup, n=1):  # by default, the top card goes to the bottom of the deck
     try:
         n = n % len(tup)
@@ -59,14 +75,14 @@ def back_shift(tup, n=1):  # by default, the top card goes to the bottom of the 
     return tup[n:] + tup[0:n]
 
 
-@CountCalls
+# @CountCalls
 def check_cards_unique(d):
     d_hash = get_deck_hash(d)
     d_numbers = re.sub(r"[a-zA-Z]+", ' ', d_hash).strip().split(' ')
     return len(set(d_numbers)) == len(d)
 
 
-@CountCalls
+# @CountCalls
 def deck_changed(d, d_new):
     if not check_cards_unique(d):
         pass
@@ -75,7 +91,7 @@ def deck_changed(d, d_new):
     return d[1:] != d_new[1:]
 
 
-@CountCalls
+# @CountCalls
 def delay_deck(d, a, p):
     if get_deck_hash(d) == '1A6C2B3A7A9C8B4D5A':
         pass
@@ -105,7 +121,7 @@ def delay_deck(d, a, p):
     return ds_new
 
 
-@CountCalls
+# @CountCalls
 def move_deck(d, a, r):
     if not check_cards_unique(d):
         pass
@@ -141,7 +157,7 @@ def move_deck(d, a, r):
     return ds_new if ds_new != d else []
 
 
-@CountCalls
+# @CountCalls
 def move_card(d, i, j):
     if not check_cards_unique(d):
         pass
@@ -152,7 +168,7 @@ def move_card(d, i, j):
     return d
 
 
-@CountCalls
+# @CountCalls
 def rotate_top_card(d):
     if not check_cards_unique(d):
         pass
@@ -162,7 +178,7 @@ def rotate_top_card(d):
     return ds_new
 
 
-@CountCalls
+# @CountCalls
 def hit_deck(d, n):
     if not check_cards_unique(d):
         pass
@@ -191,7 +207,7 @@ def hit_deck(d, n):
     return ds_new
 
 
-@CountCalls
+# @CountCalls
 def use_shield(d, i):
     if not check_cards_unique(d):
         pass
@@ -209,7 +225,7 @@ def use_shield(d, i):
     return d_new
 
 
-@CountCalls
+# @CountCalls
 def hit_card(d, i):
     expected_face = ''
     if not check_cards_unique(d):
@@ -229,7 +245,7 @@ def hit_card(d, i):
 # noinspection PyShadowingNames
 
 
-@CountCalls
+# @CountCalls
 def heal_deck(d):
     if not check_cards_unique(d):
         pass
@@ -246,7 +262,7 @@ def heal_deck(d):
     return ds_new
 
 
-@CountCalls
+# @CountCalls
 def get_unique_items(items):
     unique = []
     for item in items:
@@ -255,7 +271,7 @@ def get_unique_items(items):
     return unique
 
 
-@CountCalls
+# @CountCalls
 def get_status(d, cards):
     status = dict(hero=0.0, monster=0.0)
     score = dict(healthy=1, wounded=0.5, exhausted=0)
@@ -275,7 +291,7 @@ def get_status(d, cards):
 # noinspection PyShadowingNames
 
 
-@CountCalls
+# @CountCalls
 def maneuver_deck(d):
     ds_new = []
     for i in range(1, len(d) + 1):
@@ -290,7 +306,7 @@ def maneuver_deck(d):
     return ds_new
 
 
-@CountCalls
+# @CountCalls
 def arrow_deck(d, a):
     try:
         t = a.split()[1]
@@ -299,34 +315,37 @@ def arrow_deck(d, a):
     ds_new = []
     m = len(d)
     d_new = []
+    # TODO: check out the requirement or conditions for the shield, when hitting a card with an arrow
     for i in range(m - 2, m + 1):
         if d[0][0].get("type") != d[i][0].get("type"):  # and d[i][0].get("reaction") != "shield":
             d_new = hit_card(d, i)
             if t == "double":
                 for j in range(m - 2, m + 1):
-                    if j != i and d[0][0].get("type") != d[i][0].get("type"):  # and d[i][0].get("reaction") != "shield":
+                    if j != i and d[0][0].get("type") != d[i][0].get("type"):
+                        # and d[i][0].get("reaction") != "shield":
                         d_new = hit_card(d_new, i)
         ds_new.append(d_new)
     return ds_new
 
 
-@CountCalls
+# @CountCalls
 def get_deck_hash(d):
     d_id = [str(card[0].get("number")) + card[1][0].get("face") for card in d]
     return ''.join(d_id)
 
 
-@CountCalls
+# @CountCalls
 def create_deck(d_hash, cards):
     d_numbers = re.sub(r"[a-zA-Z]+", ' ', d_hash).strip().split(' ')
     d_numbers = [int(i) for i in d_numbers]
     d_faces = re.sub(r"\d+", ' ', d_hash).strip().split(' ')
     deck = [[]]*len(d_faces)
-    for card in cards:
-        try:
-            i = d_numbers.index(card[0].get("number"))
-            c_new = rotate_card_to_face(card[:], d_faces[i].upper())
+    for i, number in enumerate(d_numbers):
+        if cards[number-1][0].get("number") == number:
+            c_new = rotate_card_to_face(cards[number-1][:], d_faces[i].upper())
             deck[i] = c_new
-        except ValueError:
-            pass
+        else:
+            print("Wrong card order definition in Cards")
+            print(f"The card listed as {ord(str(number))} displays number={cards[number-1][0].get('number')}")
+            return None
     return deck
