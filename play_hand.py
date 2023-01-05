@@ -4,18 +4,18 @@ import handybrawl as hb
 
 def recreate_game(d_hash):
     global decks_list
-    game_hash = []
+    game = []
     d_i_hash = d_hash[:]
     key_found = True
-    game_hash.append(d_i_hash)
+    game.append(d_i_hash)
     while key_found:
         d_prev_hash = decks_list.get(d_i_hash)
         if d_prev_hash:
-            game_hash.append(d_prev_hash)
+            game.append(d_prev_hash)
             d_i_hash = d_prev_hash[:-2] + d_prev_hash[-2:]
         else:
             key_found = False
-    return game_hash
+    return game
 
 
 def play_card(deck):
@@ -89,44 +89,75 @@ def play_card(deck):
         pass
 
     if decks_new:
+        global first_winner_length
+        global decks_list
+        global first_winner_hash
         for deck_i in decks_new:
             deck_i_new = hb.back_shift(deck_i[:])
             deck_i_new_hash = hb.get_deck_hash(deck_i_new)
             status = hb.get_status(deck_i, all_cards.cards)
             if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
                 decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
-                if status.get("hero") != 0 and status.get("monster") != 0:
+                game_deck_i_new = recreate_game(deck_i_new_hash)
+                if status.get("hero") != 0 \
+                        and status.get("monster") != 0 \
+                        and len(game_deck_i_new) <= 1 * first_winner_length \
+                        and not first_winner_hash:
                     # no win or defeat, and deck changed, or it is the last action row iteration anyway
                     try:
                         play_card(deck_i_new[:])
                     except RecursionError:
                         print(deck_i_new_hash, ":", status, "recursion overflow")
                 elif status.get("hero") == 0 or status.get("monster") == 0:
-                    game_deck_i_new = recreate_game(deck_i_new_hash)
-                    print(len(decks_list), ":",
-                          deck_i_new_hash, ":",
-                          status,
-                          'start deck:', game_deck_i_new[-1],
-                          'length of game:', len(game_deck_i_new) - 1)
+                    # game_deck_i_new = recreate_game(deck_i_new_hash)
+                    # print(len(decks_list), ":",
+                    #       deck_i_new_hash, ":",
+                    #       status,
+                    #       'start deck:', game_deck_i_new[-1],
+                    #       'length of game:', len(game_deck_i_new) - 1)
                     # print("hb.rotate_card_to_face", ":", hb.rotate_card_to_face.call_count)
                     if status.get("monster") == 0:
-                        pass
+                        print(len(decks_list), ":",
+                              deck_i_new_hash, ":",
+                              status,
+                              'start deck:', game_deck_i_new[-1],
+                              'length of game:', len(game_deck_i_new) - 1)
+                        if len(game_deck_i_new) < first_winner_length:
+                            first_winner_length = len(game_deck_i_new)
+                            first_winner_hash = deck_i_new_hash
     else:
         pass
 
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
-deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+deck_start_hash = '1A9A3A4A5A6A2A8A7A'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
 
 deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
 
-decks_list = dict()
+# decks_list = dict()
+# first_winner_length = 111
+# first_winner_hash = None
+#
+# play_card(deck_start)
 
-play_card(deck_start)
+from itertools import permutations
+from array import *
 
-for key, value in decks_list.items():   # iter on both keys and values
-    if key.endswith('5A') or key.startswith('5A'):
-        print(key, value)
+l = list(permutations(range(1, 10)))
+print(len(l))
+
+for i in l:
+    s = [str(j) for j in i]
+    deck_start_hash = 'A'.join(s) + 'A'
+    deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
+    decks_list = dict()
+    first_winner_length = 111
+    first_winner_hash = None
+    play_card(deck_start)
+#
+# for key, value in decks_list.items():  # iter on both keys and values
+#     if key.endswith('5A') or key.startswith('5A'):
+#         print(key, value)
