@@ -20,15 +20,15 @@ def recreate_game(d_hash):
 
 def play_card(deck):
     switcher = {
-        "hit": lambda d, a, n: hb.hit_deck(d, n),
-        "arrow": lambda d, a, n: hb.arrow_deck(d, a),
-        "push": lambda d, a, r: hb.move_deck(d, a, r),
-        "pull": lambda d, a, r: hb.move_deck(d, a, -r),
-        "delay": lambda d, a, p: hb.delay_deck(d, a, p),
-        "quicken": lambda d, a, p: hb.delay_deck(d, a, -p),
-        "rotate": lambda d, a, n: hb.rotate_top_card(d),
-        "heal": lambda d, a, n: hb.heal_deck(d),
-        "maneuver": lambda d, a, n: hb.maneuver_deck(d),
+        "hit": lambda d, a, n: hb.hit_deck(d, n),  # deck, action,
+        "arrow": lambda d, a, nt: hb.arrow_deck(d, a, nt),  # deck, action, number of targets
+        "push": lambda d, a, r: hb.move_deck(d, a, r),  # deck, action, range
+        "pull": lambda d, a, r: hb.move_deck(d, a, -r),  # deck, action, range
+        "delay": lambda d, a, p: hb.delay_deck(d, a, p),  # deck, action, by positions
+        "quicken": lambda d, a, p: hb.delay_deck(d, a, -p),  # deck, action, by positions
+        "rotate": lambda d, a, n: hb.rotate_top_card(d),  # deck
+        "heal": lambda d, a, n: hb.heal_deck(d),  # deck
+        "maneuver": lambda d, a, n: hb.maneuver_deck(d),  # deck
     }
     decks_new_i = []
     decks_new_j_prev_unchanged_rows = []
@@ -83,7 +83,7 @@ def play_card(deck):
     decks_new = hb.get_unique_items(decks_new_i[:])
 
     for deck_i in decks_new:
-        status_i = hb.get_status(deck_i, all_cards.cards)
+        status_i = hb.get_status(deck_i)
 
     if hb.get_deck_hash(deck) == '3B1A6B2A8B':
         pass
@@ -95,7 +95,7 @@ def play_card(deck):
         for deck_i in decks_new:
             deck_i_new = hb.back_shift(deck_i[:])
             deck_i_new_hash = hb.get_deck_hash(deck_i_new)
-            status = hb.get_status(deck_i, all_cards.cards)
+            status = hb.get_status(deck_i)
             if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
                 decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
                 game_deck_i_new = recreate_game(deck_i_new_hash)
