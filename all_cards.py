@@ -13,7 +13,7 @@ A face header contains the following keys
     shield : str (optional)
     reaction : str (optional)
 An action (str) consist of the action name (str) and specifier (int or str)
-The following action names are recognised
+The following action names are recognised (as expected at the end of the development)
     - hit
     - rotate
     - delay
@@ -54,7 +54,7 @@ cards = [[  # card 1
     [
         dict(face="C", life="exhausted"),
         [("hit", 2)],
-        [("delay", 1)]
+        [("delay", 2)]
     ],
     [
         dict(face="D", life="wounded"),

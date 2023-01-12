@@ -45,17 +45,22 @@ def play_card(deck):
                     pass
                 action_raw = action[0]
                 deck_j_hash = hb.get_deck_hash(deck_j)
-                if deck_j_hash == '6A8A2A1B':
+                if deck_j_hash == '1A2A3A4A6A7A5A8A9A':
                     pass
-                decks_new_j = switcher.get(action_raw.split()[0])(deck_j[:], action_raw, action[1])
-                duplicates = [deck for deck in decks_new_j if decks_new_j.count(deck) > 1]
-                if len(duplicates):
+                decks_new_j.extend(switcher.get(action_raw.split()[0])(deck_j[:], action_raw, action[1]))
+            duplicates = [deck for deck in decks_new_j if decks_new_j.count(deck) > 1]
+            if len(duplicates):
+                pass
+            for deck_new_j in decks_new_j:
+                if hb.get_deck_hash(deck_new_j) == '9C2C3C4D6A7D8A5D1C':
                     pass
-                for deck_new_j in decks_new_j:
-                    if hb.get_deck_hash(deck_new_j) == '9C2C3C4D6A7D8A5D1C':
-                        pass
-                    if not hb.check_cards_unique(deck_new_j):
-                        pass
+                if not hb.check_cards_unique(deck_new_j):
+                    pass
+            # print(hb.get_deck_hash(deck_j))
+            # if decks_new_j:
+            #    for d in decks_new_j:
+            #        print(hb.get_deck_hash(d))
+            pass
             decks_new_j = hb.get_unique_items(decks_new_j[:])
             # decks_new_j = [i for i in decks_new_j if deck_changed(i, deck) or j == len(row)]
         #            if len(decks_new_j) == 0:
@@ -131,20 +136,20 @@ def play_card(deck):
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
-deck_start_hash = '1A9A3A4A5A6A2A8A7A'
+deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+# deck_start_hash = '1C6C2D7A8A3C5D4D9C'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
 
 deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
 
-# decks_list = dict()
-# first_winner_length = 111
-# first_winner_hash = None
-#
-# play_card(deck_start)
+decks_list = dict()
+first_winner_length = 111
+first_winner_hash = None
+
+play_card(deck_start)
 
 from itertools import permutations
-from array import *
 
 l = list(permutations(range(1, 10)))
 print(len(l))
