@@ -52,7 +52,7 @@ def play_card(deck):
                 if deck_j_hash == '9A1C3A4B2A5A7A6C8A':
                     pass
                 switcher_action = action[0].split()[0]
-                decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
+                decks_new_j = switcher.get(switcher_action)(deck_j[:], action[0], action[1])
             decks_new_j = hb.get_unique_items(decks_new_j[:])
 
         # collect deck_changed bools
@@ -83,8 +83,7 @@ def play_card(deck):
     decks_new = hb.get_unique_items(decks_new_i[:])
 
     # sort results by their decreasing her status, and increasing monster status
-    for deck_i in decks_new:
-        status_i = hb.get_status(deck_i)
+    decks_new.sort(key=lambda d: (hb.get_status(d).get("hero"), -hb.get_status(d).get("monster")), reverse=True)
 
     if hb.get_deck_hash(deck) == '3B1A6B2A8B':
         pass
