@@ -1,5 +1,6 @@
 import all_cards
 import handybrawl as hb
+from itertools import permutations
 
 
 def recreate_game(d_hash):
@@ -21,63 +22,57 @@ def recreate_game(d_hash):
 def play_card(deck):
     switcher = {
         "hit": lambda d, a, n: hb.hit_deck(d, n),  # deck, action,
-        "arrow": lambda d, a, nt: hb.arrow_deck(d, a, nt),  # deck, action, number of targets
         "push": lambda d, a, r: hb.move_deck(d, a, r),  # deck, action, range
         "pull": lambda d, a, r: hb.move_deck(d, a, -r),  # deck, action, range
         "delay": lambda d, a, p: hb.delay_deck(d, a, p),  # deck, action, by positions
         "quicken": lambda d, a, p: hb.delay_deck(d, a, -p),  # deck, action, by positions
         "rotate": lambda d, a, n: hb.rotate_top_card(d),  # deck
         "heal": lambda d, a, n: hb.heal_deck(d),  # deck
+        "arrow": lambda d, a, nt: hb.arrow_deck(d, a, nt),  # deck, action, number of targets
         "maneuver": lambda d, a, n: hb.maneuver_deck(d),  # deck
     }
     decks_new_i = []
-    decks_new_j_prev_unchanged_rows = []
+    decks_new_i_prev_unchanged_rows = []
     for i, row in enumerate(deck[0][1][1:]):
         decks = [deck[:]]
         decks_new_j = []
         for j, action in enumerate(row):
-            if j > 0 and decks_new_j:
-                decks = decks_new_j[:]
-                decks_new_j = []
+            if deck[0][0].get("type") == "hero":
+                # for the hero, it is allowed not make some actions,
+                # we will drop decks which have not changed at the end of the action row
+                decks.extend(decks_new_j[:])
+            else:
+                # the monster shall make all the available actions
+                if decks_new_j:
+                    decks = decks_new_j[:]
+                # else decks have not changed by the previous action and are going to suffer the next action
             for deck_j in decks:
-                # deck_j_sign = get_deck_hash(deck_j)
-                if not hb.check_cards_unique(deck_j):
-                    pass
-                action_raw = action[0]
+                # debug test
                 deck_j_hash = hb.get_deck_hash(deck_j)
-                if deck_j_hash == '1A2A3A4A6A7A5A8A9A':
+                if deck_j_hash == '9A1C3A4B2A5A7A6C8A':
                     pass
-                decks_new_j.extend(switcher.get(action_raw.split()[0])(deck_j[:], action_raw, action[1]))
-            duplicates = [deck for deck in decks_new_j if decks_new_j.count(deck) > 1]
-            if len(duplicates):
-                pass
-            for deck_new_j in decks_new_j:
-                if hb.get_deck_hash(deck_new_j) == '9C2C3C4D6A7D8A5D1C':
-                    pass
-                if not hb.check_cards_unique(deck_new_j):
-                    pass
-            # print(hb.get_deck_hash(deck_j))
-            # if decks_new_j:
-            #    for d in decks_new_j:
-            #        print(hb.get_deck_hash(d))
-            pass
+                switcher_action = action[0].split()[0]
+                decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
             decks_new_j = hb.get_unique_items(decks_new_j[:])
-            # decks_new_j = [i for i in decks_new_j if deck_changed(i, deck) or j == len(row)]
-        #            if len(decks_new_j) == 0:
-        #                decks_new_j.append(deck)
 
-        decks_new_j_changed = [hb.deck_changed(i, deck) for i in decks_new_j]
-        if True in decks_new_j_changed:
-            decks_new_j = [deck_new_j for i, deck_new_j in enumerate(decks_new_j) if decks_new_j_changed[i]]
+        # collect deck_changed bools
+        decks_new_j_changed = [hb.deck_changed(d, deck) for d in decks_new_j]
+        # decks_new_i = [m for m in decks_new_j if hb.deck_changed(m, deck)]
+
+        # if any deck changed
+        if any(decks_new_j_changed):
+            if not all(decks_new_j_changed):
+                decks_new_j = [deck_new_j for m, deck_new_j in enumerate(decks_new_j) if decks_new_j_changed[m]]
             decks_new_i.extend(decks_new_j)
             decks_new_i = hb.get_unique_items(decks_new_i[:])
             if deck[0][0].get('type') == 'monster':
                 break
+        # all the decks stale, no new deck show new configuration
         else:
-            decks_new_j_prev_unchanged_rows.extend(decks_new_j)
-            if i == len(deck[0][1][1:]) - 1:
-                if deck[0][0].get('type') == 'monster' or not decks_new_i:
-                    decks_new_i = hb.get_unique_items(decks_new_j_prev_unchanged_rows[:])
+            decks_new_i_prev_unchanged_rows.extend(decks_new_j)
+        # if the last row has been reached
+        if i == len(deck[0][1][1:]) - 1 and not decks_new_i:
+            decks_new_i = hb.get_unique_items(decks_new_i_prev_unchanged_rows[:])
 
         # remove duplicates and remove the original deck, if others could be created
 
@@ -87,6 +82,7 @@ def play_card(deck):
 
     decks_new = hb.get_unique_items(decks_new_i[:])
 
+    # sort results by their decreasing her status, and increasing monster status
     for deck_i in decks_new:
         status_i = hb.get_status(deck_i)
 
@@ -106,7 +102,7 @@ def play_card(deck):
                 game_deck_i_new = recreate_game(deck_i_new_hash)
                 if status.get("hero") != 0 \
                         and status.get("monster") != 0 \
-                        and len(game_deck_i_new) <= 1 * first_winner_length \
+                        and len(game_deck_i_new) <= 1.5 * first_winner_length \
                         and not first_winner_hash:
                     # no win or defeat, and deck changed, or it is the last action row iteration anyway
                     try:
@@ -149,13 +145,11 @@ first_winner_hash = None
 
 play_card(deck_start)
 
-from itertools import permutations
+lst = list(permutations(range(1, 10)))
+print(len(lst))
 
-l = list(permutations(range(1, 10)))
-print(len(l))
-
-for i in l:
-    s = [str(j) for j in i]
+for k in lst:
+    s = [str(j) for j in k]
     deck_start_hash = 'A'.join(s) + 'A'
     deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
     decks_list = dict()

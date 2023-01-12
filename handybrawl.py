@@ -210,11 +210,11 @@ def move_deck(d, a, r):
     Game rules applicable:
     (all needs rewording)
     hero:
-        Pull: Move the closest enemy card in range X to the bottom of the deck. (needs rewording)
-        Push: Move the furthest card in range X behind the active card.
+        Pull: Move the furthest card in range X behind the active card.
+        Push: Move the closest enemy card in range X to the bottom of the deck. (needs rewording)
     monster:
-        Push Move the furthest card in range X behind the active card. Don't target enemy cards. (needs rewording)
-        Pull: Move the closest enemy card in range to the bottom of the deck.
+        Pull: Move the furthest card in range X behind the active card. Don't target enemy cards. (needs rewording)
+        Push: Move the closest enemy card in range to the bottom of the deck.
 
     :param d:
     :param a:
@@ -238,24 +238,21 @@ def move_deck(d, a, r):
                 (t == "ally" or t == "any") and
                 d[0][0].get("type") == d[i][0].get("type")
         ) or (
-                (
-                        (
-                                (t == "enemy" or t == "any") and
-                                d[0][0].get("type") != d[i][0].get("type") and
-                                # Game rules applicable:
-                                # Feature: Heavy
-                                # Card with this feature cannot be moved by any enemy action.
-                                d[i][1][0].get("feature") != "heavy"
-                        ) and
-                        r < 0 and
-                        d[i][1][0].get("life") != "exhausted"
-                )
+                    (
+                            (t == "enemy" or t == "any") and
+                            d[0][0].get("type") != d[i][0].get("type") and
+                            # Heavy card cannot be moved by any enemy action.
+                            d[i][1][0].get("feature") != "heavy"
+                    ) and
+                    # do not pull exhausted enemies
+                    not (r < 0 and
+                         d[i][1][0].get("life") != "exhausted")
         ):
             end_position = 1 if r < 1 else len(d) - 1
             ds_new.append(move_card(d[:], i, end_position))
             if d[0][0].get("type") == "monster":
                 break
-    return ds_new if ds_new != d else []
+    return ds_new if ds_new != [d] else []
 
 
 # @CountCalls
@@ -264,8 +261,8 @@ def move_card(d, i, j):
     move the i-th card to the j-th position in the deck, shift the cards inbetween
 
     Game rules applicable:
-        Pull: Move the closest enemy card in range X to the bottom of the deck. Move the furthest card in range X behind the active card.
-        Push:
+        Pull: Move the closest enemy card in range X to the bottom of the deck.
+        Push: Move the furthest card in range X behind the active card.
 
     :param d: the current deck
     :param i: the i-the card to be moved
@@ -451,7 +448,8 @@ def heal_card(c):
 # @CountCalls
 def get_unique_items(lst) -> "list":
     """
-    get unique items out of the lst (list)
+    Get unique items out of the lst (list).
+
     :param lst: a list of items possibly containing duplicates
     :return: a list of unique items
     """
