@@ -45,7 +45,7 @@ def rotate_card_to_face(c, f):
 # @CountCalls
 def flip(c):
     """
-    Flip the card, back side becomes the front and front side becomes the back (backflip)
+    Flip the card, back side becomes the front and front side becomes the back (back-flip)
 
     Game rules applicable:
         Flip: Flip this card along the long edge.
@@ -284,7 +284,8 @@ def rotate_top_card(d, i=0):
     rotate() the i-th card in the deck, default is the top card (i=0)
 
     Game rules applicable:
-        Rotate: Rotate this card 180° without changing the side. This action is mandatory. (rewording) This action cannot be skipped.
+        Rotate: Rotate this card 180° without changing the side. This action is mandatory.
+        (rewording) This action cannot be skipped.
 
     :param d: the current deck
     :param i: the i-th card in the deck
@@ -350,7 +351,9 @@ def use_shield(d, i):
         If in range of you MAY intercept and negate the damage. If you do so, activate all icons after the arrow.
     monster:
         Reaction: Block (reword or use a different icon)
-        If in range of targeting an ally card, intercept and negate the damage. If you do so, activate all icons after the arrow. If multiple BLOCKS available, use the furthest.
+        If in range of targeting an ally card, intercept and negate the damage.
+        If you do so, activate all icons after the arrow.
+        If multiple BLOCKS available, use the furthest.
 
     :param d: the current deck
     :param i: the i-th card
@@ -384,7 +387,7 @@ def hit_card(d, i):
     monster:
         Hit: Damage closest non-[empty heart] (unexhausted) enemy card in range X.
 
-    :param d: the currect deck
+    :param d: the current deck
     :param i: the i-the card in the deck [0, 1...]
     :return: new deck (single)
     """
@@ -532,7 +535,8 @@ def arrow_deck(d, t=1, end=3):
             d_new = hit_card(d, i)
             if t == 2:
                 for j in range(m - end - 1, m + 1):
-                    if j != i and d[0][0].get("type") != d[i][0].get("type"):  # and d[i][0].get("reaction") != "shield":
+                    if j != i and d[0][0].get("type") != d[i][0].get("type"):
+                        # and d[i][0].get("reaction") != "shield":
                         d_new = hit_card(d_new, i)
         ds_new.append(d_new)
     return ds_new
@@ -541,7 +545,8 @@ def arrow_deck(d, t=1, end=3):
 # @CountCalls
 def get_deck_hash(d):
     """
-    Create a unique string identifying the deck consisting of numbers and faces in the order of the cards appearing in the deck.
+    Create a unique string identifying the deck.
+    The string consists of numbers and faces in the order of the cards appearing in the deck.
 
     :param d: the deck
     :return: the hash (str)
@@ -598,7 +603,8 @@ Game rules applicable:
 # def set_ablaze:
 """
 Game rules applicable:
-    Set ablaze: Choose 2 different cards that was used to pay the Condition: Fire Cost cost and damage all cards in between them.
+    Set ablaze: Choose 2 different cards that was used to pay the cost and damage all cards in between them.
+    Condition: Fire Cost
 """
 
 """
@@ -616,7 +622,8 @@ rewording: ...in the deck -> ...on the top of the deck
 # def inspire(d):
 """
 Game rules applicable:
-    Inspire: Activate other closest ally card from the middle of the deck. Treat all the cards above it as if they didn't exist.
+    Inspire: Activate other closest ally card from the middle of the deck.
+        Treat all the cards above it as if they didn't exist.
 """
 
 
@@ -628,17 +635,23 @@ Game rules applicable:
 
 """
 Condition: Spider Swarm
-If the top card of the deck is a ally and a continuous group of 1+ Spider Swarm cards is positioned directly behind it, activate all SPIDER SWARM rows of cards in that group starting from the most distant one and continuing towards the top of the deck, before you activate the top card of the deck in a normal manner. (Don't activate a SPIDER SWARM row of a top card of the deck).
+If the top card of the deck is a ally and a continuous group of 1+ Spider Swarm cards is positioned directly behind it
+    Activate all SPIDER SWARM rows of cards in that group starting from the most distant one
+    Continue towards the top of the deck, before you activate the top card of the deck in a normal manner.
+    (Don't activate a SPIDER SWARM row of a top card of the deck).
 
 Feature: Venom
-Prevents an enemy card directly in front of this card from performing actions that change cards position: DELAY, QUICKEN, TELEPORT. Feature: Webs
-Feature: Sticky web: (missing name) 
-Prevents an enemy card directly in front of this card from performing actions that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
+Prevents an enemy card directly in front of this card from performing actions that change cards position:
+    DELAY, QUICKEN, TELEPORT. Feature: Webs
+Feature: Sticky web: (missing name) Prevents an enemy card directly in front of this card from performing actions
+    that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
 """
 
 """
 Reaction: Block
-If in range of targeting an ally card, intercept and negate the damage. If you do so, activate all icons after the arrow. If multiple BLOCKS available, use the furthest.
+    If in range of targeting an ally card, intercept and negate the damage. 
+    If you do so, activate all icons after the arrow. 
+    If multiple BLOCKS available, use the furthest.
 """
 
 # def teleport(d):
