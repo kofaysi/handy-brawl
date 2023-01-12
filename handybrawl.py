@@ -574,8 +574,14 @@ def create_deck(d_hash, cards):
             deck[i] = c_new
         else:
             print("Wrong card order definition in Cards")
-            print(f"The card listed as {ord(str(number))} displays number={cards[number - 1][0].get('number')}")
-            return None
+            print(f"The card listed as {str(number)} displays number={cards[number - 1][0].get('number')}")
+            for card in cards:
+                if card[0].get("number") == number:
+                    c_new = rotate_card_to_face(card[:], d_faces[i].upper())
+                    deck[i] = c_new
+            else:
+                print(f"The card number {str(number)} couldn't be found in the card list.")
+                return None
     return deck
 
 
