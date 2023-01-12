@@ -157,6 +157,10 @@ for i in l:
     first_winner_length = 111
     first_winner_hash = None
     play_card(deck_start)
+    print(len(decks_list))
+
+pass
+
 #
 # for key, value in decks_list.items():  # iter on both keys and values
 #     if key.endswith('5A') or key.startswith('5A'):
