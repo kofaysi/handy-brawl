@@ -49,11 +49,13 @@ def play_card(deck):
             for deck_j in decks:
                 # debug test
                 deck_j_hash = hb.get_deck_hash(deck_j)
-                if deck_j_hash == '9A1C3A4B2A5A7A6C8A':
+                if deck_j_hash == '5A6D7A9A8A1B4A2A3B':
                     pass
                 switcher_action = action[0].split()[0]
                 decks_new_j = switcher.get(switcher_action)(deck_j[:], action[0], action[1])
-            decks_new_j = hb.get_unique_items(decks_new_j[:])
+                if isinstance(decks_new_j, int):
+                    pass
+            decks_new_j = hb.get_unique_items(decks_new_j)
 
         # collect deck_changed bools
         decks_new_j_changed = [hb.deck_changed(d, deck) for d in decks_new_j]

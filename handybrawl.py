@@ -314,29 +314,36 @@ def hit_deck(d, n):
     """
     if not check_cards_unique(d):
         pass
-    # shield_found = False
+    if get_deck_hash(d) == '5A6D7A9A8A1B4A2A3B':
+        pass
+    shield_found = False
     ds_new = []
     if n == 0 or n > len(d) - 1:  # 0 is a substitute for the infinite hit range
         n = len(d) - 1
-    for i in reversed(range(1, n + 1)):
+    for i in reversed(range(1, n + 1)):  # use the furthest shield first
         # Reaction: Shield: Don't target
-        if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("reaction") == "shield":
-            # shield_found = True
+        if d[0][0].get("type") != d[i][0].get("type") \
+                and d[i][1][0].get("reaction") == "shield":
+            shield_found = True
             d_new = use_shield(d[:], i)
             if not check_cards_unique(d_new):
                 pass
-            ds_new.append(d_new)
+            if d_new != d:
+                ds_new.append(d_new)
             if d[0][0].get("type") == "monster":
                 break
-    # if not shield_found:  # Using shield is not mandatory
-    for i in range(1, n + 1):
-        if d[0][0].get("type") != d[i][0].get("type") and d[i][1][0].get("life") != "exhausted":
-            d_new = hit_card(d[:], i)
-            if not check_cards_unique(d_new):
-                pass
-            ds_new.append(d_new)
-            if d[0][0].get("type") == "monster":
-                break
+    if d[0][0].get("type") == "hero" or not shield_found:  # Activating enemy's shield is not mandatory for the hero
+        for i in range(1, n + 1):
+            if d[0][0].get("type") != d[i][0].get("type") \
+                    and d[i][1][0].get("life") != "exhausted" \
+                    and d[i][1][0].get("reaction") != "shield":
+                d_new = hit_card(d[:], i)
+                if not check_cards_unique(d_new):
+                    pass
+                if d_new != d:
+                    ds_new.append(d_new)
+                    if d[0][0].get("type") == "monster":
+                        break
     return ds_new
 
 
@@ -406,9 +413,9 @@ def hit_card(d, i):
     d_new = d[:]
     d_new[i] = expected_card
     return d_new  # if d != d_new else []
+
+
 # noinspection PyShadowingNames
-
-
 # @CountCalls
 def heal_deck(d):
     """
