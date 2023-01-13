@@ -1,6 +1,5 @@
 import all_cards
 import handybrawl as hb
-from itertools import permutations
 
 
 def recreate_game(d_hash):
@@ -46,17 +45,15 @@ def play_card(deck):
                 if decks_new_j:
                     decks = decks_new_j[:]
                 # else decks have not changed by the previous action and are going to suffer the next action
+            decks_new_j = []
             for deck_j in decks:
                 # debug test
                 deck_j_hash = hb.get_deck_hash(deck_j)
-                if deck_j_hash == '5A6D7A9A8A1B4A2A3B':
+                if deck_j_hash == '8D9D2A3B4A1A6C7B5D':
                     pass
                 switcher_action = action[0].split()[0]
-                decks_new_j = switcher.get(switcher_action)(deck_j[:], action[0], action[1])
-                if isinstance(decks_new_j, int):
-                    pass
+                decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
             decks_new_j = hb.get_unique_items(decks_new_j)
-
         # collect deck_changed bools
         decks_new_j_changed = [hb.deck_changed(d, deck) for d in decks_new_j]
         # decks_new_i = [m for m in decks_new_j if hb.deck_changed(m, deck)]
@@ -73,7 +70,7 @@ def play_card(deck):
         else:
             decks_new_i_prev_unchanged_rows.extend(decks_new_j)
         # if the last row has been reached
-        if i == len(deck[0][1][1:]) - 1 and not decks_new_i:
+        if not decks_new_i and i == len(deck[0][1][1:]) - 1:
             decks_new_i = hb.get_unique_items(decks_new_i_prev_unchanged_rows[:])
 
         # remove duplicates and remove the original deck, if others could be created
@@ -87,53 +84,43 @@ def play_card(deck):
     # sort results by their decreasing her status, and increasing monster status
     decks_new.sort(key=lambda d: (hb.get_status(d).get("hero"), -hb.get_status(d).get("monster")), reverse=True)
 
-    if hb.get_deck_hash(deck) == '3B1A6B2A8B':
-        pass
-
-    if decks_new:
-        global first_winner_length
-        global decks_list
-        global first_winner_hash
-        for deck_i in decks_new:
-            deck_i_new = hb.back_shift(deck_i[:])
-            deck_i_new_hash = hb.get_deck_hash(deck_i_new)
-            status = hb.get_status(deck_i)
-            if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
-                decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
-                game_deck_i_new = recreate_game(deck_i_new_hash)
-                if status.get("hero") != 0 \
-                        and status.get("monster") != 0 \
-                        and len(game_deck_i_new) <= 1.5 * first_winner_length \
-                        and not first_winner_hash:
-                    # no win or defeat, and deck changed, or it is the last action row iteration anyway
-                    try:
-                        play_card(deck_i_new[:])
-                    except RecursionError:
-                        print(deck_i_new_hash, ":", status, "recursion overflow")
-                elif status.get("hero") == 0 or status.get("monster") == 0:
-                    # game_deck_i_new = recreate_game(deck_i_new_hash)
-                    # print(len(decks_list), ":",
-                    #       deck_i_new_hash, ":",
-                    #       status,
-                    #       'start deck:', game_deck_i_new[-1],
-                    #       'length of game:', len(game_deck_i_new) - 1)
-                    # print("hb.rotate_card_to_face", ":", hb.rotate_card_to_face.call_count)
-                    if status.get("monster") == 0:
-                        print(len(decks_list), ":",
-                              deck_i_new_hash, ":",
-                              status,
-                              'start deck:', game_deck_i_new[-1],
-                              'length of game:', len(game_deck_i_new) - 1)
-                        if len(game_deck_i_new) < first_winner_length:
-                            first_winner_length = len(game_deck_i_new)
-                            first_winner_hash = deck_i_new_hash
+    for k, d in enumerate(decks_new):
+        print(k+1, ":", hb.get_deck_hash(d))
+    if len(decks_new) != 1:
+        option_number = input('Choose card variant to play: ')
     else:
-        pass
+        option_number = 1
+    deck_i = decks_new[int(option_number)-1]
+
+    global decks_list
+    deck_i_new = hb.back_shift(deck_i[:])
+    deck_i_new_hash = hb.get_deck_hash(deck_i_new)
+    status = hb.get_status(deck_i)
+    print(status)
+    if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
+        decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
+        game_deck_i_new = recreate_game(deck_i_new_hash)
+        if status.get("hero") != 0 \
+                and status.get("monster") != 0:
+            # no win or defeat, and deck changed
+            try:
+                play_card(deck_i_new[:])
+            except RecursionError:
+                print(deck_i_new_hash, ":", status, "recursion overflow")
+        elif status.get("hero") == 0 or status.get("monster") == 0:
+            if status.get("monster") == 0:
+                print("game end", ":", len(decks_list), ":",
+                      deck_i_new_hash, ":",
+                      status,
+                      'start deck:', game_deck_i_new[-1],
+                      'length of game:', len(game_deck_i_new) - 1)
 
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
 deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+deck_start_hash = '1A2A3A5A4A6A9A7A8A'
+deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1C6C2D7A8A3C5D4D9C'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
@@ -141,27 +128,5 @@ deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
 
 decks_list = dict()
-first_winner_length = 111
-first_winner_hash = None
 
 play_card(deck_start)
-
-lst = list(permutations(range(1, 10)))
-print(len(lst))
-
-for k in lst:
-    s = [str(j) for j in k]
-    deck_start_hash = 'A'.join(s) + 'A'
-    deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
-    decks_list = dict()
-    first_winner_length = 111
-    first_winner_hash = None
-    play_card(deck_start)
-    print(len(decks_list))
-
-pass
-
-#
-# for key, value in decks_list.items():  # iter on both keys and values
-#     if key.endswith('5A') or key.startswith('5A'):
-#         print(key, value)

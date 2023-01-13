@@ -153,10 +153,6 @@ def deck_changed(d, d_new):
     :param d: a deck of cards
     :return: bool True if decks are differing
     """
-    if not check_cards_unique(d):
-        pass
-    if not check_cards_unique(d_new):
-        pass
     return d[1:] != d_new[1:]
 
 
@@ -193,8 +189,6 @@ def delay_deck(d, a, p):
                     (t == "enemy" or t == "any") and
                     d[0][0].get("type") != d[i][0].get("type")
             ):
-                if p < 0:
-                    j = -j
                 end_position = i + j
                 if len(d) > end_position >= 1:
                     d_new = move_card(d[:], i, end_position)
@@ -233,7 +227,7 @@ def move_deck(d, a, r):
     move_range = range(1, min(abs(r) + 1, len(d)))
     if r < 0:
         move_range = reversed(move_range)
-    for i in move_range:
+    for i in list(move_range):
         if (
                 (t == "ally" or t == "any") and
                 d[0][0].get("type") == d[i][0].get("type")
@@ -244,9 +238,10 @@ def move_deck(d, a, r):
                             # Heavy card cannot be moved by any enemy action.
                             d[i][1][0].get("feature") != "heavy"
                     ) and
-                    # do not pull exhausted enemies
-                    not (r < 0 and
-                         d[i][1][0].get("life") != "exhausted")
+                    # for monster: do not pull exhausted enemies
+                    not (d[0][0].get("type") == "monster"
+                         and r < 0
+                         and d[i][1][0].get("life") == "exhausted")
         ):
             end_position = 1 if r < 1 else len(d) - 1
             ds_new.append(move_card(d[:], i, end_position))
@@ -320,7 +315,12 @@ def hit_deck(d, n):
     ds_new = []
     if n == 0 or n > len(d) - 1:  # 0 is a substitute for the infinite hit range
         n = len(d) - 1
-    for i in reversed(range(1, n + 1)):  # use the furthest shield first
+    shield_range = []
+    if d[0][0].get("type") == "hero":
+        shield_range = reversed(range(1, n + 1))  # use the furthest shield first
+    else:
+        shield_range = range(1, n + 1)  # follow hit order
+    for i in list(shield_range):
         # Reaction: Shield: Don't target
         if d[0][0].get("type") != d[i][0].get("type") \
                 and d[i][1][0].get("reaction") == "shield":
@@ -330,8 +330,8 @@ def hit_deck(d, n):
                 pass
             if d_new != d:
                 ds_new.append(d_new)
-            if d[0][0].get("type") == "monster":
-                break
+                if d[0][0].get("type") == "monster":
+                    break
     if d[0][0].get("type") == "hero" or not shield_found:  # Activating enemy's shield is not mandatory for the hero
         for i in range(1, n + 1):
             if d[0][0].get("type") != d[i][0].get("type") \
@@ -376,7 +376,7 @@ def use_shield(d, i):
 
     action = d[i][1][0].get("shield")
     if action:
-        # todo possible replacement not to use lambda: d_new[i] = rotate(d[i])
+        # a switcher construction used for more possible shield variations
         d_new[i] = switcher.get(action)(d[i][:])
         if not check_cards_unique(d_new):
             pass
@@ -519,7 +519,7 @@ def maneuver_deck(d):
 
 
 # @CountCalls
-def arrow_deck(d, t=1, end=3):
+def arrow_deck(d, t=1, end_range=3):
     """
     hit_card() every possible card in the deck.
 
@@ -530,18 +530,18 @@ def arrow_deck(d, t=1, end=3):
 
     :param d: the current deck
     :param t: the number of targets, different cards targets are targeted
-    :param end: number (int) of the cards att the end of the deck to be targeted possibly
+    :param end_range: number (int) of the cards att the end of the deck to be targeted possibly
     :return: new decks
     """
     ds_new = []
     m = len(d)
     d_new = []
-    # TODO: check out the requirement or conditions for the shield, when hitting a card with an arrow
-    for i in range(m - end - 1, m + 1):
+    # a shield is not applicable for an arrow
+    for i in range(m - end_range - 1, m + 1):
         if d[0][0].get("type") != d[i][0].get("type"):  # and d[i][0].get("reaction") != "shield":
             d_new = hit_card(d, i)
             if t == 2:
-                for j in range(m - end - 1, m + 1):
+                for j in range(m - end_range - 1, m + 1):
                     if j != i and d[0][0].get("type") != d[i][0].get("type"):
                         # and d[i][0].get("reaction") != "shield":
                         d_new = hit_card(d_new, i)
@@ -571,11 +571,6 @@ def create_deck(d_hash, cards):
     :param cards: the definition of all the available cards (list)
     :return: a deck, a list of cards, (list of lists)
     """
-    # todo use unzip_hash() instead of re.
-    # d_numbers = re.sub(r"[a-zA-Z]+", ' ', d_hash).strip().split(' ')
-    # d_numbers = [int(i) for i in d_numbers]
-    # d_faces = re.sub(r"\d+", ' ', d_hash).strip().split(' ')
-
     d_numbers, d_faces = unzip_hash(d_hash)
     deck = [[]]*len(d_faces)
     for i, number in enumerate(d_numbers):

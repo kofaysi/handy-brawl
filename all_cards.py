@@ -220,7 +220,7 @@ cards = [[  # card 1
     [
         dict(face="D", life="wounded"),
         [("heal", None), ("heal", None), ("heal", None), ("rotate", None)],
-        [("pull", 5)]
+        [("pull ally", 5)]
     ]
 ], [
     dict(name="ranger", type="hero", number=10),
