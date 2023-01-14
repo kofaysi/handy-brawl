@@ -100,20 +100,21 @@ def play_card(deck):
     if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
         decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
         game_deck_i_new = recreate_game(deck_i_new_hash)
-        if status.get("hero") != 0 \
-                and status.get("monster") != 0:
-            # no win or defeat, and deck changed
-            try:
-                play_card(deck_i_new[:])
-            except RecursionError:
-                print(deck_i_new_hash, ":", status, "recursion overflow")
-        elif status.get("hero") == 0 or status.get("monster") == 0:
+        if status.get("hero") == 0 or status.get("monster") == 0:
             if status.get("monster") == 0:
                 print("game end", ":", len(decks_list), ":",
                       deck_i_new_hash, ":",
                       status,
                       'start deck:', game_deck_i_new[-1],
                       'length of game:', len(game_deck_i_new) - 1)
+        elif status.get("hero") != 0 \
+                and status.get("monster") != 0:
+            # no win or defeat, and deck changed
+            try:
+                play_card(deck_i_new[:])
+            except RecursionError:
+                print(deck_i_new_hash, ":", status, "recursion overflow")
+
 
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
