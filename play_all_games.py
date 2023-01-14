@@ -1,3 +1,7 @@
+"""
+Solve the deck by finding the lowest number of turns using recursion.
+"""
+
 import all_cards
 import handybrawl as hb
 from itertools import permutations
@@ -85,44 +89,47 @@ def play_card(deck):
     # sort results by their decreasing her status, and increasing monster status
     decks_new.sort(key=lambda d: (hb.get_status(d).get("hero"), -hb.get_status(d).get("monster")), reverse=True)
 
-    if hb.get_deck_hash(deck) == '3B1A6B2A8B':
+    if hb.get_deck_hash(deck) == '3A7C2A4B8C5A6C':
         pass
 
-    if decks_new:
-        global first_winner_length, decks_list, first_winner_hash
-        for deck_i in decks_new:
-            deck_i_new = hb.back_shift(deck_i[:])
-            deck_i_new_hash = hb.get_deck_hash(deck_i_new)
-            status = hb.get_status(deck_i)
-            if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
-                decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
-                game_deck_i_new = recreate_game(deck_i_new_hash)
-                if status.get("hero") == 0 or status.get("monster") == 0:
-                    if status.get("monster") == 0:
-                        print(len(decks_list), ":",
-                              deck_i_new_hash, ":",
-                              status,
-                              'start deck:', game_deck_i_new[-1],
-                              'length of game:', len(game_deck_i_new) - 1)
-                        if len(game_deck_i_new) < first_winner_length:
-                            first_winner_length = len(game_deck_i_new)
-                            first_winner_hash = deck_i_new_hash
-                elif (status.get("hero") != 0
-                        and status.get("monster") != 0
-                        and len(game_deck_i_new) <= first_winner_length):
-                        # and not first_winner_hash):
-                    try:
-                        play_card(deck_i_new[:])
-                    except RecursionError:
-                        print(deck_i_new_hash, ":", status, "recursion overflow")
-    else:
-        pass
+    global first_winner_length, decks_list, first_winner_hash
+    for deck_i in decks_new:
+        if hb.get_deck_hash(deck_i) == '3A7C2A4B8C5A6C':
+            pass
+        deck_i_new = hb.back_shift(deck_i[:])
+        deck_i_new_hash = hb.get_deck_hash(deck_i_new)
+        status = hb.get_status(deck_i)
+        if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
+            decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
+            game_deck_i_new = recreate_game(deck_i_new_hash)
+            if status.get("hero") == 0 or status.get("monster") == 0:
+                if status.get("monster") == 0:
+                    print(len(decks_list), ":",
+                          deck_i_new_hash, ":",
+                          status,
+                          'start deck:', game_deck_i_new[-1],
+                          'length of game:', len(game_deck_i_new) - 1)
+                    if len(game_deck_i_new) - 1 < first_winner_length:
+                        first_winner_length = len(game_deck_i_new) - 1
+                        first_winner_hash = deck_i_new_hash
+            elif len(game_deck_i_new) < first_winner_length:
+                # print(len(game_deck_i_new) - 1)
+                try:
+                    # make a new turn with the deck, expect +1 on len(recreate_game())
+                    play_card(deck_i_new[:])
+                except RecursionError:
+                    print(deck_i_new_hash, ":", status, "recursion overflow")
+            else:
+                pass
+        else:
+            pass
 
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
 deck_start_hash = '1A2A3A4A5A6A7A8A9A'
-deck_start_hash = '1A2A3A4A6A9A8A5A7A'
+deck_start_hash = '2A3A4A5A6A7A8A'
+# deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
 
