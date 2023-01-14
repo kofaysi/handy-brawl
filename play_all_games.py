@@ -97,24 +97,7 @@ def play_card(deck):
             if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
                 decks_list[deck_i_new_hash] = hb.get_deck_hash(deck)
                 game_deck_i_new = recreate_game(deck_i_new_hash)
-                if (status.get("hero") != 0
-                        and status.get("monster") != 0
-                        and len(game_deck_i_new) <= first_winner_length
-                        and not first_winner_hash):
-                    # no win or defeat, and deck changed, or it is the last action row iteration anyway
-                    print(len(game_deck_i_new))
-                    try:
-                        play_card(deck_i_new[:])
-                    except RecursionError:
-                        print(deck_i_new_hash, ":", status, "recursion overflow")
-                elif status.get("hero") == 0 or status.get("monster") == 0:
-                    # game_deck_i_new = recreate_game(deck_i_new_hash)
-                    # print(len(decks_list), ":",
-                    #       deck_i_new_hash, ":",
-                    #       status,
-                    #       'start deck:', game_deck_i_new[-1],
-                    #       'length of game:', len(game_deck_i_new) - 1)
-                    # print("hb.rotate_card_to_face", ":", hb.rotate_card_to_face.call_count)
+                if status.get("hero") == 0 or status.get("monster") == 0:
                     if status.get("monster") == 0:
                         print(len(decks_list), ":",
                               deck_i_new_hash, ":",
@@ -124,6 +107,14 @@ def play_card(deck):
                         if len(game_deck_i_new) < first_winner_length:
                             first_winner_length = len(game_deck_i_new)
                             first_winner_hash = deck_i_new_hash
+                elif (status.get("hero") != 0
+                        and status.get("monster") != 0
+                        and len(game_deck_i_new) <= first_winner_length):
+                        # and not first_winner_hash):
+                    try:
+                        play_card(deck_i_new[:])
+                    except RecursionError:
+                        print(deck_i_new_hash, ":", status, "recursion overflow")
     else:
         pass
 
@@ -138,7 +129,7 @@ deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
 
 decks_list = dict()
-first_winner_length = 30
+first_winner_length = 32
 first_winner_hash = None
 
 play_card(deck_start)
