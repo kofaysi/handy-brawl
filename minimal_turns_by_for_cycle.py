@@ -30,7 +30,7 @@ def play_card(deck):
         "delay": lambda d, a, p: hb.delay_deck(d, a, p),  # deck, action, by positions
         "quicken": lambda d, a, p: hb.delay_deck(d, a, -p),  # deck, action, by positions
         "rotate": lambda d, a, n: hb.rotate_top_card(d),  # deck
-        "heal": lambda d, a, n: hb.heal_deck(d),  # deck
+        "heal": lambda d, a, n: hb.revive_deck(d),  # deck
         "arrow": lambda d, a, e: hb.arrow_deck(d, a, -e),  # deck, action, end of range
         "maneuver": lambda d, a, n: hb.maneuver_deck(d),  # deck
     }

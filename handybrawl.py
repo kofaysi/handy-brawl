@@ -461,9 +461,9 @@ def hit_card(d, i):
 
 # noinspection PyShadowingNames
 # @CountCalls
-def heal_deck(d):
+def revive_deck(d, a):
     """
-    heal_card() every possible card in the current deck
+    revive_card() every possible card in the current deck
 
     Game rules applicable:
         Heal: Return any [half leaf] (wounded) to its starting position.
@@ -477,23 +477,27 @@ def heal_deck(d):
         pass
     ds_new = []
     for i in range(1, len(d)):
-        if d[0][0].get("type") == d[i][0].get("type") and d[i][1][0].get("life") == "wounded":
-            d_new = d[:]
-            d_new[i] = heal_card(d[i])
-            ds_new.append(d_new)
-            if not check_cards_unique(d_new):
-                pass
-            if d[0][0].get("type") == "monster":
-                break
+        if d[0][0].get("type") == d[i][0].get("type"):
+            if (a == "heal" and d[i][1][0].get("life") == "wounded") \
+                    or (a == "resurrect" and d[i][1][0].get("life") == "exhausted"):
+                d_new = d[:]
+                d_new[i] = revive_card(d[i])
+                ds_new.append(d_new)
+                if not check_cards_unique(d_new):
+                    pass
+                if d[0][0].get("type") == "monster":
+                    break
+
     return ds_new
 
 
-def heal_card(c):
+def revive_card(c):
     """
     Turn the card to its starting ("A") position.
 
     Game rules applicable:
         Heal: Return any [half leaf] (wounded) to its starting position.
+        Resurrect: Return closest ally card to its starting position.
 
     :param c: a card
     :return: a new card
