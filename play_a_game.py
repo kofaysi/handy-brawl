@@ -1,5 +1,6 @@
 import cards
 import handybrawl as hb
+from colorama import Fore, Back, Style
 
 
 def recreate_game(d_hash):
@@ -85,7 +86,17 @@ def play_card(deck):
     decks_new.sort(key=lambda d: (hb.get_status(d).get("hero"), -hb.get_status(d).get("monster")), reverse=True)
 
     for k, d in enumerate(decks_new):
-        print(k+1, ":", hb.get_deck_hash(d))
+        hash_k = hb.get_deck_hash(d)
+        numbers, letters = hb.unzip_hash(hash_k)
+        card_list = list(zip(numbers, letters))
+        s = ''
+        for t in card_list:
+            if t[0] in {1, 2, 3, 4, 5}:
+                s += Fore.BLUE
+            else:
+                s += Fore.GREEN
+            s += str(t[0]) + t[1] + Style.RESET_ALL + ' '
+        print("{:2d}".format(k+1), ":", s)
     if len(decks_new) != 1:
         option_number = input('Choose card variant to play: ')
     else:
