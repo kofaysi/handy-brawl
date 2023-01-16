@@ -2,7 +2,7 @@
 Solve the deck by finding the lowest number of turns using for cycle.
 """
 
-import all_cards
+import cards
 import handybrawl as hb
 
 
@@ -101,7 +101,7 @@ deck_start_hash = '2A3A4A5A6A7A8A'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
 
-deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
+deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
 decks_list = dict()
 first_winner_length = 32
