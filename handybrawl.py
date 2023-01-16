@@ -207,7 +207,8 @@ def move_deck(d, a, r):
         Pull: Move the furthest card in range X behind the active card.
         Push: Move the closest enemy card in range X to the bottom of the deck. (needs rewording)
     monster:
-        Pull: Move the furthest card in range X behind the active card. Don't target enemy cards. (needs rewording)
+        Pull: Move the furthest card in range X behind the active card.
+              Don't target enemy cards. (needs rewording)
         Push: Move the closest enemy card in range to the bottom of the deck.
 
     :param d:
@@ -311,59 +312,98 @@ def hit_deck(d, n):
         pass
     if get_deck_hash(d) == '5A6D7A9A8A1B4A2A3B':
         pass
-    shield_found = False
+
     ds_new = []
     if n == 0 or n > len(d) - 1:  # 0 is a substitute for the infinite hit range
         n = len(d) - 1
-    shield_range = []
     if d[0][0].get("type") == "hero":
-        shield_range = reversed(range(1, n + 1))  # use the furthest shield first
+        # for hero targeting monster, use the furthest shield first
+        hit_range = reversed(range(1, n + 1))
     else:
-        shield_range = range(1, n + 1)  # follow hit order
-    for i in list(shield_range):
+        # for monster targeting hero, follow hit order
+        hit_range = range(1, n + 1)
+
+    shield_found = False
+    for i in list(hit_range):
         # Reaction: Shield: Don't target
         if d[0][0].get("type") != d[i][0].get("type") \
                 and d[i][1][0].get("reaction") == "shield":
+            d_new = intercept(d[:], i, "shield")
             shield_found = True
-            d_new = use_shield(d[:], i)
             if not check_cards_unique(d_new):
                 pass
             if d_new != d:
                 ds_new.append(d_new)
-                if d[0][0].get("type") == "monster":
+                # if monster's shield has been found and activated, break
+                if d[0][0].get("type") == "hero":
                     break
-    if d[0][0].get("type") == "hero" or not shield_found:  # Activating enemy's shield is not mandatory for the hero
-        for i in range(1, n + 1):
+
+    dodge_found = False
+    found_hero = False
+    for i in list(hit_range):
+        # Reaction: Dodge: Don't target
+        if not found_hero and d[0][0].get("type") != d[i][0].get("type") \
+                and d[i][1][0].get("reaction") == "dodge":
+            if d[0][0].get("type") == "monster":
+                found_hero = True
+            dodge_found = True
+            d_new = intercept(d[:], i, "dodge")
+            if not check_cards_unique(d_new):
+                pass
+            if d_new != d:
+                ds_new.append(d_new)
+                # if monster's shield has been found and activated, break
+                if d[0][0].get("type") == "hero":
+                    break
+
+    # Continue collecting new deck outcomes by applying hit_card(), if it is a monster's turn,
+    # or it is a hero's turn and no shield or no dodge has been found.
+    # Activating ally's shield is not mandatory for the hero.
+    if d[0][0].get("type") == "monster" \
+            or (d[0][0].get("type") == "hero"
+                and (not shield_found
+                     or not dodge_found)):
+        for i in list(hit_range):
             if d[0][0].get("type") != d[i][0].get("type") \
-                    and d[i][1][0].get("life") != "exhausted" \
-                    and d[i][1][0].get("reaction") != "shield":
+                    and d[i][1][0].get("life") != "exhausted":
+                # even if it is mostly not effective,
+                # hero may refuse to activate the shield or dodge and take damage instead
                 d_new = hit_card(d[:], i)
                 if not check_cards_unique(d_new):
                     pass
                 if d_new != d:
                     ds_new.append(d_new)
+                    # if closest hero has been hit, break
                     if d[0][0].get("type") == "monster":
                         break
     return ds_new
 
 
 # @CountCalls
-def use_shield(d, i):
+def intercept(d, i, reaction):
     """
     rotate() the i-th card in the deck as a result of the shield property/reaction of the card
 
     Game rules applicable:
     hero:
-        Reaction Shield:
-        If in range of you MAY intercept and negate the damage. If you do so, activate all icons after the arrow.
+        Reaction: Shield
+            If in range of you MAY intercept and negate the damage.
+            (rewording) If in range of DAMAGE, you MAY intercept and negate the damage.
+            If you do so, activate all icons after the arrow.
+            (rewording) If you do so, activate all actions after the arrow.
+        Reaction: Dodge
+            If targeted by an enemy action, you MAY negate it.
+            (rewording) If targeted by an enemy action, you MAY intercept and negate it.
+            If you do so, activate all actions after the arrow.
     monster:
         Reaction: Block (reword or use a different icon)
-        If in range of targeting an ally card, intercept and negate the damage.
-        If you do so, activate all icons after the arrow.
-        If multiple BLOCKS available, use the furthest.
+            If in range of targeting an ally card, intercept and negate the damage.
+            If you do so, activate all icons after the arrow.
+            If multiple BLOCKS available, use the furthest.
 
     :param d: the current deck
     :param i: the i-th card
+    :param reaction: a string activating the intercept()
     :return: the new deck
     """
     if not check_cards_unique(d):
@@ -374,9 +414,13 @@ def use_shield(d, i):
         "rotate": lambda c: rotate(c[:])
     }
 
-    action = d[i][1][0].get("shield")
-    if action:
-        # a switcher construction used for more possible shield variations
+    try:
+        action = d[i][1][0].get(reaction)
+    except KeyError:
+        pass
+
+    if action or not "None":
+        # a switcher construction used for multiple possible shield or dodge reactions
         d_new[i] = switcher.get(action)(d[i][:])
         if not check_cards_unique(d_new):
             pass
@@ -423,8 +467,10 @@ def heal_deck(d):
 
     Game rules applicable:
         Heal: Return any [half leaf] (wounded) to its starting position.
+        Resurrect: Return closest ally card to its starting position.
 
     :param d: the current deck
+    :param a: action "resurrect" or "heal"
     :return: new decks
     """
     if not check_cards_unique(d):
@@ -518,34 +564,93 @@ def maneuver_deck(d):
     return ds_new
 
 
+# https://stackoverflow.com/questions/127704/algorithm-to-return-all-combinations-of-k-elements-from-n
+def iter_combs(n, k):
+    comb = []
+
+    def itr(v, s, j):
+        nonlocal comb
+        if j == k:
+            comb.append(v)
+        else:
+            for i in range(s, n):
+                itr(v+[i], i+1, j+1)
+
+    itr([], 0, 0)
+
+    return comb
+
+
 # @CountCalls
-def arrow_deck(d, t=1, end_range=3):
+def arrow_deck(d, t=1, e=-3):
     """
     hit_card() every possible card in the deck.
+    Only a hero action
 
     Game rules applicable:
+    hero:
         Arrow: Deal damage to any one of the 3 (and) bottom cards.
         Double arrow: Two arrow actions that cannot target the same card (you may still skip one of them).
-            (rewording) Two arrow actions that shall target different cards (targeting only one card is allowed).
+        (rewording) Two arrow actions that shall target different cards (targeting only one card is allowed).
 
     :param d: the current deck
     :param t: the number of targets, different cards targets are targeted
-    :param end_range: number (int) of the cards att the end of the deck to be targeted possibly
+    :param e: number (int) of the cards att the end of the deck to be targeted possibly
     :return: new decks
     """
     ds_new = []
-    m = len(d)
-    d_new = []
-    # a shield is not applicable for an arrow
-    for i in range(m - end_range - 1, m + 1):
-        if d[0][0].get("type") != d[i][0].get("type"):  # and d[i][0].get("reaction") != "shield":
-            d_new = hit_card(d, i)
-            if t == 2:
-                for j in range(m - end_range - 1, m + 1):
-                    if j != i and d[0][0].get("type") != d[i][0].get("type"):
-                        # and d[i][0].get("reaction") != "shield":
-                        d_new = hit_card(d_new, i)
-        ds_new.append(d_new)
+    targeted_indices = []
+    if e < 0:  # target positions at the end of the deck
+        target_range = range(len(d) + e - 1, len(d) + 1)
+    else:  # target positions at the beginning of the deck (exercise)
+        target_range = range(1, e + 1)
+    # a targeted monster shall apply the shield
+
+    for i in list(target_range):
+        d_new = d[:]
+        if d[i][0].get("type") == "monster":
+            if d[i][0].get("reaction") != "shield":
+                d_new = hit_card(d_new[:], i)
+            else:
+                d_new = intercept(d_new[:], i)
+            if t == 2:  # double arrow
+                for j in list(target_range):
+                    if i < j \
+                            and d[j][0].get("type") == "monster":
+                        if d[j][0].get("reaction") != "shield":
+                            d_new = hit_card(d_new[:], j)
+                        else:
+                            d_new = intercept(d_new[:], j)
+                        ds_new.append(d_new)
+            else:
+                ds_new.append(d_new)
+    return ds_new
+
+
+def teleport_deck(d, t):
+    """
+    Swap any places of two cards (of corresponding sides), apply for every combination
+
+    Game rules applicable:
+        Teleport: Swap places of 2 cards (of corresponding sides)
+
+    :param d: the current deck
+    :param t: the target of teleport ("ally", "enemy", "any")
+    """
+    ds_new = []
+    for i in d:
+        for j in d:
+            if i < j:
+                if t == "any" \
+                        or (
+                        t == "ally"
+                        and d[0][0].get("type") == d[i][0].get("type")
+                        ) or (
+                        t == "enemy"
+                        and d[0][0].get("type") != d[i][0].get("type")
+                        ):
+                    d[i], d[j] = d[j], d[i]
+                    ds_new.append(d)
     return ds_new
 
 
@@ -629,12 +734,6 @@ Game rules applicable:
 """
 
 
-# def revive(d):
-"""
-Game rules applicable:
-    Revive: Return closest ally card to its starting position.
-"""
-
 """
 Condition: Spider Swarm
 If the top card of the deck is a ally and a continuous group of 1+ Spider Swarm cards is positioned directly behind it
@@ -656,20 +755,8 @@ Reaction: Block
     If multiple BLOCKS available, use the furthest.
 """
 
-# def teleport(d):
-"""
-    Swap any places of two cards (of corresponding sides), apply for every combination
-    
-    Game rules applicable:
-        Teleport: Swap places of 2 cards (of corresponding sides)
-"""
 
 """
 Feature: Trap Master
 If an enemy card moves over a card with this feature, deal damage to it.
-"""
-
-"""
-Reaction: Dodge
-If targeted by an enemy action, you MAY negate it. If you do so, activate all actions after the arrow.
 """

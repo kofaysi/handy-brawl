@@ -31,7 +31,7 @@ def play_card(deck):
         "quicken": lambda d, a, p: hb.delay_deck(d, a, -p),  # deck, action, by positions
         "rotate": lambda d, a, n: hb.rotate_top_card(d),  # deck
         "heal": lambda d, a, n: hb.heal_deck(d),  # deck
-        "arrow": lambda d, a, nt: hb.arrow_deck(d, a, nt),  # deck, action, number of targets
+        "arrow": lambda d, a, e: hb.arrow_deck(d, a, -e),  # deck, action, end of range
         "maneuver": lambda d, a, n: hb.maneuver_deck(d),  # deck
     }
     decks_new_i = []
@@ -96,7 +96,7 @@ def play_card(deck):
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
 # deck_start_hash = '1A2A3A4A5A6A7A8A9A'
-deck_start_hash = '2A3A4A5A6A7A8A'
+deck_start_hash = '2A3A4A5A6A'
 # deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
@@ -145,7 +145,7 @@ while not first_winner_hash:
             decks_list[deck_i_new_hash] = hb.get_deck_hash(deck_i)
             game_deck_i_new = recreate_game(deck_i_new_hash)
             decks_i_new_A.append(deck_i_new)
-            if status.get("monster") == 0:
+            if status.get("monster") == 0 and status.get("hero") != 0:
                 print(len(decks_list), ":",
                       deck_i_new_hash, ":",
                       status,

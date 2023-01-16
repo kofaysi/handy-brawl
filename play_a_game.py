@@ -1,4 +1,4 @@
-import all_cards
+import cards
 import handybrawl as hb
 
 
@@ -116,17 +116,16 @@ def play_card(deck):
                 print(deck_i_new_hash, ":", status, "recursion overflow")
 
 
-
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
-deck_start_hash = '1A2A3A4A5A6A7A8A9A'
-deck_start_hash = '1A2A3A5A4A6A9A7A8A'
+# deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+# deck_start_hash = '1A2A3A5A4A6A9A7A8A'
 deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1C6C2D7A8A3C5D4D9C'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
 
-deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
+deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
 decks_list = dict()
 

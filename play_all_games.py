@@ -2,9 +2,8 @@
 Solve the deck by finding the lowest number of turns using recursion.
 """
 
-import all_cards
+import cards
 import handybrawl as hb
-from itertools import permutations
 
 
 def recreate_game(d_hash):
@@ -127,16 +126,16 @@ def play_card(deck):
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
-deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+# deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 deck_start_hash = '2A3A4A5A6A7A8A'
 # deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
 
-deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
+deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
 decks_list = dict()
-first_winner_length = 32
+first_winner_length = 20
 first_winner_hash = None
 
 play_card(deck_start)

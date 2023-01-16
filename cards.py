@@ -34,7 +34,9 @@ The following action names are recognised (as expected at the end of the develop
     - arrow
     - inspire
     - revive
-    - teleport
+    - teleport ally
+    - teleport enemy
+    - teleport any
     - fireball
     - ablaze
 """
