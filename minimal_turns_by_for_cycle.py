@@ -7,7 +7,7 @@ import handybrawl as hb
 
 
 def recreate_game(d_hash):
-    global decks_list
+    global game_bits
     game = []
     d_i_hash = d_hash[:]
     key_found = True
@@ -27,8 +27,8 @@ def play_card(deck):
         "hit": lambda d, a, n: hb.hit_deck(d, n),  # deck, action,
         "push": lambda d, a, r: hb.move_deck(d, a, r),  # deck, action, range
         "pull": lambda d, a, r: hb.move_deck(d, a, -r),  # deck, action, range
-        "delay": lambda d, a, p: hb.delay_deck(d, a, p),  # deck, action, by positions
-        "quicken": lambda d, a, p: hb.delay_deck(d, a, -p),  # deck, action, by positions
+        "delay": lambda d, a, p: hb.adjust_deck(d, a, p),  # deck, action, by positions
+        "quicken": lambda d, a, p: hb.adjust_deck(d, a, -p),  # deck, action, by positions
         "rotate": lambda d, a, n: hb.rotate_top_card(d),  # deck
         "heal": lambda d, a, n: hb.revive_deck(d),  # deck
         "arrow": lambda d, a, e: hb.arrow_deck(d, a, -e),  # deck, action, end of range
@@ -103,7 +103,7 @@ deck_start_hash = '2A3A4A5A6A'
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
-decks_list = dict()
+game_bits = dict()
 first_winner_length = 32
 first_winner_hash = None
 
@@ -141,12 +141,12 @@ while not first_winner_hash:
             pass
         deck_i_new_hash = hb.get_deck_hash(deck_i_new)
         status = hb.get_status(deck_i)
-        if deck_i_new_hash not in decks_list and deck_i_new_hash != hb.get_deck_hash(deck_start):
-            decks_list[deck_i_new_hash] = hb.get_deck_hash(deck_i)
+        if deck_i_new_hash not in game_bits and deck_i_new_hash != hb.get_deck_hash(deck_start):
+            game_bits[deck_i_new_hash] = hb.get_deck_hash(deck_i)
             game_deck_i_new = recreate_game(deck_i_new_hash)
             decks_i_new_A.append(deck_i_new)
             if status.get("monster") == 0 and status.get("hero") != 0:
-                print(len(decks_list), ":",
+                print(len(game_bits), ":",
                       deck_i_new_hash, ":",
                       status,
                       'start deck:', game_deck_i_new[-1],

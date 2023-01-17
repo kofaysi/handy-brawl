@@ -157,19 +157,30 @@ def deck_changed(d, d_new):
 
 
 # @CountCalls
-def delay_deck(d, a, p):
+def adjust_deck(d, a, p):
     """
     move_card() any possible card by p (int) positions within the deck
 
     Game rules applicable:
+    hero:
         Quicken: Move any card up to X spaces towards top of the deck.
         Delay: Move any card up to X spaces towards top of the deck.
+        Feature: Trap Master
+            If an enemy card moves over a card with this feature, deal damage to it.
+        Feature: Venom
+            Prevents an enemy card directly in front of this card from performing actions that change cards position:
+            DELAY, QUICKEN, TELEPORT.
 
     :param d: the current deck
     :param a: action
     :param p: number of position to take the action by
     :return: new decks
     """
+
+    # if the next card displays feature "venom", it prevents from activating the top card
+    if "venom" in d[1][1][0].get("feature"):
+        return []
+
     if get_deck_hash(d) == '1A6C2B3A7A9C8B4D5A':
         pass
     if ' ' in a:
@@ -177,22 +188,42 @@ def delay_deck(d, a, p):
     else:
         t = "any"
     ds_new = []
-    delay_range = list(range(1, abs(p) + 1))
+    adjust_range = list(range(1, abs(p) + 1))
+    step_j = 1
     if p < 0:
-        delay_range = [-i for i in delay_range]
+        adjust_range = [-i for i in adjust_range]
+        step_j = -1
+    # for all the cards in the deck...
     for i in range(1, len(d)):
-        for j in delay_range:
-            if (
-                    (t == "ally" or t == "any") and
-                    d[0][0].get("type") == d[i][0].get("type")
-            ) or (
-                    (t == "enemy" or t == "any") and
-                    d[0][0].get("type") != d[i][0].get("type")
-            ):
-                end_position = i + j
-                if len(d) > end_position >= 1:
-                    d_new = move_card(d[:], i, end_position)
+        # check on the eligibility to delay/quicken/adjust a card
+        if (
+                (t == "ally" or t == "any")
+                and d[0][0].get("type") == d[i][0].get("type")
+        ) or (
+                (t == "enemy" or t == "any")
+                and d[0][0].get("type") != d[i][0].get("type")
+                # Heavy card cannot be adjusted by any enemy action.
+                and "heavy" not in d[i][1][0].get("feature")
+        ):
+            # for all the possible new relative positions
+            # we generate a stand-alone d_new
+            d_new = d[:]
+            j = i
+            for _ in adjust_range:
+                if len(d) > j + step_j >= 1:
+                    # move by one
+                    d_new = move_card(d_new[:], j, j + step_j)
+                    # here we have to check for hero's traps in the activated enemy's adjustment
+                    # if there was any trap in the way, damage the card
+                    trap_exist = False
+                    if "traps" in d[j][1][0].get("feature"):
+                        trap_exist = True
+                    if (d[0][0].get("type") != d[j][0].get("type")
+                            and trap_exist):
+                        d_new = hit_card(d_new[:], j+step_j)
                     ds_new.append(d_new)
+                j += step_j
+    ds_new = get_unique_items(ds_new)
     return ds_new
 
 
@@ -235,9 +266,9 @@ def move_deck(d, a, r):
         ) or (
                     (
                             (t == "enemy" or t == "any") and
-                            d[0][0].get("type") != d[i][0].get("type") and
+                            d[0][0].get("type") != d[i][0].get("type")
                             # Heavy card cannot be moved by any enemy action.
-                            d[i][1][0].get("feature") != "heavy"
+                            and "heavy" not in d[i][1][0].get("feature")
                     ) and
                     # for monster: do not pull exhausted enemies
                     not (d[0][0].get("type") == "monster"
@@ -302,12 +333,20 @@ def hit_deck(d, n):
 
     Game rules applicable:
         Hit:
-        Reaction: Shield: Don't target
+        Reaction: Shield:
+            Don't target
+        Feature: Webs
+            Prevents an enemy card directly in front of this card from performing actions
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :param n: the hit range, int
     :return: the new decks
     """
+    # the next card displays feature "webs" and prevents from activating the top card
+    if d[1][0].get("webs"):
+        return []
+
     if not check_cards_unique(d):
         pass
     if get_deck_hash(d) == '5A6D7A9A8A1B4A2A3B':
@@ -417,7 +456,8 @@ def intercept(d, i, reaction):
     try:
         action = d[i][1][0].get(reaction)
     except KeyError:
-        pass
+        # reaction to intercept does not exist
+        action = None
 
     if action or not "None":
         # a switcher construction used for multiple possible shield or dodge reactions
@@ -468,11 +508,18 @@ def revive_deck(d, a):
     Game rules applicable:
         Heal: Return any [half leaf] (wounded) to its starting position.
         Resurrect: Return closest ally card to its starting position.
+        Feature: Webs
+            Prevents an enemy card directly in front of this card from performing actions
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :param a: action "resurrect" or "heal"
     :return: new decks
     """
+    # if the next card displays feature "webs", it prevents from activating the top card
+    if "webs" in d[1][1][0].get("feature"):
+        return []
+
     if not check_cards_unique(d):
         pass
     ds_new = []
@@ -551,10 +598,17 @@ def maneuver_deck(d):
 
     Game rules applicable:
         Maneuver: Rotate other ally card in a way that its health level doesn't increase.
+        Feature: Webs
+            Prevents an enemy card directly in front of this card from performing actions
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :return: list of new decks
     """
+    # the next card displays feature "webs" and prevents from activating the top card
+    if "webs" in d[1][1][0].get("feature"):
+        return []
+
     ds_new = []
     for i in range(1, len(d) + 1):
         if (d[0][0].get("type") == d[i][0].get("type") and
@@ -596,15 +650,22 @@ def arrow_deck(d, t=1, e=-3):
         Arrow: Deal damage to any one of the 3 (and) bottom cards.
         Double arrow: Two arrow actions that cannot target the same card (you may still skip one of them).
         (rewording) Two arrow actions that shall target different cards (targeting only one card is allowed).
+        Feature: Webs
+            Prevents an enemy card directly in front of this card from performing actions
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :param t: the number of targets, different cards targets are targeted
     :param e: number (int) of the cards att the end of the deck to be targeted possibly
     :return: new decks
     """
+    # the next card displays feature "webs" and prevents from activating the top card
+    if "webs" in d[1][1][0].get("feature"):
+        return []
+
     ds_new = []
-    targeted_indices = []
-    if e < 0:  # target positions at the end of the deck
+    # if targeting positions at the end of the deck
+    if e < 0:
         target_range = range(len(d) + e - 1, len(d) + 1)
     else:  # target positions at the beginning of the deck (exercise)
         target_range = range(1, e + 1)
@@ -616,7 +677,7 @@ def arrow_deck(d, t=1, e=-3):
             if d[i][0].get("reaction") != "shield":
                 d_new = hit_card(d_new[:], i)
             else:
-                d_new = intercept(d_new[:], i)
+                d_new = intercept(d_new[:], i, "shield")
             if t == 2:  # double arrow
                 for j in list(target_range):
                     if i < j \
@@ -624,7 +685,7 @@ def arrow_deck(d, t=1, e=-3):
                         if d[j][0].get("reaction") != "shield":
                             d_new = hit_card(d_new[:], j)
                         else:
-                            d_new = intercept(d_new[:], j)
+                            d_new = intercept(d_new[:], j, "shield")
                         ds_new.append(d_new)
             else:
                 ds_new.append(d_new)
@@ -637,24 +698,52 @@ def teleport_deck(d, t):
 
     Game rules applicable:
         Teleport: Swap places of 2 cards (of corresponding sides)
+        Feature: Venom
+            Prevents an enemy card directly in front of this card from performing actions that change cards position:
+            DELAY, QUICKEN, TELEPORT.
 
     :param d: the current deck
     :param t: the target of teleport ("ally", "enemy", "any")
     """
+    # the next card displays feature "venom" and prevents from activating the top card
+    if "venom" in d[1][1][0].get("feature"):
+        return []
+
     ds_new = []
-    for i in d:
-        for j in d:
-            if i < j:
+    for i, _ in enumerate(d):
+        for j, _ in enumerate(d):
+            if i < j and (i and j) > 0:
                 if t == "any" \
                         or (
                         t == "ally"
-                        and d[0][0].get("type") == d[i][0].get("type")
+                        and d[0][0].get("type") == d[i][0].get("type") == d[j][0].get("type")
                         ) or (
                         t == "enemy"
-                        and d[0][0].get("type") != d[i][0].get("type")
+                        and d[0][0].get("type") != d[i][0].get("type") == d[j][0].get("type")
                         ):
                     d[i], d[j] = d[j], d[i]
                     ds_new.append(d)
+    return ds_new
+
+
+def inspire(d):
+    """
+    Game rules applicable:
+        Inspire: Activate other closest ally card from the middle of the deck.
+            Treat all the cards above it as if they didn't exist.
+    """
+    ds_new = []
+    for i, _ in enumerate(d):
+        if d[0][0].get("type") == d[i][0].get("type") \
+                and d[i][1][0].get("life") != "exhausted":
+            ds_new_i = play_card(d[i:])
+            for d_new_i in ds_new_i:
+                d_new = d[:i] + d_new_i
+                if d_new != d:
+                    ds_new.append([])
+        # if monster's inspire was successful and generated any new different deck on the closest ally card, end inspire
+        if ds_new and d[0][0].get("type") == "monster":
+            return ds_new
     return ds_new
 
 
@@ -699,16 +788,87 @@ def create_deck(d_hash, cards):
     return deck
 
 
+def play_card(deck):
+    switcher = {
+        "hit": lambda d, a, n: hit_deck(d, n),  # deck, action,
+        "push": lambda d, a, r: move_deck(d, a, r),  # deck, action, range
+        "pull": lambda d, a, r: move_deck(d, a, -r),  # deck, action, range
+        "delay": lambda d, a, p: adjust_deck(d, a, p),  # deck, action, by positions
+        "quicken": lambda d, a, p: adjust_deck(d, a, -p),  # deck, action, by positions
+        "rotate": lambda d, a, n: rotate_top_card(d),  # deck
+        "heal": lambda d, a, n: revive_deck(d, a),  # deck
+        "arrow": lambda d, a, nt: arrow_deck(d, a, nt),  # deck, action, number of targets
+        "maneuver": lambda d, a, n: maneuver_deck(d),  # deck
+    }
+    decks_new_i = []
+    decks_new_i_prev_unchanged_rows = []
+    for i, row in enumerate(deck[0][1][1:]):
+        decks = [deck[:]]
+        decks_new_j = []
+        for j, action in enumerate(row):
+            if deck[0][0].get("type") == "hero":
+                # for the hero, it is allowed not make some actions,
+                # we will drop decks which have not changed at the end of the action row
+                decks.extend(decks_new_j[:])
+            else:
+                # the monster shall make all the available actions
+                if decks_new_j:
+                    decks = decks_new_j[:]
+                # else decks have not changed by the previous action and are going to suffer the next action
+            decks_new_j = []
+            for deck_j in decks:
+                # debug test
+                deck_j_hash = get_deck_hash(deck_j)
+                if deck_j_hash == '8D9D2A3B4A1A6C7B5D':
+                    pass
+                switcher_action = action[0].split()[0]
+                decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
+            decks_new_j = get_unique_items(decks_new_j)
+        # collect deck_changed bools
+        decks_new_j_changed = [deck_changed(d, deck) for d in decks_new_j]
+        # decks_new_i = [m for m in decks_new_j if deck_changed(m, deck)]
+
+        # if any deck changed
+        if any(decks_new_j_changed):
+            if not all(decks_new_j_changed):
+                decks_new_j = [deck_new_j for m, deck_new_j in enumerate(decks_new_j) if decks_new_j_changed[m]]
+            decks_new_i.extend(decks_new_j)
+            decks_new_i = get_unique_items(decks_new_i[:])
+            if deck[0][0].get('type') == 'monster':
+                break
+        # all the decks stale, no new deck show new configuration
+        else:
+            decks_new_i_prev_unchanged_rows.extend(decks_new_j)
+        # if the last row has been reached
+        if not decks_new_i and i == len(deck[0][1][1:]) - 1:
+            decks_new_i = get_unique_items(decks_new_i_prev_unchanged_rows[:])
+
+        # remove duplicates and remove the original deck, if others could be created
+
+        # decks_new_i = [i for i in decks_new_i if deck_changed(i, deck)]
+        # if len(decks_new_i) == 0:
+        #    decks_new_i.append(deck)
+
+    return get_unique_items(decks_new_i[:])
+
+
 """
 pyromancer
 Condition: Fire Cost
-Pay the cost by rotating X cards with Reaction: Fire Cost to activate the actions pointed by the arrow.
+    Pay the cost by rotating X cards with Reaction: Fire Cost to activate the actions pointed by the arrow.
 """
 
 # def fireball:
 """
 Game rules applicable:
     Fireball: Choose 1 card that was used to pay the Condition: Fire Cost cost and damage both cards adjacent to it.
+    Feature: Webs
+        Prevents an enemy card directly in front of this card from performing actions
+        that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
+    
+    # the next card displays feature "webs" and prevents from activating the top card
+    if "webs" in d[1][1][0].get("feature"):
+        return []
 """
 
 # def set_ablaze:
@@ -716,11 +876,18 @@ Game rules applicable:
 Game rules applicable:
     Set ablaze: Choose 2 different cards that was used to pay the cost and damage all cards in between them.
     Condition: Fire Cost
+    Feature: Webs
+        Prevents an enemy card directly in front of this card from performing actions
+        that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
+        
+    # the next card displays feature "webs" and prevents from activating the top card
+    if "webs" in d[1][1][0].get("feature"):
+        return []
 """
 
 """
-Reaction: Paying Fire Cost Used to pay
-Is always followed by an action:
+Reaction: Paying Fire Cost
+    Used to pay [fire]. Is always followed by an action
 """
 
 """
@@ -730,37 +897,10 @@ rewording: ...in the deck -> ...on the top of the deck
 """
 
 
-# def inspire(d):
-"""
-Game rules applicable:
-    Inspire: Activate other closest ally card from the middle of the deck.
-        Treat all the cards above it as if they didn't exist.
-"""
-
-
 """
 Condition: Spider Swarm
 If the top card of the deck is a ally and a continuous group of 1+ Spider Swarm cards is positioned directly behind it
     Activate all SPIDER SWARM rows of cards in that group starting from the most distant one
     Continue towards the top of the deck, before you activate the top card of the deck in a normal manner.
     (Don't activate a SPIDER SWARM row of a top card of the deck).
-
-Feature: Venom
-Prevents an enemy card directly in front of this card from performing actions that change cards position:
-    DELAY, QUICKEN, TELEPORT. Feature: Webs
-Feature: Sticky web: (missing name) Prevents an enemy card directly in front of this card from performing actions
-    that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
-"""
-
-"""
-Reaction: Block
-    If in range of targeting an ally card, intercept and negate the damage. 
-    If you do so, activate all icons after the arrow. 
-    If multiple BLOCKS available, use the furthest.
-"""
-
-
-"""
-Feature: Trap Master
-If an enemy card moves over a card with this feature, deal damage to it.
 """

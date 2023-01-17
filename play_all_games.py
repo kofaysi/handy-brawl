@@ -7,7 +7,7 @@ import handybrawl as hb
 
 
 def recreate_game(d_hash):
-    global decks_list
+    global game_bits
     game = []
     d_i_hash = d_hash[:]
     key_found = True
@@ -27,8 +27,8 @@ def play_card(deck):
         "hit": lambda d, a, n: hb.hit_deck(d, n),  # deck, action,
         "push": lambda d, a, r: hb.move_deck(d, a, r),  # deck, action, range
         "pull": lambda d, a, r: hb.move_deck(d, a, -r),  # deck, action, range
-        "delay": lambda d, a, p: hb.delay_deck(d, a, p),  # deck, action, by positions
-        "quicken": lambda d, a, p: hb.delay_deck(d, a, -p),  # deck, action, by positions
+        "delay": lambda d, a, p: hb.adjust_deck(d, a, p),  # deck, action, by positions
+        "quicken": lambda d, a, p: hb.adjust_deck(d, a, -p),  # deck, action, by positions
         "rotate": lambda d, a, n: hb.rotate_top_card(d),  # deck
         "heal": lambda d, a, n: hb.revive_deck(d),  # deck
         "arrow": lambda d, a, nt: hb.arrow_deck(d, a, nt),  # deck, action, number of targets
@@ -91,7 +91,7 @@ def play_card(deck):
     if hb.get_deck_hash(deck) == '3A7C2A4B8C5A6C':
         pass
 
-    global first_winner_length, decks_list, first_winner_hash
+    global first_winner_length, game_bits, first_winner_hash
     for deck_i in decks_new:
         if hb.get_deck_hash(deck_i) == '3A7C2A4B8C5A6C':
             pass
@@ -134,7 +134,7 @@ deck_start_hash = '2A3A4A5A6A7A8A'
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
-decks_list = dict()
+game_bits = dict()
 first_winner_length = 20
 first_winner_hash = None
 
@@ -147,15 +147,15 @@ play_card(deck_start)
 #     s = [str(j) for j in k]
 #     deck_start_hash = 'A'.join(s) + 'A'
 #     deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
-#     decks_list = dict()
+#     game_bits = dict()
 #     first_winner_length = 111
 #     first_winner_hash = None
 #     play_card(deck_start)
-#     print(len(decks_list))
+#     print(len(game_bits))
 
 pass
 
 #
-# for key, value in decks_list.items():  # iter on both keys and values
+# for key, value in game_bits.items():  # iter on both keys and values
 #     if key.endswith('5A') or key.startswith('5A'):
 #         print(key, value)
