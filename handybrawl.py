@@ -1,5 +1,5 @@
 """
-functions to manipulate the deck according to the Handy Brawl game project
+functions to manipulate the deck according to the Handy Brawl game rules actions
 """
 
 
@@ -39,6 +39,7 @@ def rotate_card_to_face(c, f):
             face_current = c_new[1][0].get("face")
             if face_current != f:
                 c_new = flip(rotate(c[:]))
+    # todo transcribe a werewolf feature of the face into the head of the card
     return c_new
 
 
@@ -53,6 +54,7 @@ def flip(c):
     :param c: a card
     :return: a new card
     """
+    # todo transcribe a werewolf feature of the face into the head of the card
     return [c[0], c[3], c[4], c[1], c[2]]
 
 
@@ -67,6 +69,7 @@ def rotate(c):
     :param c: a card
     :return: a new card
     """
+    # todo transcribe a werewolf feature of the face into the head of the card
     return [c[0], c[2], c[1], c[4], c[3]]
 
 
