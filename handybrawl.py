@@ -923,6 +923,8 @@ def play_card(deck):
                     pass
                 switcher_action = action[0].split()[0]
                 decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
+            # if no valid result has been generated, use the input as the outcome
+            # todo: check on the algo
             if not decks_new_j:
                 decks_new_j = decks[:]
             decks_new_j = get_unique_items(decks_new_j)
@@ -946,6 +948,8 @@ def play_card(deck):
             if decks_new_i_prev_unchanged_rows:
                 decks_new_i = get_unique_items(decks_new_i_prev_unchanged_rows[:])
             else:
+                # when no row generated a valid results, turn back to the original deck, the input
+                # todo: check on the algo
                 decks_new_i = [deck[:]]
 
                 # remove duplicates and remove the original deck, if others could be created
