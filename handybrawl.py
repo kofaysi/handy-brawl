@@ -816,14 +816,11 @@ def inspire_deck(d):
     """
     ds_new = []
     for i, _ in enumerate(d):
-        # todo: check whether an exhausted card is allowed to be inspired
-        if d[0][0].get("type") == d[i][0].get("type") \
-                and d[i][1][0].get("life") != "exhausted":
-            ds_new_i = play_card(d[i:])
-            for d_new_i in ds_new_i:
-                d_new = d[:i] + d_new_i
-                if d_new != d:
-                    ds_new.append([])
+        ds_new_i = play_card(d[i:])
+        for d_new_i in ds_new_i:
+            d_new = d[:i] + d_new_i
+            if d_new != d:
+                ds_new.append([])
         # if monster's inspire was successful and generated any new different deck on the closest ally card, end inspire
         if ds_new and d[0][0].get("type") == "monster":
             return ds_new
