@@ -1,19 +1,27 @@
 """
 List of all cards ordered by the number of the cards
-A card consists of a header (dict) and four faces (lists).
-The card header contains the following keys:
+
+A deck consists of a list of cards.
+
+A card consists of a list of one header (dict) and four faces.
+The card header (dict) identifies and specifies the card and contains the following keys:
     name : str ["warrior", "ogre", "ranger", "vampire", "pyromancer", "venomous"]
     type : str ["hero", "monster"]
     number : int, the card number
-A face consists of a header (dict) identifying and specifying the face and lists of actions (row-by-row).
-A face header contains the following keys
+
+A face consists of a list of one header and one or more rows (of actions).
+The face header (dict) identifies and specifies the face and contains the following keys:
     face : str ["A", "B", "C", "D"]
     life : str ["healthy", "wounded", "exhausted"]
-    feature : set of str (mandatory, at least empty set {})
+    feature : set of str (optional)
     reaction : str (optional)
     shield : str (optional)
-An action (str) consist of the action name (str) and specifier (int or str)
-The following action names are recognised (as expected at the end of the development)
+    other named feature : str (optional)
+
+A row of actions consists of a list of consequtive actions.
+
+An action is a tuple of an action (str) and a modifier (int or str or None).
+The following action names are recognised (as expected by the end of the development):
     - hit
     - rotate
     - delay
@@ -49,118 +57,118 @@ cards = [[  # card 1
         [("delay", 2), ("rotate", None)]
     ],
     [
-        dict(face="B", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
         [("delay", 1), ("hit", 2)],
         [("delay", 2)]
     ],
     [
-        dict(face="C", life="exhausted", feature={}),
+        dict(face="C", life="exhausted"),
         [("hit", 2)],
         [("delay", 2)]
     ],
     [
-        dict(face="D", life="wounded", feature={}),
+        dict(face="D", life="wounded"),
         [("hit", 4)],
         [("quicken", 2)]
     ]
 ], [
     dict(name="warrior", type="hero", number=2),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [("hit", 2), ("rotate", None)],
         [("delay", 2)]
     ],
     [
-        dict(face="B", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
         [("heal", None), ("rotate", None)],
         [("quicken", 2)]
     ],
     [
-        dict(face="C", life="exhausted", feature={}),
+        dict(face="C", life="exhausted"),
         [("quicken", 2)],
         [("delay", 2)]
     ],
     [
-        dict(face="D", life="wounded", feature={}),
+        dict(face="D", life="wounded"),
         [("heal", None), ("rotate", None)],
         [("delay", 3)]
     ]
 ], [
     dict(name="warrior", type="hero", number=3),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [("delay", 2), ("rotate", None)],
         [("quicken", 2), ("rotate", None)]
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [("hit", 4), ("hit", 4), ("rotate", None)]
     ],
     [
-        dict(face="C", life="exhausted", feature={}),
+        dict(face="C", life="exhausted"),
         [("quicken", 2)],
         [("delay", 2)]
     ],
     [
-        dict(face="D", life="wounded", feature={}),
+        dict(face="D", life="wounded"),
         [("hit", 4)],
         [("delay", 1)]
     ]
 ], [
     dict(name="warrior", type="hero", number=4),
     [
-        dict(face="A", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="A", life="healthy", reaction="shield", shield="rotate"),
         [("hit", 4)],
         [("quicken", 2)]
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [("hit", 2)],
         [("delay", 1), ("quicken", 1), ("rotate", None)]
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [("hit", 4)],
         [("quicken", 1)]
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [("hit", 2)],
         [("heal", None)]
     ]
 ], [
     dict(name="warrior", type="hero", number=5),
     [
-        dict(face="A", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="A", life="healthy", reaction="shield", shield="rotate"),
         [("quicken", 2), ("hit", 2)]
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [("hit", 2), ("rotate", None)],
         [("quicken", 2), ("rotate", None)]
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [("delay", 3), ("hit", 2), ("hit", 2), ("rotate", None)],
         [("quicken", 2)]
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [("hit", 4)],
         [("quicken", 1)]
     ]
 ], [  # card 6
     dict(name="ogre", type="monster", number=6),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [("pull enemy", 5), ("hit", 1), ("rotate", None)]
     ],
     [
-        dict(face="B", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
         [("hit", 4), ("push enemy", 3)],
     ],
     [
-        dict(face="C", life="exhausted", feature={}),
+        dict(face="C", life="exhausted"),
         [("hit", 5)],
     ],
     [
@@ -174,16 +182,16 @@ cards = [[  # card 1
         [("hit", 4), ("rotate", None)],
     ],
     [
-        dict(face="B", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
         [("heal", None), ("rotate", None)],
         [("hit", 7), ("rotate", None)]
     ],
     [
-        dict(face="C", life="exhausted", feature={}),
+        dict(face="C", life="exhausted"),
         [("hit", 5), ("pull ally", 3)],
     ],
     [
-        dict(face="D", life="wounded", feature={}),
+        dict(face="D", life="wounded"),
         [("push enemy", 3), ("hit", 5)]
     ]
 ], [
@@ -193,26 +201,26 @@ cards = [[  # card 1
         [("hit", 4), ("rotate", None)],
     ],
     [
-        dict(face="B", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
         [("heal", None), ("rotate", None)],
         [("hit", 5), ("rotate", None)]
     ],
     [
-        dict(face="C", life="exhausted", feature={}),
+        dict(face="C", life="exhausted"),
         [("pull enemy", 6), ("hit", 1)],
     ],
     [
-        dict(face="D", life="wounded", feature={}),
+        dict(face="D", life="wounded"),
         [("pull enemy", 4), ("hit", 1)]
     ]
 ], [
     dict(name="ogre", type="monster", number=9),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [("push enemy", 3), ("push enemy", 3), ("rotate", None)]
     ],
     [
-        dict(face="B", life="healthy", feature={}, reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
         [("hit", 5), ("rotate", None)],
     ],
     [
@@ -220,7 +228,7 @@ cards = [[  # card 1
         [("hit", 0)],
     ],
     [
-        dict(face="D", life="wounded", feature={}),
+        dict(face="D", life="wounded"),
         [("heal", None), ("heal", None), ("heal", None), ("rotate", None)],
         [("pull ally", 5)]
     ]
@@ -257,24 +265,24 @@ cards = [[  # card 1
         [("hit", 1), ("rotate", None)]
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [("delay hero", 2)],
         [("quicken enemy", 2)],
         [("maneuver", None), ("maneuver", None)]
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [("hit", 1), ("hit", 1), ("rotate", None)],
         [("quicken enemy", 2), ("maneuver", None)]
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [("hit", 1), ("maneuver", None), ("delay hero", 2)]
     ]
 ], [
     dict(name="ranger", type="hero", number=12),
     [
-        dict(face="A", life="healthy", feature={}, reaction="dodge", dodge="rotate"),
+        dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
         [("maneuver", None), ("quicken enemy", 2), ("rotate", None)],
         [("delay", 1), ("rotate", None)]
     ],
@@ -302,7 +310,7 @@ cards = [[  # card 1
         [("delay", 1)]
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [("arrow", 1), ("rotate", None)],
         [("maneuver", None), ("hit", 1), ("rotate", None)],
         [("quicken enemy", 2)]
@@ -314,19 +322,19 @@ cards = [[  # card 1
         [("delay", 1)]
     ],
     [
-        dict(face="D", life="wounded", feature={}),
+        dict(face="D", life="wounded"),
         [("arrow", 1)],
         [("quicken enemy", 2), ("maneuver", None)]
     ]
 ], [
     dict(name="ranger", type="hero", number=14),
     [
-        dict(face="A", life="healthy", feature={}, reaction="dodge", dodge="rotate"),
+        dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
         [("arrow", 1), ("rotate", None)],
         [("quicken enemy", 2), ("rotate", None)]
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [("arrow", 2)],
         [("delay hero", 2), ("maneuver", None)],
         [("heal", None)]
@@ -337,7 +345,7 @@ cards = [[  # card 1
         [("maneuver", None), ("hit", 1)]
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [("arrow", 1)],
         [("delay hero", 2)],
         [("heal", None)]
@@ -345,23 +353,23 @@ cards = [[  # card 1
 ], [
     dict(name="vampire", type="monster", number=15),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -369,23 +377,23 @@ cards = [[  # card 1
 ], [
     dict(name="vampire", type="monster", number=16),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -393,23 +401,23 @@ cards = [[  # card 1
 ], [
     dict(name="vampire", type="monster", number=17),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -417,23 +425,23 @@ cards = [[  # card 1
 ], [
     dict(name="vampire", type="monster", number=18),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -441,23 +449,23 @@ cards = [[  # card 1
 ], [
     dict(name="pyromancer", type="hero", number=19),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -465,23 +473,23 @@ cards = [[  # card 1
 ], [
     dict(name="pyromancer", type="hero", number=20),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -489,23 +497,23 @@ cards = [[  # card 1
 ], [
     dict(name="pyromancer", type="hero", number=21),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -513,23 +521,23 @@ cards = [[  # card 1
 ], [
     dict(name="pyromancer", type="hero", number=22),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -537,23 +545,23 @@ cards = [[  # card 1
 ], [
     dict(name="pyromancer", type="hero", number=23),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -561,23 +569,23 @@ cards = [[  # card 1
 ], [
     dict(name="venomous", type="monster", number=24),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -585,23 +593,23 @@ cards = [[  # card 1
 ], [
     dict(name="venomous", type="monster", number=25),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -609,23 +617,23 @@ cards = [[  # card 1
 ], [
     dict(name="venomous", type="monster", number=26),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
@@ -633,23 +641,23 @@ cards = [[  # card 1
 ], [
     dict(name="venomous", type="monster", number=27),
     [
-        dict(face="A", life="healthy", feature={}),
+        dict(face="A", life="healthy"),
         [],
         []
     ],
     [
-        dict(face="B", life="healthy", feature={}),
+        dict(face="B", life="healthy"),
         [],
         [],
         []
     ],
     [
-        dict(face="C", life="wounded", feature={}),
+        dict(face="C", life="wounded"),
         [],
         []
     ],
     [
-        dict(face="D", life="exhausted", feature={}),
+        dict(face="D", life="exhausted"),
         [],
         [],
         []
