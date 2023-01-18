@@ -119,17 +119,6 @@ def rotate(c):
 
 
 # @CountCalls
-def rotate_flip(c):
-    """
-    rotate() and flip() the same card
-
-    :param c: a card
-    :return: a new card
-    """
-    return flip(rotate(c[:]))
-
-
-# @CountCalls
 def back_shift(tup, n=1):
     """
     Send n (int) top cards to the bottom of the deck, one-by-one
