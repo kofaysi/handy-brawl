@@ -52,7 +52,7 @@ The following action names are recognised (as expected by the end of the develop
 cards = [[  # card 1
     dict(name="warrior", type="hero", number=1),
     [
-        dict(face="A", life="healthy", feature={"light"}),
+        dict(face="A", life="healthy"),
         [("hit", 2)],
         [("delay", 2), ("rotate", None)]
     ],
@@ -197,11 +197,11 @@ cards = [[  # card 1
 ], [
     dict(name="ogre", type="monster", number=8),
     [
-        dict(face="A", life="healthy", feature={"heavy"}),
+        dict(face="A", life="healthy"),
         [("hit", 4), ("rotate", None)],
     ],
     [
-        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", feature={"heavy"}),
         [("heal", None), ("rotate", None)],
         [("hit", 5), ("rotate", None)]
     ],

@@ -3,6 +3,8 @@ from colorama import Fore, Style  # , Back
 """
 Functions to manipulate the virtual deck of cards according to the Handy Brawl game rules.
 
+The deck is represented as a list with lists (cards) from top (start=0) to bottom (end=len(deck)-1). 
+
 Functions:
 
     rotate_card_to_face(c : list, f : str) -> list:
@@ -924,9 +926,11 @@ def play_card(deck):
                 switcher_action = action[0].split()[0]
                 decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
             # if no valid result has been generated, use the input as the outcome
-            # todo: check on the algo
+            # todo: check on the following algo
             if not decks_new_j:
                 decks_new_j = decks[:]
+            # todo: the rotate is mandatory, but not all last actions are mandatory;
+            # check, whether outcomes are generated with and without the last action, for hero only
             decks_new_j = get_unique_items(decks_new_j)
         # collect deck_changed bools
         decks_new_j_changed = [deck_changed(d, deck) for d in decks_new_j]
