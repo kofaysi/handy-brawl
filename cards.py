@@ -188,7 +188,7 @@ cards = [[  # card 1
     ],
     [
         dict(face="C", life="exhausted"),
-        [("hit", 5), ("pull ally", 3)],
+        [("hit", 5), ("pull ally", 4)],
     ],
     [
         dict(face="D", life="wounded"),
