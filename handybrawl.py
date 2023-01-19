@@ -416,7 +416,8 @@ def hit_deck(d, n):
     for i in hit_list:
         # Reaction: Shield: Don't target
         if d[0][0].get("type") != d[i][0].get("type") \
-                and d[i][1][0].get("reaction") == "shield":
+                and "feature" in d[i][1][0] \
+                and d[i][1][0].get("feature")[0] == "shield":
             d_new = intercept(d[:], i, "shield")
             shield_found = True
             if not check_cards_unique(d_new):

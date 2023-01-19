@@ -220,7 +220,7 @@ cards = [[  # card 1
         [("push enemy", 3), ("push enemy", 3), ("rotate", None)]
     ],
     [
-        dict(face="B", life="healthy", reaction="shield", shield="rotate"),
+        dict(face="B", life="healthy", reaction=("shield", "rotate")),
         [("hit", 5), ("rotate", None)],
     ],
     [
