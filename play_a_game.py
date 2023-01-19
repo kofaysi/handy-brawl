@@ -53,6 +53,8 @@ def request_deck():
     app_description = "This application is a hobby type of project by Milan Žroutík <zroutik@e.email>."
 
     instructions = "The hash for a deck is a string consisting of alternating integers and characters [A, B, C, D].\n" \
+                   "The physical cards in the physical deck are played from top to bottom." \
+                   "The virtual cards (their faces) in the virtual deck are listed from left to right.\n" \
                    "Card numbers are represented by integers and the faces of the cards by letters.\n" \
                    "Lower case letters are accepted. Spaces are accepted.\n" \
                    "Missing letters represent the face 'A' of the card.\n" \

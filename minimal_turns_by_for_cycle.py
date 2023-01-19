@@ -1,5 +1,6 @@
 """
-Solve the deck by finding the lowest number of turns using for cycle.
+Solve the deck by finding the lowest number of turns using a for-cycle.
+It is highly time-inefficient way of finding the solution.
 """
 
 import cards
@@ -13,7 +14,7 @@ def recreate_game(d_hash):
     key_found = True
     game.append(d_i_hash)
     while key_found:
-        d_prev_hash = decks_list.get(d_i_hash)
+        d_prev_hash = hb.game_bits.get(d_i_hash)
         if d_prev_hash:
             game.append(d_prev_hash)
             d_i_hash = d_prev_hash[:-2] + d_prev_hash[-2:]
@@ -30,7 +31,7 @@ def play_card(deck):
         "delay": lambda d, a, p: hb.adjust_deck(d, a, p),  # deck, action, by positions
         "quicken": lambda d, a, p: hb.adjust_deck(d, a, -p),  # deck, action, by positions
         "rotate": lambda d, a, n: hb.rotate_top_card(d),  # deck
-        "heal": lambda d, a, n: hb.revive_deck(d),  # deck
+        "heal": lambda d, a, n: hb.revive_deck(d, a),  # deck
         "arrow": lambda d, a, e: hb.arrow_deck(d, a, -e),  # deck, action, end of range
         "maneuver": lambda d, a, n: hb.maneuver_deck(d),  # deck
     }
@@ -97,6 +98,7 @@ def play_card(deck):
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
 # deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 deck_start_hash = '2A3A4A5A6A'
+deck_start_hash = '2A3A4A5A6A7A8A'
 # deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'

@@ -416,9 +416,9 @@ def hit_deck(d, n):
     for i in hit_list:
         # Reaction: Shield: Don't target
         if d[0][0].get("type") != d[i][0].get("type") \
-                and "feature" in d[i][1][0] \
-                and d[i][1][0].get("feature")[0] == "shield":
-            d_new = intercept(d[:], i, "shield")
+                and "reaction" in d[i][1][0] \
+                and d[i][1][0].get("reaction")[0] == "shield":
+            d_new = intercept(d[:], i, d[i][1][0].get("reaction")[1])
             shield_found = True
             if not check_cards_unique(d_new):
                 pass
@@ -493,7 +493,7 @@ def intercept(d, i, reaction):
 
     :param d: the current deck
     :param i: the i-th card
-    :param reaction: a string activating the intercept()
+    :param reaction: a string describing the action after activating the intercept()
     :return: the new deck
     """
     if not check_cards_unique(d):
@@ -504,15 +504,15 @@ def intercept(d, i, reaction):
         "rotate": lambda c: rotate(c[:])
     }
 
-    try:
-        action = d[i][1][0].get(reaction)
-    except KeyError:
-        # reaction to intercept does not exist
-        action = None
+    # try:
+    #     action = d[i][1][0].get(reaction)
+    # except KeyError:
+    #     # reaction to intercept does not exist
+    #     action = None
 
-    if action or not "None":
+    if reaction or reaction is not "None":
         # a switcher construction used for multiple possible shield or dodge reactions
-        d_new[i] = switcher.get(action)(d[i][:])
+        d_new[i] = switcher.get(reaction)(d[i][:])
         if not check_cards_unique(d_new):
             pass
     return d_new
@@ -741,6 +741,8 @@ def arrow_deck(d, t=1, e=-3):
     for i in target_list:
         d_new = d[:]
         if d[i][0].get("type") == "monster":
+            # todo: rewrite using check for "reaction" existence
+            # also consider "dodge" as a reaction
             if d[i][0].get("reaction") != "shield":
                 d_new = hit_card(d_new[:], i)
             else:

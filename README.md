@@ -1,4 +1,4 @@
-# handy-brawl
+# Handy Brawl in terminal
 
 This application is a simulating the Handy Brawl game by Igor Zuber.
 Download the cards and the rules from the files section at https://boardgamegeek.com/boardgame/362692/handy-brawl.
@@ -13,7 +13,7 @@ The hash for a deck is a string consisting of alternating integers and character
 Card numbers are represented by integers and the faces of the cards by letters.
 Lower case letters are accepted. Spaces are accepted.
 Missing letters represent the face 'A' of the card.
-    (Spaces between numbers are required in such case.)
+    (Spaces between numbers are mandatory in such case.)
 
 Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.
 Valid hash examples:
