@@ -15,10 +15,7 @@ deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '9b2b6d5c'
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)
-
-deck = deck_start[:]
-decks_new = [deck]
-print("Welcome to the new game with the following deck:")
+decks_new = None
 
 
 def request_number(minimum=1, maximum=1):
@@ -50,26 +47,33 @@ def request_number(minimum=1, maximum=1):
 
 while True:
     # sort results by their decreasing her status, and increasing monster status
-    decks_new.sort(key=lambda dx: (hb.get_status(dx).get("hero"), -hb.get_status(dx).get("monster")), reverse=True)
 
-    # global card_colours, card_status
-    for k, d in enumerate(decks_new):
-        s = ''
-        for c in d:
-            s += hb.colour_card_hash(c)
-        print("{:3d}".format(k+1), ":", s)
-
-    if len(decks_new) != 1:
-        option_number = request_number(maximum=len(decks_new))
+    if not decks_new:
+        # initialise at start
+        deck = deck_start[:]
+        decks_new = [deck]
+        print("Welcome to the new game with the following deck:")
+        deck_i_new = deck_i = decks_new[0]
     else:
-        option_number = 1
-        print("A single outcome evaluated. Proceeding automatically to a new deck...")
-    deck_i = decks_new[option_number-1]
+        decks_new.sort(key=lambda dx: (hb.get_status(dx).get("hero"), -hb.get_status(dx).get("monster")), reverse=True)
 
-    # print('Your choice:',  option_number)
-    print('The new deck to play is:')
+        # global card_colours, card_status
+        for k, d in enumerate(decks_new):
+            s = ''
+            for c in d:
+                s += hb.colour_card_hash(c)
+            print("{:3d}".format(k + 1), ":", s)
+            deck_i_new = hb.back_shift(deck_i[:])
 
-    deck_i_new = hb.back_shift(deck_i[:])
+        if len(decks_new) != 1:
+            option_number = request_number(maximum=len(decks_new))
+        else:
+            option_number = 1
+            print("A single outcome evaluated. Proceeding automatically to a new deck...")
+        deck_i = decks_new[option_number-1]
+
+        print('The new deck to play is:')
+
     s = ''
     for c in deck_i_new:
         s += hb.colour_card_hash(c)
@@ -81,7 +85,7 @@ while True:
     deck_i_new_hash = hb.get_deck_hash(deck_i_new)
     status = hb.get_status(deck_i)
     print(status)
-    if deck_i_new_hash not in hb.game_bits and deck_i_new_hash != hb.get_deck_hash(deck_start):
+    if deck_i_new_hash not in hb.game_bits:
         hb.game_bits[deck_i_new_hash] = hb.get_deck_hash(deck)
         if status.get("hero") == 0 or status.get("monster") == 0:
             game_deck_i_new = hb.recreate_game(deck_i_new_hash)
