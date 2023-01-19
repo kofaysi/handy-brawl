@@ -966,12 +966,20 @@ def play_card(deck):
     return get_unique_items(decks_new_i[:])
 
 
-card_colours = dict(warrior=Fore.RED, ogre=Fore.GREEN, ranger=Fore.LIGHTGREEN_EX, vampire=Fore.MAGENTA, pyromancer=Fore.LIGHTYELLOW_EX, venomous=Fore.LIGHTMAGENTA_EX)
+card_colours = dict(warrior=Fore.BLUE,
+                    ogre=Fore.GREEN,
+                    huntress=Fore.LIGHTGREEN_EX,
+                    vampire=Fore.LIGHTBLUE_EX,
+                    pyromancer=Fore.LIGHTYELLOW_EX,
+                    spider=Fore.LIGHTMAGENTA_EX,
+                    werewolf=Fore.LIGHTBLACK_EX,
+                    demon=Fore.LIGHTCYAN_EX)
 card_status_symbols = dict(healthy="◼", wounded="⬓", exhausted="◻")
 
 
 def colour_card_hash(c):
-    s_out = Style.BRIGHT \
+    # Style.BRIGHT \
+    s_out = '' \
             + card_colours[c[0].get("name")] \
             + "{:2d}".format(c[0].get("number")) \
             + c[1][0].get("face") \

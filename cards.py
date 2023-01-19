@@ -5,7 +5,7 @@ A deck consists of a list of cards.
 
 A card consists of a list of one header (dict) and four faces.
 The card header (dict) identifies and specifies the card and contains the following keys:
-    name : str ["warrior", "ogre", "ranger", "vampire", "pyromancer", "venomous"]
+    name : str ["warrior", "ogre", "huntress", "vampire", "pyromancer", "spider"]
     type : str ["hero", "monster"]
     number : int, the card number
 
@@ -47,6 +47,9 @@ The following action names are recognised (as expected by the end of the develop
     - teleport any
     - fireball
     - ablaze
+    - condition, this is a special action
+        for which the second item in the tuple is a list of actions:
+        example (condition, [("fire", 2), (ablaze, None), (hit, 2)])
 """
 
 cards = [[  # card 1
@@ -233,7 +236,7 @@ cards = [[  # card 1
         [("pull ally", 5)]
     ]
 ], [
-    dict(name="ranger", type="hero", number=10),
+    dict(name="huntress", type="hero", number=10),
     [
         dict(face="A", life="healthy", feature={"trap"}),
         [("arrow", 1), ("rotate", None)],
@@ -257,7 +260,7 @@ cards = [[  # card 1
         [("quicken", 1)]
     ]
 ], [
-    dict(name="ranger", type="hero", number=11),
+    dict(name="huntress", type="hero", number=11),
     [
         dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
         [("arrow", 1), ("rotate", None)],
@@ -280,7 +283,7 @@ cards = [[  # card 1
         [("hit", 1), ("maneuver", None), ("delay hero", 2)]
     ]
 ], [
-    dict(name="ranger", type="hero", number=12),
+    dict(name="huntress", type="hero", number=12),
     [
         dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
         [("maneuver", None), ("quicken enemy", 2), ("rotate", None)],
@@ -302,7 +305,7 @@ cards = [[  # card 1
         [("maneuver", None), ("hit", 1)]
     ]
 ], [
-    dict(name="ranger", type="hero", number=13),
+    dict(name="huntress", type="hero", number=13),
     [
         dict(face="A", life="healthy", feature={"trap"}),
         [("maneuver", None), ("rotate", None)],
@@ -327,7 +330,7 @@ cards = [[  # card 1
         [("quicken enemy", 2), ("maneuver", None)]
     ]
 ], [
-    dict(name="ranger", type="hero", number=14),
+    dict(name="huntress", type="hero", number=14),
     [
         dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
         [("arrow", 1), ("rotate", None)],
@@ -567,7 +570,7 @@ cards = [[  # card 1
         []
     ]
 ], [
-    dict(name="venomous", type="monster", number=24),
+    dict(name="spider", type="monster", number=24),
     [
         dict(face="A", life="healthy"),
         [],
@@ -591,7 +594,7 @@ cards = [[  # card 1
         []
     ]
 ], [
-    dict(name="venomous", type="monster", number=25),
+    dict(name="spider", type="monster", number=25),
     [
         dict(face="A", life="healthy"),
         [],
@@ -615,7 +618,7 @@ cards = [[  # card 1
         []
     ]
 ], [
-    dict(name="venomous", type="monster", number=26),
+    dict(name="spider", type="monster", number=26),
     [
         dict(face="A", life="healthy"),
         [],
@@ -639,7 +642,223 @@ cards = [[  # card 1
         []
     ]
 ], [
-    dict(name="venomous", type="monster", number=27),
+    dict(name="spider", type="monster", number=27),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="werewolf", type="monster", number=28),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="werewolf", type="monster", number=29),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="werewolf", type="monster", number=30),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="werewolf", type="monster", number=31),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="werewolf", type="monster", number=32),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="demon", type="monster", number=33),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="demon", type="monster", number=34),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="demon", type="monster", number=35),
+    [
+        dict(face="A", life="healthy"),
+        [],
+        []
+    ],
+    [
+        dict(face="B", life="healthy"),
+        [],
+        [],
+        []
+    ],
+    [
+        dict(face="C", life="wounded"),
+        [],
+        []
+    ],
+    [
+        dict(face="D", life="exhausted"),
+        [],
+        [],
+        []
+    ]
+], [
+    dict(name="demon", type="monster", number=36),
     [
         dict(face="A", life="healthy"),
         [],
@@ -663,5 +882,3 @@ cards = [[  # card 1
         []
     ]
 ]]
-
-# pyromancer, vampire, venomous

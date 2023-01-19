@@ -1,5 +1,6 @@
 import cards
 import handybrawl as hb
+import re
 
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
@@ -13,9 +14,6 @@ deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '1C6C2D7A8A3C5D4D9C'
 # deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
-
-deck_start = hb.create_deck(deck_start_hash, cards.cards)
-decks_new = None
 
 
 def request_number(minimum=1, maximum=1):
@@ -45,6 +43,88 @@ def request_number(minimum=1, maximum=1):
     return number
 
 
+def request_deck():
+    game_description = "This application is a simulating the Handy Brawl game by Igor Zuber.\n" \
+                       "A card overview is required to play the game properly.\n" \
+                       "The cards design and available actions on faces are not displayed. " \
+                       "Download the cards and the rules from the files section at " \
+                       "https://boardgamegeek.com/boardgame/362692/handy-brawl." \
+
+    app_description = "This application is a hobby type of project by Milan Žroutík <zroutik@e.email>."
+
+    instructions = "The hash for a deck is a string consisting of alternating integers and characters [A, B, C, D].\n" \
+                   "Card numbers are represented by integers and the faces of the cards by letters.\n" \
+                   "Lower case letters are accepted. Spaces are accepted.\n" \
+                   "Missing letters represent the face 'A' of the card.\n" \
+                   "    (Spaces between numbers are required in such case.)\n" \
+                   "Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.\n" \
+                   "Valid hash examples:\n" \
+                   "    - 1A6A2A7A3A8A4A9A5A\n" \
+                   "    - 1A 6A 2A 7A 3A 8A 4A 9A 5A\n" \
+                   "    - 1 6 2 7 3 8 4 9 5"
+
+    def corrections(s_hash: str) -> str:
+        # make the hash uppercase
+        s_hash = s_hash.strip().upper()
+        # remove other then [A, B, C, D] chars
+        s_hash = re.sub(r'[E-Z]', '', s_hash)
+        # replace spaces between numbers without chars by char 'A'
+        s_hash = re.sub(r'(\d)\s+(?=\d)', r'\1A', s_hash)
+        # add face A to the number without chars by char 'A' and at the end of the string
+        s_hash = re.sub(r'(\d)$', r'\1A', s_hash)
+        # remove spaces
+        s_hash = re.sub(r'([ABCD])\s*(?=\d)', r'\1', s_hash)
+        return s_hash
+
+    print(app_description)
+    print()
+    print(game_description)
+    print()
+    print(instructions)
+    print()
+
+    while True:
+        try:
+            input_hash = str(input('Enter a hash for the deck to play: '))
+        except ValueError:
+            print("The input has been captured.")
+            # better try again... Return to the start of the loop
+            continue
+
+        input_hash_cor = corrections(input_hash)
+
+        try:
+            hb.get_deck_hash(hb.create_deck(input_hash_cor, cards.cards))
+            print("The accepted hash: ", input_hash_cor)
+            numbers, _ = hb.unzip_hash(input_hash)
+            if not all([1 <= i <= 9 for i in numbers]):
+                print("Use card numbers for the warrior and the ogre characters, in the range from 1 to 9. "
+                      "Other characters are coming soon.")
+                continue
+            print("If the hash has been parsed incorrectly, start the application over.")
+            break
+        except ValueError:
+            print("The supplied input is not following the the suggested structure.")
+            print("The hash cannot be converted to its deck representation.")
+            print(instructions)
+            continue
+        except IndexError:
+            print("No corresponding card numbers could be found.")
+            continue
+
+    return input_hash_cor
+
+
+if 'deck_start_hash' not in locals():
+    deck_start_hash = ''
+
+if not deck_start_hash:
+    deck_start_hash = request_deck()
+
+deck_start = hb.create_deck(deck_start_hash, cards.cards)
+decks_new = None
+
+
 while True:
     # sort results by their decreasing her status, and increasing monster status
 
@@ -54,10 +134,14 @@ while True:
         decks_new = [deck_prev]
         deck_new = deck_prev = decks_new[0]
         print("Welcome to the new game with the following deck:")
+        symbol_description = "Each colour represents one character.\n" \
+                             "The life status is represented by square symbols:"
+        print(symbol_description)
+        print(hb.card_status_symbols)
     else:
         decks_new.sort(key=lambda dx: (hb.get_status(dx).get("hero"), -hb.get_status(dx).get("monster")), reverse=True)
 
-        # global card_colours, card_status
+        # global card_colours, card_status .
         for k, d in enumerate(decks_new):
             s = ''
             for c in d:
