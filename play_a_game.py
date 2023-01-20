@@ -58,24 +58,26 @@ def request_number(minimum=1, maximum=1):
 def request_deck():
     game_description = "This application is a simulating the Handy Brawl game by Igor Zuber.\n" \
                        "A card overview is required to play the game properly.\n" \
-                       "The cards design and available actions on faces are not displayed. " \
+                       "The cards design and available actions on faces are not displayed.\n" \
                        "Download the cards and the rules from the files section at " \
                        "https://boardgamegeek.com/boardgame/362692/handy-brawl." \
 
     app_description = "This application is a hobby type of project by Milan Žroutík <zroutik@e.email>."
 
     instructions = "The hash for a deck is a string consisting of alternating integers and characters [A, B, C, D].\n" \
-                   "The physical cards in the physical deck are played from top to bottom." \
-                   "The virtual deck with card (and their faces) in the virtual deck are listed from right to left.\n" \
+                   "The physical cards in the physical deck are played from top to bottom. " \
+                   "The virtual deck with cards (and their faces) are displayed from right to left.\n" \
                    "Card numbers are represented by integers and the faces of the cards by letters.\n" \
                    "Lower case letters are allowed. Spaces are allowed.\n" \
                    "Missing letters represent the face 'A' of the card.\n" \
                    "    (Spaces between numbers are required in such case.)\n" \
                    "Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.\n" \
-                   "Some examples of a valid hash:\n" \
-                   "    - 5A9A4A8A3A7A2A6A1A\n" \
-                   "    - 5A 9A 4A 8A 3A 7A 2A 6A 1A\n" \
-                   "    - 5 9 4 8 3 7 2 6 1"
+                   "The visualisation od the deck (5A◼  9A◼  4A◼  8A◼  3A◼  7A◼  2A◼  6A◼  1A◼)\n " \
+                   "and the hash to the deck (1A6A2A7A3A8A4A9A5A) have reversed order of the cards.\n " \
+                   "Some examples of a valid hash (top card of the deck first, bottom card of the deck last):\n" \
+                   "    - 1A6A2A7A3A8A4A9A5A\n" \
+                   "    - 1A 6A 2A 7A 3A 8A 4A 9A 5A\n" \
+                   "    - 1 6 2 7 3 8 4 9 5"
 
     def corrections(s_hash: str) -> str:
         # make the hash uppercase
@@ -101,7 +103,8 @@ def request_deck():
 
     while True:
         try:
-            input_hash = str(input('Enter a hash for the deck to play: '))
+            input_hash = str(input('Enter a hash for the deck to play '
+                                   '(start entering the top card first, proceed the list from left to right): '))
         except ValueError:
             print("The input has been captured.")
             # better try again... Return to the start of the loop
@@ -134,8 +137,8 @@ def request_deck():
 if 'deck_start_hash' not in locals():
     deck_start_hash = ''
 
-answer = input("Do you wish to start a game with the deck saved within the scrip? ([Y]es/No) "
-               "(In case of 'no', you will be requested to enter your own deck): ")
+answer = input("Do you wish to start a game with your own deck? ([Y]es/No) "
+               "(In case of 'no', you will be served by the deck saved within the script): ")
 
 # or not deck_start_hash
 if answer.lower() in {'yes', 'y', 'yeah', 'ano', 'igen'}:
