@@ -5,6 +5,9 @@ There are no means to manipulate the virtual deck of cards such as in the PCIO r
 The deck is visualised as a list of strings (cards) from right (top card) to left (bottom card).
 
 The application may be a subject to rapid changes in the following weeks.
+todo:
+    - add missing characters
+    - add missing actions and conditions
 """
 
 import cards
