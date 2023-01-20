@@ -6,7 +6,7 @@ Download the cards and the rules from the files section at https://boardgamegeek
 This application is a hobby type of project by Milan Žroutík <zroutik@e.email>.
 
 The game is represented as a flow of turns.
-Due to the structure of the deck and the action selection at the face of the top card, some turns require no user inetraction.
+Due to the structure of the deck and the action selection at the face of the top card, some turns require no user interaction.
 For others, variants of outcome are offered to the user to choose from.
 
 The hash for a deck is a string consisting of alternating integers and characters [A, B, C, D].

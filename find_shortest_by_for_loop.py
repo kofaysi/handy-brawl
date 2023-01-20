@@ -1,16 +1,17 @@
 """
-Solve the deck by finding the lowest number of turns using a for-cycle.
+Solve the deck by finding the lowest number of turns using a for-loop.
 It is highly time-inefficient way of finding the solution.
+This algorithm is like to work well for finding solutions for deck with up to 6 cards.
 """
 
 import cards
 import handybrawl as hb
 
 
-# deck_start_hash = '1A6A2A7A3A8A4A9A5A'
+deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
 # deck_start_hash = '1A2A3A4A5A6A7A8A9A'
-deck_start_hash = '1A6A2A8A3A'
+# deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '2A3A4A5A6A7A8A'
 # deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1A6A2A8A3A'
@@ -18,7 +19,7 @@ deck_start_hash = '1A6A2A8A3A'
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
-first_winner_length = 32
+first_winner_length = 13
 first_winner_hash = None
 
 decks_new_main = [deck_start]
@@ -29,9 +30,18 @@ while not first_winner_hash:
     print("Turn:", i)
     decks_i_new = []
     for deck_i in decks_new_main:
-        decks_i_new.extend(hb.play_card(deck_i))
+        # do not execute play_card() if the deck had been an origin previously
+        if hb.get_deck_hash(deck_i) not in hb.game_turns.values():
+            decks_i_new.extend(hb.play_card(deck_i))
+            for deck_i_new in decks_i_new:
+                deck_i_new_hash = hb.get_deck_hash(hb.back_shift(deck_i[:]))
+                if deck_i_new_hash not in hb.game_turns:
+                    hb.game_turns[deck_i_new_hash] = hb.get_deck_hash(deck_i)
 
+    # the for cycle needs to get rid of duplicates and optionally sort the list of decks
     decks_i_new = hb.get_unique_items(decks_i_new[:])
+    decks_i_new.sort(key=lambda d: (hb.get_status(d).get("hero"), -hb.get_status(d).get("monster")), reverse=True)
+
     print("Number of results:", len(decks_i_new))
 
     decks_i_new_A = []
@@ -53,12 +63,13 @@ while not first_winner_hash:
             pass
         deck_i_new_hash = hb.get_deck_hash(deck_i_new)
         status = hb.get_status(deck_i)
-        if deck_i_new_hash not in hb.game_bits and deck_i_new_hash != hb.get_deck_hash(deck_start):
-            hb.game_bits[deck_i_new_hash] = hb.get_deck_hash(deck_i)
+        # do not count the deck if the deck had been any result previously
+        if deck_i_new_hash not in hb.game_turns and deck_i_new_hash != hb.get_deck_hash(deck_start):
+            hb.game_turns[deck_i_new_hash] = hb.get_deck_hash(deck_i)
             game_deck_i_new = hb.recreate_game(deck_i_new_hash)
             decks_i_new_A.append(deck_i_new)
             if status.get("monster") == 0 and status.get("hero") != 0:
-                print(len(hb.game_bits), ":",
+                print(len(hb.game_turns), ":",
                       deck_i_new_hash, ":",
                       status,
                       'start deck:', game_deck_i_new[-1],

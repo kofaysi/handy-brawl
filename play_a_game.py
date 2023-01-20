@@ -1,3 +1,7 @@
+"""
+
+"""
+
 import cards
 import handybrawl as hb
 import re
@@ -174,12 +178,12 @@ while True:
     deck_prev_hash = hb.get_deck_hash(deck_prev)
     status = hb.get_status(deck_new)
     print(status)
-    if deck_new_hash not in hb.game_bits:
+    if deck_new_hash not in hb.game_turns:
         if deck_new_hash != deck_prev_hash:
-            hb.game_bits[deck_new_hash] = deck_prev_hash
+            hb.game_turns[deck_new_hash] = deck_prev_hash
         if status.get("hero") == 0 or status.get("monster") == 0:
             game_deck_new = hb.recreate_game(deck_new_hash)
-            print("game end", ":", len(hb.game_bits), ":",
+            print("game end", ":", len(hb.game_turns), ":",
                   deck_new_hash, ":",
                   status,
                   'start deck:', game_deck_new[-1],

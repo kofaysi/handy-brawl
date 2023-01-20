@@ -1,53 +1,55 @@
-from colorama import Fore, Style  # , Back
-
 """
+
 Functions to manipulate the virtual deck of cards according to the Handy Brawl game rules.
 
 The deck is represented as a list with lists (cards) from top (start=0) to bottom (end=len(deck)-1). 
 
 Functions:
 
-    rotate_card_to_face(c : list, f : str) -> list:
-    flip(c : list) -> list:
-    rotate(c : list) -> list:
-    rotate_flip(c : list) -> list:
-    back_shift(tup : tuple, n=1 : int) -> tuple:
-    check_cards_unique(d : list) -> bool:
-    unzip_hash(d_hash : str) -> list, list:
-    deck_changed(d1 : list, d2 : list, i=1 : int) -> bool:
-    adjust_deck(d : list, a : str, p : str) -> list:
-    move_deck(d : list, a : str, r : str) -> list:
-    move_card(d : list, i : int, j : int) -> list:
-    rotate_top_card(d : list, i=0 : int) -> list:
-    hit_deck(d : list, n : int) -> list:
-    intercept(d : list, i : int, reaction) -> list:
-    hit_card(d : list, i : int) -> list:
-    revive_deck(d : list, a : str) -> list:
-    revive_card(c : list) -> list:
-    get_unique_items(lst : list) -> list:
-    get_status(d : list) -> dict:
-    maneuver_deck(d : list) -> list:
-    iter_combs(n : int, k : int) -> list:
-    arrow_deck(d : list, t=1 : int, e=-3 : int) -> list:
-    teleport_deck(d : list, t : int) -> list:
-    inspire_deck(d : list) -> list:
-    get_deck_hash(d : list) -> list:
-    create_deck(d_hash : str, cards) -> list:
-    recreate_game(d_hash : str) -> list:
-    play_card(deck : list): -> list:
+- rotate_card_to_face(c : list, f : str) -> list:
+- flip(c : list) -> list:
+- rotate(c : list) -> list:
+- rotate_flip(c : list) -> list:
+- back_shift(tup : tuple, n=1 : int) -> tuple:
+- check_cards_unique(d : list) -> bool:
+- unzip_hash(d_hash : str) -> list, list:
+- deck_changed(d1 : list, d2 : list, i=1 : int) -> bool:
+- adjust_deck(d : list, a : str, p : str) -> list:
+- move_deck(d : list, a : str, r : str) -> list:
+- move_card(d : list, i : int, j : int) -> list:
+- rotate_top_card(d : list, i=0 : int) -> list:
+- hit_deck(d : list, n : int) -> list:
+- intercept(d : list, i : int, reaction) -> list:
+- hit_card(d : list, i : int) -> list:
+- revive_deck(d : list, a : str) -> list:
+- revive_card(c : list) -> list:
+- get_unique_items(lst : list) -> list:
+- get_status(d : list) -> dict:
+- maneuver_deck(d : list) -> list:
+- iter_combs(n : int, k : int) -> list:
+- arrow_deck(d : list, t=1 : int, e=-3 : int) -> list:
+- teleport_deck(d : list, t : int) -> list:
+- inspire_deck(d : list) -> list:
+- get_deck_hash(d : list) -> list:
+- create_deck(d_hash : str, cards) -> list:
+- recreate_game(d_hash : str) -> list:
+- play_card(deck : list): -> list:
 
 Variables:
 
-    game_bits : dict
-        Dictionary to store the game bits.
-        The deck hash with no existing key with the same name, is the starting/first deck.
-    card_status_symbols : dict
-        Dictionary of status names and symbols for displaying in terminal.
-    card_colours : dict
-        Dictionary of card names and colours for displaying in terminal.
+- game_turns : dict
+    Dictionary to store the hashes of the game turns, game_turns[result] = origin.
+    There can be multiple origins, but only one result is counted, when executing or comparing multiple games.
+    The deck hash with no existing key with the same name, is the starting/first deck.
+- card_status_symbols : dict
+    Dictionary of status names and symbols for displaying in terminal.
+- card_colours : dict
+    Dictionary of card names and colours for displaying in terminal.
 """
 
-game_bits = dict()
+from colorama import Fore, Style  # , Back
+
+game_turns = dict()
 
 
 class CountCalls:
@@ -871,13 +873,13 @@ def recreate_game(d_hash):
     :param d_hash: a hash of the deck
     :return: list of hashes of decks starting by d_hash and ending by the hash of the start deck.
     """
-    global game_bits
+    global game_turns
     game = []
     d_i_hash = d_hash[:]
     key_found = True
     game.append(d_i_hash)
     while key_found:
-        d_prev_hash = game_bits.get(d_i_hash)
+        d_prev_hash = game_turns.get(d_i_hash)
         if d_prev_hash:
             game.append(d_prev_hash)
             d_i_hash = d_prev_hash

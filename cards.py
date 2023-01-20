@@ -1,27 +1,40 @@
 """
-List of all cards ordered by the number of the cards
+content of the file
+    List of all cards ordered by the number of the cards
 
-A deck consists of a list of cards.
 
-A card consists of a list of one header (dict) and four faces.
-The card header (dict) identifies and specifies the card and contains the following keys:
-    name : str ["warrior", "ogre", "huntress", "vampire", "pyromancer", "spider"]
-    type : str ["hero", "monster"]
-    number : int, the card number
+deck : list
+    A deck consists of a list of cards.
 
-A face consists of a list of one header and one or more rows (of actions).
-The face header (dict) identifies and specifies the face and contains the following keys:
-    face : str ["A", "B", "C", "D"]
-    life : str ["healthy", "wounded", "exhausted"]
-    feature : set of str (optional)
-    reaction : str (optional)
-    shield : str (optional)
-    other named feature : str (optional)
+card : list
+    A card consists of a list of one header (dict) and four faces.
 
-A row of actions consists of a list of consequtive actions.
+header (to the card) : dict
+    The card header (dict) identifies and specifies the card and contains the following keys:
+    - name : str ["warrior", "ogre", "huntress", "vampire", "pyromancer", "spider"]
+    - type : str ["hero", "monster"]
+    - number : int, the card number
 
-An action is a tuple of an action (str) and a modifier (int or str or None).
-The following action names are recognised (as expected by the end of the development):
+face : list
+    A face consists of a list of one header and one or more rows (of actions).
+
+header (to the face) : dict
+    The face header (dict) identifies and specifies the face and contains the following keys:
+
+    - face : str ["A", "B", "C", "D"]
+    - life : str ["healthy", "wounded", "exhausted"]
+    - feature : set of str (optional)
+    - reaction : str (optional)
+    - shield : str (optional)
+    - other named feature : str (optional)
+
+row [of actions] : list
+    A row of actions consists of a list of consecutive actions.
+
+action : tuple(str, int|str|None)
+    An action is a tuple of an action (str) and a modifier (int or str or None).
+    The following action names are recognised (as expected by the end of the development):
+
     - hit
     - rotate
     - delay
