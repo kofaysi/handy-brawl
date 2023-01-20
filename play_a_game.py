@@ -2,7 +2,7 @@
 An application running a Handy Brawl game in terminal according to the Handy Brawl game rules.
 There are no means to manipulate the virtual deck of cards such as in the PCIO representation of the game.
 
-The deck is represented as a list strings (cards) from left (top card) to right (bottom card).
+The deck is visualised as a list of strings (cards) from right (top card) to left (bottom card).
 
 The application may be a subject to rapid changes in the following weeks.
 """
@@ -63,16 +63,16 @@ def request_deck():
 
     instructions = "The hash for a deck is a string consisting of alternating integers and characters [A, B, C, D].\n" \
                    "The physical cards in the physical deck are played from top to bottom." \
-                   "The virtual cards (their faces) in the virtual deck are listed from left to right.\n" \
+                   "The virtual deck with card (and their faces) in the virtual deck are listed from right to left.\n" \
                    "Card numbers are represented by integers and the faces of the cards by letters.\n" \
                    "Lower case letters are allowed. Spaces are allowed.\n" \
                    "Missing letters represent the face 'A' of the card.\n" \
                    "    (Spaces between numbers are required in such case.)\n" \
                    "Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.\n" \
-                   "Valid hash examples:\n" \
-                   "    - 1A6A2A7A3A8A4A9A5A\n" \
-                   "    - 1A 6A 2A 7A 3A 8A 4A 9A 5A\n" \
-                   "    - 1 6 2 7 3 8 4 9 5"
+                   "Some examples of a valid hash:\n" \
+                   "    - 5A9A4A8A3A7A2A6A1A\n" \
+                   "    - 5A 9A 4A 8A 3A 7A 2A 6A 1A\n" \
+                   "    - 5 9 4 8 3 7 2 6 1"
 
     def corrections(s_hash: str) -> str:
         # make the hash uppercase
@@ -142,6 +142,13 @@ deck_start = hb.create_deck(deck_start_hash, cards.cards)
 decks_new = None
 
 
+def build_graphical_representation_to_deck(deck):
+    rep = ''
+    for card in reversed(deck):
+        rep += hb.colour_card_hash(card)
+    return rep
+
+
 while True:
     # sort results by their decreasing her status, and increasing monster status
 
@@ -159,10 +166,8 @@ while True:
         decks_new.sort(key=lambda dx: (hb.get_status(dx).get("hero"), -hb.get_status(dx).get("monster")), reverse=True)
 
         # global card_colours, card_status .
-        for k, d in enumerate(decks_new):
-            s = ''
-            for c in d:
-                s += hb.colour_card_hash(c)
+        for k, d in enumerate(reversed(decks_new)):
+            s = build_graphical_representation_to_deck(d)
             print("{:3d}".format(k + 1), ":", s)
 
         if len(decks_new) != 1:
@@ -177,9 +182,7 @@ while True:
 
         print('The new deck to play is:')
 
-    s = ''
-    for c in deck_new:
-        s += hb.colour_card_hash(c)
+    s = build_graphical_representation_to_deck(deck_new)
     print(' '*6 + s)
 
     if hb.get_deck_hash(deck_new) == '6A3A9A8A5A7A1A2A4A':
