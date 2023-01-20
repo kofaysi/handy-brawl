@@ -510,7 +510,7 @@ def intercept(d, i, reaction):
     #     # reaction to intercept does not exist
     #     action = None
 
-    if reaction or reaction is not "None":
+    if reaction or reaction != "None":
         # a switcher construction used for multiple possible shield or dodge reactions
         d_new[i] = switcher.get(reaction)(d[i][:])
         if not check_cards_unique(d_new):
@@ -965,6 +965,9 @@ def play_card(deck):
         # if len(decks_new_i) == 0:
         #    decks_new_i.append(deck)
 
+    # sort results by their decreasing her status, and increasing monster status
+    decks_new_i.sort(key=lambda d: (get_status(d).get("hero"), -get_status(d).get("monster")), reverse=True)
+
     return get_unique_items(decks_new_i[:])
 
 
@@ -976,6 +979,7 @@ card_colours = dict(warrior=Fore.BLUE,
                     spider=Fore.LIGHTMAGENTA_EX,
                     werewolf=Fore.LIGHTBLACK_EX,
                     demon=Fore.LIGHTCYAN_EX)
+
 card_status_symbols = dict(healthy="◼", wounded="⬓", exhausted="◻")
 
 
