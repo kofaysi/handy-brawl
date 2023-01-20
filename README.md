@@ -1,6 +1,6 @@
 # Handy Brawl in terminal
 
-This application is a simulating the Handy Brawl game by Igor Zuber.
+This application (play_a_game.py) is a simulating the Handy Brawl game by Igor Zuber.
 Download the cards and the rules from the files section at https://boardgamegeek.com/boardgame/362692/handy-brawl.
 
 This application is a hobby type of project by Milan Žroutík <zroutik@e.email>.
@@ -18,9 +18,9 @@ Missing letters represent the face 'A' of the card.
 Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.
 Valid hash examples:
 
-- 1A6A2A7A3A8A4A9A5A
-- 1A 6A 2A 7A 3A 8A 4A 9A 5A
-- 1 6 2 7 3 8 4 9 5
+- 5A9A4A8A3A7A2A6A1A
+- 5A 9A 4A 8A 3A 7A 2A 6A 1A
+- 5 9 4 8 3 7 2 6 1
 
 The decks are represented similarly by a list of number+character+life items.
 Therefore, a card overview is required to play the game properly.
