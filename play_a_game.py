@@ -1,5 +1,10 @@
 """
+An application running a Handy Brawl game in terminal according to the Handy Brawl game rules.
+There are no means to manipulate the virtual deck of cards such as in the PCIO representation of the game.
 
+The deck is represented as a list strings (cards) from left (top card) to right (bottom card).
+
+The application may be a subject to rapid changes in the following weeks.
 """
 
 import cards
@@ -60,7 +65,7 @@ def request_deck():
                    "The physical cards in the physical deck are played from top to bottom." \
                    "The virtual cards (their faces) in the virtual deck are listed from left to right.\n" \
                    "Card numbers are represented by integers and the faces of the cards by letters.\n" \
-                   "Lower case letters are accepted. Spaces are accepted.\n" \
+                   "Lower case letters are allowed. Spaces are allowed.\n" \
                    "Missing letters represent the face 'A' of the card.\n" \
                    "    (Spaces between numbers are required in such case.)\n" \
                    "Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.\n" \
@@ -74,6 +79,8 @@ def request_deck():
         s_hash = s_hash.strip().upper()
         # remove other then [A, B, C, D] chars
         s_hash = re.sub(r'[E-Z]', '', s_hash)
+        # replace spaces between numbers and following chars
+        s_hash = re.sub(r'(\d)\s+(?=[ABCD])', r'\1', s_hash)
         # replace spaces between numbers without chars by char 'A'
         s_hash = re.sub(r'(\d)\s+(?=\d)', r'\1A', s_hash)
         # add face A to the number without chars by char 'A' and at the end of the string
@@ -102,7 +109,7 @@ def request_deck():
         try:
             hb.get_deck_hash(hb.create_deck(input_hash_cor, cards.cards))
             print("The accepted hash: ", input_hash_cor)
-            numbers, _ = hb.unzip_hash(input_hash)
+            numbers, _ = hb.unzip_hash(input_hash_cor)
             if not all([1 <= i <= 9 for i in numbers]):
                 print("Use card numbers for the warrior and the ogre characters, in the range from 1 to 9. "
                       "Other characters are coming soon.")
@@ -124,7 +131,11 @@ def request_deck():
 if 'deck_start_hash' not in locals():
     deck_start_hash = ''
 
-if not deck_start_hash:
+answer = input("Do you wish to start a game with the deck saved within the scrip? ([Y]es/No) "
+               "(In case of 'no', you will be requested to enter your own deck): ")
+
+# or not deck_start_hash
+if answer.lower() in {'yes', 'y', 'yeah', 'ano', 'igen'}:
     deck_start_hash = request_deck()
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)

@@ -1,5 +1,4 @@
 """
-
 Functions to manipulate the virtual deck of cards according to the Handy Brawl game rules.
 
 The deck is represented as a list with lists (cards) from top (start=0) to bottom (end=len(deck)-1). 

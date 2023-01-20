@@ -5,6 +5,7 @@ content of the file
 
 deck : list
     A deck consists of a list of cards.
+    The deck is represented as a list of lists (cards) from top (start=0) to bottom (end=len(deck)-1).
 
 card : list
     A card consists of a list of one header (dict) and four faces.
