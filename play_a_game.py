@@ -56,7 +56,7 @@ def request_number(minimum=1, maximum=1):
 
 
 def request_deck():
-    game_description = "This application is a simulating the Handy Brawl game by Igor Zuber.\n" \
+    game_description = "This application is simulating the Handy Brawl game designed by Igor Zuber.\n" \
                        "A card overview is required to play the game properly.\n" \
                        "The cards design and available actions on faces are not displayed. " \
                        "Download the cards and the rules from the files section at " \
