@@ -6,11 +6,10 @@ It takes about 10 minutes to find the lowest maximum on
     - Intel® Core™ i5-5300U CPU @ 2.30GHz × 4
 """
 
-import pprint
-
 import cards
 import handybrawl as hb
 import pprint
+import time
 
 
 def play_card_recursive(deck):
@@ -21,7 +20,7 @@ def play_card_recursive(deck):
     if hb.get_deck_hash(deck) == '3A7C2A4B8C5A6C':
         pass
 
-    global first_winner_length, game_turns, first_winner_hash
+    global winner_game_length, game_turns, winner_deck_hash
     for deck_i in decks_new:
         if hb.get_deck_hash(deck_i) == '3A7C2A4B8C5A6C':
             pass
@@ -33,15 +32,11 @@ def play_card_recursive(deck):
             game_deck_i_new = hb.recreate_game(deck_i_new_hash)
             if status.get("hero") == 0 or status.get("monster") == 0:
                 if status.get("monster") == 0:
-                    print(len(hb.game_turns), ":",
-                          deck_i_new_hash, ":",
-                          status,
-                          'start deck:', game_deck_i_new[-1],
-                          'length of game:', len(game_deck_i_new) - 1)
-                    if len(game_deck_i_new) - 1 < first_winner_length:
-                        first_winner_length = len(game_deck_i_new) - 1
-                        first_winner_hash = deck_i_new_hash
-            elif len(game_deck_i_new) < first_winner_length:
+                    hb.report_game_status(game_deck_i_new)
+                    if len(game_deck_i_new) - 1 < winner_game_length:
+                        winner_game_length = len(game_deck_i_new) - 1
+                        winner_deck_hash = deck_i_new_hash
+            elif len(game_deck_i_new) < winner_game_length:
                 # print(len(game_deck_i_new) - 1)
                 try:
                     # make a new turn with the deck, expect +1 on len(recreate_game())
@@ -52,47 +47,36 @@ def play_card_recursive(deck):
                 pass
         else:
             pass
-    return first_winner_hash
+    return winner_deck_hash
 
+
+# record start time
+start = time.time()
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
-# deck_start_hash = '1A2A3A4A5A6A7A8A9A'
+deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 # deck_start_hash = '2A3A4A5A6A7A8A'
-deck_start_hash = '1A2A3A4A6A9A8A5A7A'
-# deck_start_hash = '1A6A2A8A3A'
+# deck_start_hash = '1A2A3A4A6A9A8A5A7A'
+deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '9b2b6d5c'
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
 game_turns = dict()
-first_winner_length = 20
-first_winner_hash = None
+winner_game_length = 20
+winner_deck_hash = None
 print("Searching for the first possible winning outcome. "
       "Then searching further for the solution with the highest hero's life.")
 
 winner_hash = play_card_recursive(deck_start)
+
 winner_game = hb.recreate_game(winner_hash)
-winner_game.reverse()
 print("The game with the least turns and the highest hero life flows the following:")
 pprint.pprint(winner_game)
 
-# lst = list(permutations(range(1, 10)))
-# print(len(lst))
-#
-# for k in lst:
-#     s = [str(j) for j in k]
-#     deck_start_hash = 'A'.join(s) + 'A'
-#     deck_start = hb.create_deck(deck_start_hash, all_cards.cards)
-#     game_turns = dict()
-#     first_winner_length = 111
-#     first_winner_hash = None
-#     play_card_recursive(deck_start)
-#     print(len(game_turns))
+# record end time
+end = time.time()
 
-pass
-
-#
-# for key, value in game_turns.items():  # iter on both keys and values
-#     if key.endswith('5A') or key.startswith('5A'):
-#         print(key, value)
+# print the difference between start and end time in milliseconds
+print("The time of execution of above program is :", (end-start) * 10**3, "ms")

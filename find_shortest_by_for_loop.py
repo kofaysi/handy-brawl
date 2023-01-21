@@ -6,12 +6,17 @@ This algorithm is like to work well for finding solutions for deck with up to 6 
 
 import cards
 import handybrawl as hb
+import pprint
+import time
+
+# record start time
+start = time.time()
 
 
-deck_start_hash = '1A2A3A4A6A9A8A5A7A'
+# deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
 # deck_start_hash = '1A2A3A4A5A6A7A8A9A'
-# deck_start_hash = '1A6A2A8A3A'
+deck_start_hash = '1A6A2A8A3A'
 # deck_start_hash = '2A3A4A5A6A7A8A'
 # deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 # deck_start_hash = '1A6A2A8A3A'
@@ -19,13 +24,13 @@ deck_start_hash = '1A2A3A4A6A9A8A5A7A'
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
-first_winner_length = 13
-first_winner_hash = None
+winner_game_length = 13
+winner_hash = None
 
 decks_new_main = [deck_start]
 i = 0
 
-while not first_winner_hash:
+while not winner_hash:
     i += 1
     print("Turn:", i)
     decks_i_new = []
@@ -69,14 +74,20 @@ while not first_winner_hash:
             game_deck_i_new = hb.recreate_game(deck_i_new_hash)
             decks_i_new_A.append(deck_i_new)
             if status.get("monster") == 0 and status.get("hero") != 0:
-                print(len(hb.game_turns), ":",
-                      deck_i_new_hash, ":",
-                      status,
-                      'start deck:', game_deck_i_new[-1],
-                      'length of game:', len(game_deck_i_new) - 1)
-                first_winner_length = len(game_deck_i_new) - 1
-                first_winner_hash = deck_i_new_hash
+                hb.report_game_status(game_deck_i_new)
+                winner_game_length = len(game_deck_i_new) - 1
+                winner_hash = deck_i_new_hash
 
     decks_new_main = decks_i_new_A
 
 pass
+
+winner_game = hb.recreate_game(winner_hash)
+print("The game with the least turns and the highest hero life flows the following:")
+pprint.pprint(winner_game)
+
+# record end time
+end = time.time()
+
+# print the difference between start and end time in milliseconds
+print("The time of execution of above program is :", (end-start) * 10**3, "ms")

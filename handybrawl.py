@@ -48,6 +48,8 @@ Variables:
 
 from colorama import Fore, Style  # , Back
 
+import cards
+
 game_turns = dict()
 
 
@@ -167,6 +169,7 @@ def unzip_hash(d_hash):
     numbers = []
     hash_new = ''
     # create a new has in which train of alphas are separated by a separator ' ' (blank space) from train of numerics
+    # import re is avoided on purpose. the function runs seldom.
     for i, s in enumerate(d_hash):
         if i > 0 and d_hash[i - 1].isalpha() ^ s.isalpha():
             hash_new += ' '
@@ -217,54 +220,25 @@ def adjust_deck(d, a, p):
     :param p: number of position to take the action by
     :return: new decks
     """
-
-    # if the next card displays feature "venom", it prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "venom" in d[1][1][0].get("feature"):
+    if d[0][0].get("type") == "hero" and "feature" in d[1][1][0] and "venom" in d[1][1][0].get("feature"):
         return []
 
-    if get_deck_hash(d) == '1A6C2B3A7A9C8B4D5A':
-        pass
-    if ' ' in a:
-        t = a.split()[1]
-    else:
-        t = "any"
+    t = a.split()[1] if ' ' in a else "any"
     ds_new = []
     adjust_list = list(range(1, abs(p) + 1))
-    step_j = 1
-    if p < 0:
-        adjust_list = [-i for i in adjust_list]
-        step_j = -1
-    # for all the cards in the deck...
+    step_j = 1 if p > 0 else -1
     for i in range(1, len(d)):
-        # check on the eligibility to delay/quicken/adjust a card
-        if (
-                (t == "ally" or t == "any")
-                and d[0][0].get("type") == d[i][0].get("type")
-        ) or (
-                (t == "enemy" or t == "any")
-                and d[0][0].get("type") != d[i][0].get("type")
-                # Heavy card cannot be adjusted by any enemy action.
-                and not ("feature" in d[i][1][0]
-                         and "heavy" in d[i][1][0].get("feature"))
-        ):
-            # for all the possible new relative positions
-            # we generate a stand-alone d_new
+        if ((t == "ally" or t == "any") and d[0][0].get("type") == d[i][0].get("type")) \
+                or ((t == "enemy" or t == "any")
+                    and d[0][0].get("type") != d[i][0].get("type")
+                    and not ("feature" in d[i][1][0] and "heavy" in d[i][1][0].get("feature"))):
             d_new = d[:]
             j = i
-            for _ in adjust_list:
-                if len(d) > j + step_j >= 1:
-                    # move by one
+            for _ in range(1, abs(p) + 1):
+                if 0 < j + step_j < len(d):
                     d_new = move_card(d_new[:], j, j + step_j)
-                    # here we have to check for hero's traps in the activated enemy's adjustment
-                    # if there was any trap in the way, damage the card
-                    trap_exist = False
-                    if "feature" in d[j][1][0] \
-                            and "traps" in d[j][1][0].get("feature"):
-                        trap_exist = True
-                    if (d[0][0].get("type") != d[j][0].get("type")
-                            and trap_exist):
+                    trap_exist = "feature" in d[j][1][0] and "traps" in d[j][1][0].get("feature")
+                    if d[0][0].get("type") != d[j][0].get("type") and trap_exist:
                         d_new = hit_card(d_new[:], j+step_j)
                     ds_new.append(d_new)
                 j += step_j
@@ -292,15 +266,8 @@ def move_deck(d, a, r):
     :param r:
     :return:
     """
-    if not check_cards_unique(d):
-        pass
-    if get_deck_hash(d) == '7D3A8A4B9A5B1A6C2B':
-        pass
     ds_new = []
-    if ' ' in a:
-        t = a.split()[1]
-    else:
-        t = "any"
+    t = a.split()[1] if ' ' in a else "any"
     move_range = range(1, min(abs(r) + 1, len(d)))
     if r < 0:
         move_range = reversed(move_range)
@@ -522,7 +489,8 @@ def intercept(d, i, reaction):
 # @CountCalls
 def hit_card(d, i):
     """
-    Change the life status to the i-th card in the deck
+    Changes the life status of the i-th card in the deck to "wounded" if it is "healthy"
+    and "exhausted" if it is "wounded"
 
     Game rules applicable:
     hero:
@@ -531,16 +499,12 @@ def hit_card(d, i):
         Hit: Damage closest non-[empty heart] (unexhausted) enemy card in range X.
 
     :param d: the current deck
-    :param i: the i-the card in the deck [0, 1...]
+    :param i: the i-th card in the deck [0, 1...]
     :return: new deck (single)
     """
     expected_face = ''
-    if not check_cards_unique(d):
-        pass
-    if d[i][1][0].get("life") == "healthy":
-        expected_life = "wounded"
-    else:
-        expected_life = "exhausted"
+    expected_life = "wounded" if d[i][1][0].get("life") == "healthy" else "exhausted"
+
     for j in range(1, 5):
         if d[i][j][0].get("life") == expected_life:
             expected_face = d[i][j][0].get("face")
@@ -548,7 +512,7 @@ def hit_card(d, i):
     expected_card = rotate_card_to_face(d[i][:], expected_face)
     d_new = d[:]
     d_new[i] = expected_card
-    return d_new  # if d != d_new else []
+    return d_new
 
 
 # noinspection PyShadowingNames
@@ -629,19 +593,16 @@ def get_status(d):
     Calculate a simple numerical health score.
 
     :param d: the deck
-    :return: the health status (tuple(bool, float))
+    :return: the health status (dict('hero'=float, 'monster'=float))
     """
-    status = dict(hero=0.0, monster=0.0)
-    score = dict(healthy=1, wounded=0.5, exhausted=0)
-    deck = d[:]
-    for card in deck:
+    status = {"hero": 0, "monster": 0}
+    score = {"healthy": 1, "wounded": 0.5, "exhausted": 0}
+
+    for card in d:
+        card_type = card[0].get("type")
         card_score = score.get(card[1][0].get("life"))
-        if card[0].get("type") == "hero":
-            temp_score = status.get("hero") + card_score
-            status.update(hero=temp_score)
-        else:
-            temp_score = status.get("monster") + card_score
-            status.update(monster=temp_score)
+        status[card_type] += card_score
+
     return status
 
 
@@ -776,26 +737,22 @@ def teleport_deck(d, t):
     :param d: the current deck
     :param t: the target of teleport ("ally", "enemy", "any")
     """
+    ds_new = []
+    is_venom = d[1][1][0].get("feature") == "venom" if "feature" in d[1][1][0] else False
+    first_card_type = d[0][0].get("type")
+
     # the next card displays feature "venom" and prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "venom" in d[1][1][0].get("feature"):
+    if first_card_type == "hero" and is_venom:
         return []
 
-    ds_new = []
-    for i, _ in enumerate(d):
-        for j, _ in enumerate(d):
-            if i < j and (i and j) > 0:
-                if t == "any" \
-                        or (
-                        t == "ally"
-                        and d[0][0].get("type") == d[i][0].get("type") == d[j][0].get("type")
-                        ) or (
-                        t == "enemy"
-                        and d[0][0].get("type") != d[i][0].get("type") == d[j][0].get("type")
-                        ):
-                    d[i], d[j] = d[j], d[i]
-                    ds_new.append(d)
+    for i in range(len(d)):
+        for j in range(i+1, len(d)):
+            if (t == "any" or
+                (t == "ally" and first_card_type == d[i][0].get("type") == d[j][0].get("type")) or
+                    (t == "enemy" and first_card_type != d[i][0].get("type") == d[j][0].get("type"))):
+                d_new = d.copy()
+                d_new[i], d_new[j] = d_new[j], d_new[i]
+                ds_new.append(d_new)
     return ds_new
 
 
@@ -810,14 +767,14 @@ def inspire_deck(d):
     :param d: the current deck
     """
     ds_new = []
+    is_monster_turn = d[0][0].get("type") == "monster"
     for i, _ in enumerate(d):
         ds_new_i = play_card(d[i:])
         for d_new_i in ds_new_i:
             d_new = d[:i] + d_new_i
             if d_new != d:
-                ds_new.append([])
-        # if monster's inspire was successful and generated any new different deck on the closest ally card, end inspire
-        if ds_new and d[0][0].get("type") == "monster":
+                ds_new.append(d_new)
+        if is_monster_turn:
             return ds_new
     return ds_new
 
@@ -831,12 +788,12 @@ def get_deck_hash(d):
     :param d: the deck
     :return: the hash (str)
     """
-    d_id = [str(card[0].get("number")) + card[1][0].get("face") for card in d]
+    d_id = [f"{card[0]['number']}{card[1][0]['face']}" for card in d]
     return ''.join(d_id)
 
 
 # @CountCalls
-def create_deck(d_hash, cards):
+def create_deck(d_hash, cards=cards.cards):
     """
     Create a deck consisting of cards based on the hash.
 
@@ -845,21 +802,14 @@ def create_deck(d_hash, cards):
     :return: a deck, a list of cards, (list of lists)
     """
     d_numbers, d_faces = unzip_hash(d_hash)
-    deck = [[]]*len(d_faces)
-    for i, number in enumerate(d_numbers):
-        if cards[number - 1][0].get("number") == number:
-            c_new = rotate_card_to_face(cards[number - 1][:], d_faces[i].upper())
-            deck[i] = c_new
-        else:
-            print("Wrong card order definition in Cards")
-            print(f"The card listed as {str(number)} displays number={cards[number - 1][0].get('number')}")
-            for card in cards:
-                if card[0].get("number") == number:
-                    c_new = rotate_card_to_face(card[:], d_faces[i].upper())
-                    deck[i] = c_new
-            else:
-                print(f"The card number {str(number)} couldn't be found in the card list.")
-                return None
+    # deck = [rotate_card_to_face(card, d_faces[i].upper()) if card[0].get("number") == d_numbers[i] else None
+    #        for i, card in enumerate(cards) if card[0].get("number") in d_numbers]
+    deck = [rotate_card_to_face(cards[n-1], d_faces[i].upper()) if cards[n-1][0].get("number") == n else None
+            for i, n in enumerate(d_numbers)]
+
+    if None in deck:
+        print("Wrong card order definition in Cards")
+        return None
     return deck
 
 
@@ -872,19 +822,19 @@ def recreate_game(d_hash):
     :param d_hash: a hash of the deck
     :return: list of hashes of decks starting by d_hash and ending by the hash of the start deck.
     """
-    global game_turns
     game = []
-    d_i_hash = d_hash[:]
-    key_found = True
-    game.append(d_i_hash)
-    while key_found:
-        d_prev_hash = game_turns.get(d_i_hash)
-        if d_prev_hash:
-            game.append(d_prev_hash)
-            d_i_hash = d_prev_hash
-        else:
-            key_found = False
-    return game
+    while d_hash:
+        game.append(d_hash)
+        d_hash = game_turns.get(d_hash)
+    return game[::-1]
+
+
+def report_game_status(game):
+    print(len(game_turns), ":",
+          game[-1], ":",
+          get_status(create_deck(game[-1])),
+          'start deck:', game[0],
+          'length of game:', len(game) - 1)
 
 
 def play_card(deck):
@@ -925,8 +875,6 @@ def play_card(deck):
             for deck_j in decks:
                 # debug test
                 deck_j_hash = get_deck_hash(deck_j)
-                if deck_j_hash == '7C1A2A5A9B6B4B8D3D':
-                    pass
                 switcher_action = action[0].split()[0]
                 decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
             # if no valid result has been generated, use the input as the outcome
