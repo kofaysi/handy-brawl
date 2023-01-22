@@ -214,7 +214,11 @@ def adjust_deck(d, a, p):
     :param p: number of position to take the action by
     :return: new decks
     """
-    if d[0][0].get("type") == "hero" and "feature" in d[1][1][0] and "venom" in d[1][1][0].get("feature"):
+    is_venom = d[1][1][0].get("feature") == "venom" if "feature" in d[1][1][0] else False
+    first_card_type = d[0][0].get("type")
+
+    # the next card displays feature "venom" and prevents from activating the top hero card
+    if first_card_type == "hero" and is_venom:
         return []
 
     t = a.split()[1] if ' ' in a else "any"
@@ -347,12 +351,11 @@ def hit_deck(d, n):
     :param n: the hit range, int
     :return: the new decks
     """
-    if d[0][0].get("type") == "hero":
-        pass
-    # the next card displays feature "webs" and prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "webs" in d[1][1][0].get("feature"):
+    is_webs = d[1][1][0].get("feature") == "webs" if "feature" in d[1][1][0] else False
+    first_card_type = d[0][0].get("type")
+
+    # the next card displays feature "venom" and prevents from activating the top hero card
+    if first_card_type == "hero" and is_webs:
         return []
 
     if not check_cards_unique(d):
@@ -523,10 +526,11 @@ def revive_deck(d, a):
     :param a: action "resurrect" or "heal"
     :return: new decks
     """
-    # if the next card displays feature "webs", it prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "webs" in d[1][1][0].get("feature"):
+    is_webs = d[1][1][0].get("feature") == "webs" if "feature" in d[1][1][0] else False
+    first_card_type = d[0][0].get("type")
+
+    # the next card displays feature "venom" and prevents from activating the top hero card
+    if first_card_type == "hero" and is_webs:
         return []
 
     if not check_cards_unique(d):
@@ -585,8 +589,8 @@ def get_status(d):
     :param d: the deck
     :return: the health status (dict('hero'=float, 'monster'=float))
     """
-    status = {"hero": 0, "monster": 0}
-    score = {"healthy": 1, "wounded": 0.5, "exhausted": 0}
+    status = {"hero": 0., "monster": 0.}
+    score = {"healthy": 1., "wounded": 0.5, "exhausted": 0.}
 
     for card in d:
         card_type = card[0].get("type")
@@ -612,10 +616,11 @@ def maneuver_deck(d):
     :param d: the current deck
     :return: list of new decks
     """
-    # the next card displays feature "webs" and prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "webs" in d[1][1][0].get("feature"):
+    is_webs = d[1][1][0].get("feature") == "webs" if "feature" in d[1][1][0] else False
+    first_card_type = d[0][0].get("type")
+
+    # the next card displays feature "venom" and prevents from activating the top hero card
+    if first_card_type == "hero" and is_webs:
         return []
 
     ds_new = []
@@ -737,9 +742,9 @@ def teleport_deck(d, t):
 
     for i in range(len(d)):
         for j in range(i+1, len(d)):
-            if (t == "any" or
-                (t == "ally" and first_card_type == d[i][0].get("type") == d[j][0].get("type")) or
-                    (t == "enemy" and first_card_type != d[i][0].get("type") == d[j][0].get("type"))):
+            if (t == "any"
+                    or (t == "ally" and first_card_type == d[i][0].get("type") == d[j][0].get("type"))
+                    or (t == "enemy" and first_card_type != d[i][0].get("type") == d[j][0].get("type"))):
                 d_new = d.copy()
                 d_new[i], d_new[j] = d_new[j], d_new[i]
                 ds_new.append(d_new)

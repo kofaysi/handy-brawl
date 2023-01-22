@@ -1,0 +1,31 @@
+/usr/bin/python3.10 /home/milan/PycharmProjects/handy-brawl/find_shortest_by_recursion.py 
+Searching for the first possible winning outcome. Then searching further for the solution with the highest hero's life.
+1600336 : 4D9C2D7C5D3A6C8C1C : {'hero': 1.5, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 19
+1602250 : 6C4D7C9C1C5D8C2D3A : {'hero': 1.5, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 18
+1614508 : 6C7C9C4C5A3D8C2D1C : {'hero': 2.5, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 17
+1614582 : 1C7C6C9C4C2B3D8C5D : {'hero': 2.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 16
+1614583 : 1C7C9C6C4C2B3D8C5D : {'hero': 2.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 16
+1614584 : 6C7C1C9C4C2B3D8C5D : {'hero': 2.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 16
+1614585 : 6C7C9C1C4C2B3D8C5D : {'hero': 2.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 16
+1614586 : 6C7C9C4C1C2B3D8C5D : {'hero': 2.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 16
+1679578 : 9C6C2C7C5D8C4C1D3A : {'hero': 2.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 15
+1805477 : 6C1D7C8C5D9C2C4A3A : {'hero': 2.5, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 14
+2191700 : 7C6C3D8C5D9C1D4A2B : {'hero': 3.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 13
+2214152 : 7C2A6C4C8C5D9C1D3A : {'hero': 3.0, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 12
+2850433 : 9C2A6C7C4D1D8C5D3A : {'hero': 2.5, 'monster': 0} start deck: 1A2A3A4A5A6A7A8A9A length of game: 11
+The game with the least turns and the highest hero life flows the following:
+['1A2A3A4A5A6A7A8A9A',
+ '3A2A4A5A6A7A8A9A1B',
+ '2A5A4A6A7A8A9A1B3B',
+ '5A6A7A4A8A9A1B3B2A',
+ '6D7A4A1B8A9A3B2A5A',
+ '7A4D1B8A9A3B2A5A6C',
+ '4D1D8A9A3B2A5A6C7B',
+ '1D8D9A3B2A5A6C7B4D',
+ '8C9A3B2A5A6C7B4D1D',
+ '5C9A3B2A6C7B4D1D8C',
+ '3B9C2A6C7B4D1D8C5D',
+ '9C2A6C7C4D1D8C5D3A']
+The time of execution of above program is : 1022712.3649120331 ms
+
+Process finished with exit code 0
