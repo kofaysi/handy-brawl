@@ -802,8 +802,6 @@ def create_deck(d_hash, cards=cards.cards):
     :return: a deck, a list of cards, (list of lists)
     """
     d_numbers, d_faces = unzip_hash(d_hash)
-    # deck = [rotate_card_to_face(card, d_faces[i].upper()) if card[0].get("number") == d_numbers[i] else None
-    #        for i, card in enumerate(cards) if card[0].get("number") in d_numbers]
     deck = [rotate_card_to_face(cards[n-1], d_faces[i].upper()) if cards[n-1][0].get("number") == n else None
             for i, n in enumerate(d_numbers)]
 
@@ -845,6 +843,15 @@ def play_card(deck):
     :param deck: input deck
     :return: list of decks
     """
+    # todo:
+    #   To optimize this function, you could consider the following:
+    #   Use list comprehension instead of for loops, as it is more efficient
+    #   Use built-in python functions like filter() and map() to process the data
+    #   Use local variable instead of appending to list and in the end returning it
+    #   Remove unnecessary if conditions, as they can slow down the function
+    #   Use set or frozenset instead of list to keep track of unique items
+    #   Use a more efficient data structure like a numpy array instead of a nested list
+    #   Use Cython or Numba to speed up the function if it's still slow after trying the above suggestions.
     switcher = {
         "hit": lambda d, a, n: hit_deck(d, n),  # deck, action,
         "push": lambda d, a, r: move_deck(d, a, r),  # deck, action, range
@@ -872,9 +879,8 @@ def play_card(deck):
                     decks = decks_new_j[:]
                 # else decks have not changed by the previous action and are going to suffer the next action
             decks_new_j = []
+            # decks_new_j = [switcher.get(action[0].split()[0])(deck_j[:], action[0], action[1]) for deck_j in decks]
             for deck_j in decks:
-                # debug test
-                deck_j_hash = get_deck_hash(deck_j)
                 switcher_action = action[0].split()[0]
                 decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
             # if no valid result has been generated, use the input as the outcome
