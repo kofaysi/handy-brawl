@@ -878,11 +878,13 @@ def play_card(deck):
                 if decks_new_j:
                     decks = decks_new_j[:]
                 # else decks have not changed by the previous action and are going to suffer the next action
-            decks_new_j = []
-            # decks_new_j = [switcher.get(action[0].split()[0])(deck_j[:], action[0], action[1]) for deck_j in decks]
-            for deck_j in decks:
-                switcher_action = action[0].split()[0]
-                decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
+            #decks_new_j = []
+            decks_new_j = [d
+                           for deck_j in decks
+                           for d in switcher.get(action[0].split()[0])(deck_j[:], action[0], action[1])]
+            # for deck_j in decks:
+            #    switcher_action = action[0].split()[0]
+            #    decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
             # if no valid result has been generated, use the input as the outcome
             # todo: check on the following algo
             if not decks_new_j:
