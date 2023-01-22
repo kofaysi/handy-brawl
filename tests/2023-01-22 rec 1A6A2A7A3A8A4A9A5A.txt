@@ -1,0 +1,25 @@
+/usr/bin/python3.10 /home/milan/PycharmProjects/handy-brawl/find_shortest_by_recursion.py 
+Searching for the first possible winning outcome. Then searching further for the solution with the highest hero's life.
+44 : 9C5D1C3A2C7C6C8C4D : {'hero': 1, 'monster': 0} start deck: 1A6A2A7A3A8A4A9A5A length of game: 18
+334 : 7C9C6C5D1B2C4C8C3D : {'hero': 2.0, 'monster': 0} start deck: 1A6A2A7A3A8A4A9A5A length of game: 16
+90278 : 7C8C9C6C1C2C3A4C5D : {'hero': 1.5, 'monster': 0} start deck: 1A6A2A7A3A8A4A9A5A length of game: 15
+94627 : 7C8C5D9C1D2C6C4D3A : {'hero': 1.5, 'monster': 0} start deck: 1A6A2A7A3A8A4A9A5A length of game: 14
+95233 : 6C7C8C5D9C1D2C3A4C : {'hero': 2.0, 'monster': 0} start deck: 1A6A2A7A3A8A4A9A5A length of game: 13
+198498 : 7C6C4A8C1D9C5D2C3D : {'hero': 2.0, 'monster': 0} start deck: 1A6A2A7A3A8A4A9A5A length of game: 12
+The game with the least turns and the highest hero life flows the following:
+['1A6A2A7A3A8A4A9A5A',
+ '6D2A7A3A8A4A9A5A1A',
+ '2C7A3A8A4A9A5A1A6C',
+ '7A3A4A8A9A5A1A6C2C',
+ '3D4A8A9A5A1A6C2C7B',
+ '4A8A9D5A1A6C2C7B3D',
+ '8D9D5A1A6C2C7B3D4A',
+ '1D9D5A6C2C7B3D4A8D',
+ '9C5A6C2C7B3D4A8D1D',
+ '5C6C2C7B3D4A8D1D9C',
+ '2C7C6C3D4A8D1D9C5D',
+ '3D7C6C4A8D1D9C5D2C',
+ '7C6C4A8C1D9C5D2C3D']
+The time of execution of above program is : 537761.3742351532 ms
+
+Process finished with exit code 0

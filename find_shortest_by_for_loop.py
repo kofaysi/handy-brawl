@@ -34,12 +34,19 @@ while not winner_hash:
     i += 1
     print("Turn:", i)
     decks_i_new = []
+    if i == 6:
+        pass
     for deck_i in decks_new_main:
+        if hb.get_deck_hash(deck_i) == '1D3A6C2C8D':
+            pass
         # do not execute play_card() if the deck had been an origin previously
         if hb.get_deck_hash(deck_i) not in hb.game_turns.values():
             decks_i_new.extend(hb.play_card(deck_i))
+
             for deck_i_new in decks_i_new:
                 deck_i_new_hash = hb.get_deck_hash(hb.back_shift(deck_i[:]))
+                if deck_i_new_hash == '3A6C2C8C1D':
+                    pass
                 if deck_i_new_hash not in hb.game_turns:
                     hb.game_turns[deck_i_new_hash] = hb.get_deck_hash(deck_i)
 

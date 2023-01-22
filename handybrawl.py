@@ -149,13 +149,7 @@ def check_cards_unique(d) -> bool:
     :return: bool True if card numbers in the deck are unique
         bool False if card numbers in the deck are not unique
     """
-    numbers = set()
-    for c in d:
-        number = c[0].get("number")
-        if number in numbers:
-            return False
-        numbers.add(number)
-    return True
+    return len(d) == len({c[0]["number"] for c in d})
 
 
 def unzip_hash(d_hash):
@@ -331,12 +325,8 @@ def rotate_top_card(d, i=0):
     :param i: the i-th card in the deck
     :return: list of multiple new decks
     """
-    if not check_cards_unique(d):
-        pass
-    d_new = d[:]
-    d_new[i] = rotate(d[i])
-    ds_new = [d_new]
-    return ds_new
+    d[i] = rotate(d[i])
+    return [d]
 
 
 # @CountCalls
@@ -873,18 +863,14 @@ def play_card(deck):
                 # for the hero, it is allowed not make some actions,
                 # we will drop decks which have not changed at the end of the action row
                 decks.extend(decks_new_j[:])
-            else:
+            elif decks_new_j:
                 # the monster shall make all the available actions
-                if decks_new_j:
-                    decks = decks_new_j[:]
+                decks = decks_new_j[:]
                 # else decks have not changed by the previous action and are going to suffer the next action
-            #decks_new_j = []
             decks_new_j = [d
                            for deck_j in decks
                            for d in switcher.get(action[0].split()[0])(deck_j[:], action[0], action[1])]
-            # for deck_j in decks:
-            #    switcher_action = action[0].split()[0]
-            #    decks_new_j.extend(switcher.get(switcher_action)(deck_j[:], action[0], action[1]))
+
             # if no valid result has been generated, use the input as the outcome
             # todo: check on the following algo
             if not decks_new_j:
