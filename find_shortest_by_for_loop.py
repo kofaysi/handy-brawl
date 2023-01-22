@@ -70,7 +70,7 @@ while not winner_hash:
         status = hb.get_status(deck_i)
         # do not count the deck if the deck had been any result previously
         if deck_i_new_hash not in hb.game_turns and deck_i_new_hash != hb.get_deck_hash(deck_start):
-            hb.game_turns[deck_i_new_hash] = hb.get_deck_hash(deck_i)
+            # hb.game_turns[deck_i_new_hash] = hb.get_deck_hash(deck_i)
             game_deck_i_new = hb.recreate_game(deck_i_new_hash)
             decks_i_new_A.append(deck_i_new)
             if status.get("monster") == 0 and status.get("hero") != 0:
