@@ -74,7 +74,7 @@ while not winner_hash:
         if hb.get_deck_hash(deck_i_new) == '4A5A6A8A7A2A3B':
             pass
         deck_i_new_hash = hb.get_deck_hash(deck_i_new)
-        status = hb.get_status(deck_i)
+        status = hb.get_status(deck_i_new)
         # do not count the deck if the deck had been any result previously
         if deck_i_new_hash not in hb.game_turns and deck_i_new_hash != hb.get_deck_hash(deck_start):
             # hb.game_turns[deck_i_new_hash] = hb.get_deck_hash(deck_i)
