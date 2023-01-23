@@ -53,20 +53,21 @@ def play_card_recursive(deck):
 # record start time
 start = time.time()
 
-deck_start_hash = '1A6A2A7A3A8A4A9A5A'
+# deck_start_hash = '1A6A2A7A3A8A4A9A5A'
 # deck_start_hash = '5A9A4A8A3A7A2A6A1A'
 # deck_start_hash = '6A7A8A9A1A2A3A4A5A'
 # deck_start_hash = '1A2A3A4A5A6A7A8A9A'
 # deck_start_hash = '9A8A7A6A5A4A3A2A1A' # no winning game
 # deck_start_hash = '2A3A4A5A6A7A8A'
 # deck_start_hash = '1A2A3A4A6A9A8A5A7A'
-# deck_start_hash = '1A6A2A8A3A'
+deck_start_hash = '1A6A2A7A3A8A4A'
+deck_start_hash = '10A15A11A16A12A17A13A18A14A'
 # deck_start_hash = '9b2b6d5c'
 
 deck_start = hb.create_deck(deck_start_hash, cards.cards)
 
 game_turns = dict()
-winner_game_length = 15
+winner_game_length = 10
 winner_deck_hash = None
 print("Searching for the first possible winning outcome. "
       "Then searching further for the solution with the highest hero's life.")

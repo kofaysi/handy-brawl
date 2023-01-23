@@ -580,6 +580,9 @@ def get_unique_items(lst) -> "list":
     return uniques
 
 
+score = {"healthy": 1., "wounded": 0.5, "exhausted": 0.}
+
+
 # @CountCalls
 def get_status(d):
     """
@@ -590,8 +593,6 @@ def get_status(d):
     :return: the health status (dict('hero'=float, 'monster'=float))
     """
     status = {"hero": 0., "monster": 0.}
-    score = {"healthy": 1., "wounded": 0.5, "exhausted": 0.}
-
     for card in d:
         card_type = card[0].get("type")
         card_score = score.get(card[1][0].get("life"))
@@ -624,7 +625,7 @@ def maneuver_deck(d):
         return []
 
     ds_new = []
-    for i in range(1, len(d) + 1):
+    for i in range(1, len(d) - 1):
         if (d[0][0].get("type") == d[i][0].get("type") and
                 (d[i][1][0].get("life") == d[i][2][0].get("life") or
                  (d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "wounded") or
