@@ -1,39 +1,41 @@
 """
 content of the file
-    List of all cards ordered by the number of the cards
+    A tuple of all cards ordered by the number of the cards
 
 
-deck : list
-    A deck consists of a list of cards.
-    The deck is represented as a list of lists (cards) from top (start=0) to bottom (end=len(deck)-1).
+deck : tuple
+    A deck consists of a tuple of cards.
+    The deck is represented as a tuple of tuples (cards) from top (start=0) to bottom (end=len(deck)-1).
 
-card : list
-    A card consists of a list of one header (dict) and four faces.
+card : tuple
+    A card consists of a tuple of one header (dict) and four faces.
 
 header (to the card) : dict
     The card header (dict) identifies and specifies the card and contains the following keys:
-    - name : str ["warrior", "ogre", "huntress", "vampire", "pyromancer", "spider"]
-    - type : str ["hero", "monster"]
+    - name : str ("warrior", "ogre", "huntress", "vampire", "pyromancer", "spider")
+    - type : str ("hero", "monster")
     - number : int, the card number
 
-face : list
+face : tuple
     A face consists of a list of one header and one or more rows (of actions).
 
 header (to the face) : dict
     The face header (dict) identifies and specifies the face and contains the following keys:
 
-    - face : str ["A", "B", "C", "D"]
-    - life : str ["healthy", "wounded", "exhausted"]
+    - face : str ("A", "B", "C", "D")
+    - life : str ("healthy", "wounded", "exhausted")
     - feature : set of str (optional)
     - reaction : str (optional)
     - shield : str (optional)
     - other named feature : str (optional)
 
-row [of actions] : list
-    A row of actions consists of a list of consecutive actions.
+row (of actions) : tuple
+    A row of actions consists of a tuple of consecutive actions.
+    Do not forget to nest also single actions by using additional comma, ((str, int, str),)
 
-action : tuple(str, int|str|None)
-    An action is a tuple of an action (str) and a modifier (int or str or None).
+action : tuple(str, int, str)
+    An action is a tuple of an action (str), range or number of positions (int) and target side (str).
+    The second and/or the third element may be None, depending on the action.
     The following action names are recognised (as expected by the end of the development):
 
     - hit
@@ -63,836 +65,841 @@ action : tuple(str, int|str|None)
     - ablaze
     - condition, this is a special action
         for which the second item in the tuple is a list of actions:
-        example (condition, [("fire", 2), (ablaze, None), (hit, 2)])
+        example (condition, (("fire", 2, "ally"), ("ablaze", None, "enemy"), ("hit", 2, "enemy"),))
+
+    The following targets are recognised
+    - "enemy"
+    - "ally"
+    - "any"
 """
 
-cards = [[  # card 1
+cards = ((  # card 1
     dict(name="warrior", type="hero", number=1),
-    [
+    (
         dict(face="A", life="healthy"),
-        [("hit", 2)],
-        [("delay", 2), ("rotate", None)]
-    ],
-    [
+        (("hit", 2, "enemy"),),
+        (("delay", 2, "any"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="B", life="healthy", reaction="shield", shield="rotate"),
-        [("delay", 1), ("hit", 2)],
-        [("delay", 2)]
-    ],
-    [
+        (("delay", 1, "any"), ("hit", 2, "enemy"),),
+        (("delay", 2, "any"),)
+    ),
+    (
         dict(face="C", life="exhausted"),
-        [("hit", 2)],
-        [("delay", 2)]
-    ],
-    [
+        (("hit", 2, "enemy"), ),
+        (("delay", 2, "any"), )
+    ),
+    (
         dict(face="D", life="wounded"),
-        [("hit", 4)],
-        [("quicken", 2)]
-    ]
-], [
+        (("hit", 4, "enemy"),),
+        (("quicken", 2, "any"),)
+    )
+), (
     dict(name="warrior", type="hero", number=2),
-    [
+    (
         dict(face="A", life="healthy"),
-        [("hit", 2), ("rotate", None)],
-        [("delay", 2)]
-    ],
-    [
+        (("hit", 2, "enemy"), ("rotate", None, "self"),),
+        (("delay", 2, "any"),)
+    ),
+    (
         dict(face="B", life="healthy", reaction="shield", shield="rotate"),
-        [("heal", None), ("rotate", None)],
-        [("quicken", 2)]
-    ],
-    [
+        (("heal", None, "ally"), ("rotate", None, "self"),),
+        (("quicken", 2, "any"),)
+    ),
+    (
         dict(face="C", life="exhausted"),
-        [("quicken", 2)],
-        [("delay", 2)]
-    ],
-    [
+        (("quicken", 2, "any"),),
+        (("delay", 2, "any"),)
+    ),
+    (
         dict(face="D", life="wounded"),
-        [("heal", None), ("rotate", None)],
-        [("delay", 3)]
-    ]
-], [
+        (("heal", None, "ally"), ("rotate", None, "self"),),
+        (("delay", 3, "any"),)
+    )
+), (
     dict(name="warrior", type="hero", number=3),
-    [
+    (
         dict(face="A", life="healthy"),
-        [("delay", 2), ("rotate", None)],
-        [("quicken", 2), ("rotate", None)]
-    ],
-    [
+        (("delay", 2, "any"), ("rotate", None, "self"),),
+        (("quicken", 2, "any"), ("rotate", None, ),)
+    ),
+    (
         dict(face="B", life="healthy"),
-        [("hit", 4), ("hit", 4), ("rotate", None)]
-    ],
-    [
+        (("hit", 4, "enemy"), ("hit", 4, "enemy"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="C", life="exhausted"),
-        [("quicken", 2)],
-        [("delay", 2)]
-    ],
-    [
+        (("quicken", 2, "any"),),
+        (("delay", 2, "any"),)
+    ),
+    (
         dict(face="D", life="wounded"),
-        [("hit", 4)],
-        [("delay", 1)]
-    ]
-], [
+        (("hit", 4, "enemy"),),
+        (("delay", 1, "any"),)
+    )
+), (
     dict(name="warrior", type="hero", number=4),
-    [
+    (
         dict(face="A", life="healthy", reaction="shield", shield="rotate"),
-        [("hit", 4)],
-        [("quicken", 2)]
-    ],
-    [
+        (("hit", 4, "enemy"),),
+        (("quicken", 2, "any"),)
+    ),
+    (
         dict(face="B", life="healthy"),
-        [("hit", 2)],
-        [("delay", 1), ("quicken", 1), ("rotate", None)]
-    ],
-    [
+        (("hit", 2, "enemy"),),
+        (("delay", 1, "any"), ("quicken", 1, "any"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="C", life="wounded"),
-        [("hit", 4)],
-        [("quicken", 1)]
-    ],
-    [
+        (("hit", 4, "enemy"),),
+        (("quicken", 1, "any"),)
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [("hit", 2)],
-        [("heal", None)]
-    ]
-], [
+        (("hit", 2, "enemy"),),
+        (("heal", None, "ally"),)
+    )
+), (
     dict(name="warrior", type="hero", number=5),
-    [
+    (
         dict(face="A", life="healthy", reaction="shield", shield="rotate"),
-        [("quicken", 2), ("hit", 2)]
-    ],
-    [
+        (("quicken", 2, "any"), ("hit", 2, "enemy"),)
+    ),
+    (
         dict(face="B", life="healthy"),
-        [("hit", 2), ("rotate", None)],
-        [("quicken", 2), ("rotate", None)]
-    ],
-    [
+        (("hit", 2, "enemy"), ("rotate", None, "self"),),
+        (("quicken", 2, "any"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="C", life="wounded"),
-        [("delay", 3), ("hit", 2), ("hit", 2), ("rotate", None)],
-        [("quicken", 2)]
-    ],
-    [
+        (("delay", 3, "any"), ("hit", 2, "enemy"), ("hit", 2, "enemy"), ("rotate", None, "self"),),
+        (("quicken", 2, "any"),)
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [("hit", 4)],
-        [("quicken", 1)]
-    ]
-], [  # card 6
+        (("hit", 4, "enemy"),),
+        (("quicken", 1, "any"),)
+    )
+), (  # card 6
     dict(name="ogre", type="monster", number=6),
-    [
+    (
         dict(face="A", life="healthy"),
-        [("pull enemy", 5), ("hit", 1), ("rotate", None)]
-    ],
-    [
+        (("pull", 5, "enemy"), ("hit", 1, "enemy"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="B", life="healthy", reaction="shield", shield="rotate"),
-        [("hit", 4), ("push enemy", 3)],
-    ],
-    [
+        (("hit", 4, "enemy"), ("push", 3, "enemy"),),
+    ),
+    (
         dict(face="C", life="exhausted"),
-        [("hit", 5)],
-    ],
-    [
+        (("hit", 5, "enemy"),),
+    ),
+    (
         dict(face="D", life="wounded", feature={"heavy"}, reaction="shield"),
-        [("hit", 0), ("hit", 0), ("rotate", None)],
-    ]
-], [
+        (("hit", 0, "enemy"), ("hit", 0, "enemy"), ("rotate", None, "self"),),
+    )
+), (
     dict(name="ogre", type="monster", number=7),
-    [
+    (
         dict(face="A", life="healthy", feature={"heavy"}),
-        [("hit", 4), ("rotate", None)],
-    ],
-    [
+        (("hit", 4, "enemy"), ("rotate", None, "self"),),
+    ),
+    (
         dict(face="B", life="healthy", reaction="shield", shield="rotate"),
-        [("heal", None), ("rotate", None)],
-        [("hit", 7), ("rotate", None)]
-    ],
-    [
+        (("heal", None, "ally"), ("rotate", None, "self"),),
+        (("hit", 7, "enemy"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="C", life="exhausted"),
-        [("hit", 5), ("pull ally", 4)],
-    ],
-    [
+        (("hit", 5, "enemy"), ("pull", 4, "ally"),),
+    ),
+    (
         dict(face="D", life="wounded"),
-        [("push enemy", 3), ("hit", 5)]
-    ]
-], [
+        (("push", 3, "enemy"), ("hit", 5, "enemy"),)
+    )
+), (
     dict(name="ogre", type="monster", number=8),
-    [
+    (
         dict(face="A", life="healthy"),
-        [("hit", 4), ("rotate", None)],
-    ],
-    [
+        (("hit", 4, "enemy"), ("rotate", None, "self"),),
+    ),
+    (
         dict(face="B", life="healthy", feature={"heavy"}),
-        [("heal", None), ("rotate", None)],
-        [("hit", 5), ("rotate", None)]
-    ],
-    [
+        (("heal", None, "ally"), ("rotate", None, "self"),),
+        (("hit", 5, "enemy"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="C", life="exhausted"),
-        [("pull enemy", 6), ("hit", 1)],
-    ],
-    [
+        (("pull", 6, "enemy"), ("hit", 1, "enemy"),),
+    ),
+    (
         dict(face="D", life="wounded"),
-        [("pull enemy", 4), ("hit", 1)]
-    ]
-], [
+        (("pull", 4, "enemy"), ("hit", 1, "enemy"),)
+    )
+), (
     dict(name="ogre", type="monster", number=9),
-    [
+    (
         dict(face="A", life="healthy"),
-        [("push enemy", 3), ("push enemy", 3), ("rotate", None)]
-    ],
-    [
-        dict(face="B", life="healthy", reaction=("shield", "rotate")),
-        [("hit", 5), ("rotate", None)],
-    ],
-    [
+        (("push", 3, "enemy"), ("push", 3, "enemy"), ("rotate", None, "self"),)
+    ),
+    (
+        dict(face="B", life="healthy", reaction=("shield", "rotate"),),
+        (("hit", 5, "enemy"), ("rotate", None, "self"),),
+    ),
+    (
         dict(face="C", life="exhausted", feature={"heavy"}),
-        [("hit", 0)],
-    ],
-    [
+        (("hit", 0, "enemy"),),
+    ),
+    (
         dict(face="D", life="wounded"),
-        [("heal", None), ("heal", None), ("heal", None), ("rotate", None)],
-        [("pull ally", 5)]
-    ]
-], [
+        (("heal", None, "ally"), ("heal", None, "ally"), ("heal", None, "ally"), ("rotate", None, "self"),),
+        (("pull", 5, "ally"),)
+    )
+), (
     dict(name="huntress", type="hero", number=10),
-    [
+    (
         dict(face="A", life="healthy", feature={"trap"}),
-        [("arrow", 1), ("rotate", None)],
-        [("delay ally", 2), ("maneuver", None)]
-    ],
-    [
+        (("arrow", 1, "enemy"), ("rotate", None, "self"),),
+        (("delay", 2, "ally"), ("maneuver", None, "ally"),)
+    ),
+    (
         dict(face="B", life="healthy", feature={"trap"}),
-        [("quicken enemy", 2), ("maneuver", None), ("rotate", None)],
-        [("heal", None)]
-    ],
-    [
+        (("quicken", 2, "enemy"), ("maneuver", None, "ally"), ("rotate", None, "self"),),
+        (("heal", None, "ally"),)
+    ),
+    (
         dict(face="C", life="exhausted", feature={"trap"}),
-        [("maneuver", None)],
-        [("hit", 1)],
-        [("delay", 1)]
-    ],
-    [
+        (("maneuver", None, "ally"),),
+        (("hit", 1, "enemy"),),
+        (("delay", 1, "any"),)
+    ),
+    (
         dict(face="D", life="wounded", feature={"trap"}),
-        [("arrow", 2)],
-        [("maneuver", None)],
-        [("quicken", 1)]
-    ]
-], [
+        (("arrow", 2, "enemy"),),
+        (("maneuver", None, "ally"),),
+        (("quicken", 1, "any"),)
+    )
+), (
     dict(name="huntress", type="hero", number=11),
-    [
+    (
         dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
-        [("arrow", 1), ("rotate", None)],
-        [("quicken enemy", 2), ("maneuver", None), ("rotate", None)],
-        [("hit", 1), ("rotate", None)]
-    ],
-    [
+        (("arrow", 1, "enemy"), ("rotate", None, "self"),),
+        (("quicken", 2, "enemy"), ("maneuver", None, "ally"), ("rotate", None, "self"),),
+        (("hit", 1, "enemy"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="B", life="healthy"),
-        [("delay hero", 2)],
-        [("quicken enemy", 2)],
-        [("maneuver", None), ("maneuver", None)]
-    ],
-    [
+        (("delay", 2, "hero"),),
+        (("quicken", 2, "enemy"),),
+        (("maneuver", None, "ally"), ("maneuver", None, "ally"),)
+    ),
+    (
         dict(face="C", life="wounded"),
-        [("hit", 1), ("hit", 1), ("rotate", None)],
-        [("quicken enemy", 2), ("maneuver", None)]
-    ],
-    [
+        (("hit", 1, "enemy"), ("hit", 1, "enemy"), ("rotate", None, "self"),),
+        (("quicken", 2, "enemy"), ("maneuver", None, "ally"),)
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [("hit", 1), ("maneuver", None), ("delay hero", 2)]
-    ]
-], [
+        (("hit", 1, "enemy"), ("maneuver", None, "ally"), ("delay", 2, "hero"),)
+    )
+), (
     dict(name="huntress", type="hero", number=12),
-    [
+    (
         dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
-        [("maneuver", None), ("quicken enemy", 2), ("rotate", None)],
-        [("delay", 1), ("rotate", None)]
-    ],
-    [
+        (("maneuver", None, "ally"), ("quicken", 2, "enemy"), ("rotate", None, "self"),),
+        (("delay", 1, "any"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="B", life="healthy", feature={"trap"}),
-        [("arrow", 2)],
-        [("delay hero", 2), ("maneuver", None)]
-    ],
-    [
+        (("arrow", 2, "enemy"),),
+        (("delay", 2, "hero"), ("maneuver", None, "ally"),)
+    ),
+    (
         dict(face="C", life="wounded", feature={"trap"}),
-        [("delay hero", 2), ("arrow", 1)],
-        [("maneuver", None)]
-    ],
-    [
+        (("delay", 2, "hero"), ("arrow", 1, "enemy"),),
+        (("maneuver", None, "ally"),)
+    ),
+    (
         dict(face="D", life="exhausted", feature={"trap"}),
-        [("delay hero", 2), ("quicken enemy", 2)],
-        [("maneuver", None), ("hit", 1)]
-    ]
-], [
+        (("delay", 2, "hero"), ("quicken", 2, "enemy"),),
+        (("maneuver", None, "ally"), ("hit", 1, "enemy"),)
+    )
+), (
     dict(name="huntress", type="hero", number=13),
-    [
+    (
         dict(face="A", life="healthy", feature={"trap"}),
-        [("maneuver", None), ("rotate", None)],
-        [("hit", 1)],
-        [("delay", 1)]
-    ],
-    [
+        (("maneuver", None, "ally"), ("rotate", None, "self"),),
+        (("hit", 1, "enemy"),),
+        (("delay", 1, "any"),)
+    ),
+    (
         dict(face="B", life="healthy"),
-        [("arrow", 1), ("rotate", None)],
-        [("maneuver", None), ("hit", 1), ("rotate", None)],
-        [("quicken enemy", 2)]
-    ],
-    [
+        (("arrow", 1, "enemy"), ("rotate", None, "self"),),
+        (("maneuver", None, "ally"), ("hit", 1, "enemy"), ("rotate", None, "self"),),
+        (("quicken", 2, "enemy"),)
+    ),
+    (
         dict(face="C", life="exhausted", feature={"trap"}),
-        [("arrow", 1)],
-        [("maneuver", None)],
-        [("delay", 1)]
-    ],
-    [
+        (("arrow", 1, "enemy"),),
+        (("maneuver", None, "ally"),),
+        (("delay", 1, "any"),)
+    ),
+    (
         dict(face="D", life="wounded"),
-        [("arrow", 1)],
-        [("quicken enemy", 2), ("maneuver", None)]
-    ]
-], [
+        (("arrow", 1, "enemy"),),
+        (("quicken", 2, "enemy"), ("maneuver", None, "ally"),)
+    )
+), (
     dict(name="huntress", type="hero", number=14),
-    [
+    (
         dict(face="A", life="healthy", reaction="dodge", dodge="rotate"),
-        [("arrow", 1), ("rotate", None)],
-        [("quicken enemy", 2), ("rotate", None)]
-    ],
-    [
+        (("arrow", 1, "enemy"), ("rotate", None, "self"),),
+        (("quicken", 2, "enemy"), ("rotate", None, "self"),)
+    ),
+    (
         dict(face="B", life="healthy"),
-        [("arrow", 2)],
-        [("delay hero", 2), ("maneuver", None)],
-        [("heal", None)]
-    ],
-    [
+        (("arrow", 2, "enemy"),),
+        (("delay", 2, "hero"), ("maneuver", None, "ally"),),
+        (("heal", None, "ally"),)
+    ),
+    (
         dict(face="C", life="wounded", feature={"trap"}),
-        [("delay hero", 2), ("quicken enemy", 2)],
-        [("maneuver", None), ("hit", 1)]
-    ],
-    [
+        (("delay", 2, "hero"), ("quicken", 2, "enemy"),),
+        (("maneuver", None, "ally"), ("hit", 1, "enemy"),)
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [("arrow", 1)],
-        [("delay hero", 2)],
-        [("heal", None)]
-    ]
-], [
+        (("arrow", 1, "enemy"),),
+        (("delay", 2, "hero"),),
+        (("heal", None, "ally"),)
+    )
+), (
     dict(name="vampire", type="monster", number=15),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="vampire", type="monster", number=16),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="vampire", type="monster", number=17),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="vampire", type="monster", number=18),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="pyromancer", type="hero", number=19),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="pyromancer", type="hero", number=20),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="pyromancer", type="hero", number=21),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="pyromancer", type="hero", number=22),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="pyromancer", type="hero", number=23),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="spider", type="monster", number=24),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="spider", type="monster", number=25),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="spider", type="monster", number=26),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="spider", type="monster", number=27),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="werewolf", type="monster", number=28),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="werewolf", type="monster", number=29),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="werewolf", type="monster", number=30),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="werewolf", type="monster", number=31),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="werewolf", type="monster", number=32),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="demon", type="monster", number=33),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="demon", type="monster", number=34),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="demon", type="monster", number=35),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-], [
+        (),
+        (),
+        ()
+    )
+), (
     dict(name="demon", type="monster", number=36),
-    [
+    (
         dict(face="A", life="healthy"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="B", life="healthy"),
-        [],
-        [],
-        []
-    ],
-    [
+        (),
+        (),
+        ()
+    ),
+    (
         dict(face="C", life="wounded"),
-        [],
-        []
-    ],
-    [
+        (),
+        ()
+    ),
+    (
         dict(face="D", life="exhausted"),
-        [],
-        [],
-        []
-    ]
-]]
+        (),
+        (),
+        ()
+    )
+),)

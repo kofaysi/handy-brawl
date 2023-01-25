@@ -195,7 +195,7 @@ def deck_changed(d1, d2, i=1) -> bool:
 
 
 # @CountCalls
-def adjust_deck(d, a, p):
+def adjust_deck(d, p, t):
     """
     move_card() any possible card by p (int) positions within the deck
 
@@ -210,8 +210,8 @@ def adjust_deck(d, a, p):
             DELAY, QUICKEN, TELEPORT.
 
     :param d: the current deck
-    :param a: action
     :param p: number of position to take the action by
+    :param t: target side
     :return: new decks
     """
     is_venom = d[1][1][0].get("feature") == "venom" if "feature" in d[1][1][0] else False
@@ -221,9 +221,9 @@ def adjust_deck(d, a, p):
     if first_card_type == "hero" and is_venom:
         return []
 
-    t = a.split()[1] if ' ' in a else "any"
+    # t = a.split()[1] if ' ' in a else "any"
     ds_new = []
-    adjust_list = list(range(1, abs(p) + 1))
+    # adjust_list = list(range(1, abs(p) + 1))
     step_j = 1 if p > 0 else -1
     for i in range(1, len(d)):
         if ((t == "ally" or t == "any") and d[0][0].get("type") == d[i][0].get("type")) \
@@ -245,7 +245,7 @@ def adjust_deck(d, a, p):
 
 
 # @CountCalls
-def move_deck(d, a, r):
+def move_deck(d, r, t):
     """
     move_card() any possible card within the deck
 
@@ -259,13 +259,13 @@ def move_deck(d, a, r):
               Don't target enemy cards. (needs rewording)
         Push: Move the closest enemy card in range to the bottom of the deck.
 
-    :param d:
-    :param a:
-    :param r:
-    :return:
+    :param d: current deck
+    :param r: range
+    :param t: target side
+    :return: new collected decks
     """
     ds_new = []
-    t = a.split()[1] if ' ' in a else "any"
+    # t = a.split()[1] if ' ' in a else "any"
     move_range = range(1, min(abs(r) + 1, len(d)))
     if r < 0:
         move_range = reversed(move_range)
@@ -334,7 +334,7 @@ def rotate_top_card(d, i=0):
 
 
 # @CountCalls
-def hit_deck(d, n):
+def hit_deck(d, r=0):
     """
     Deal damage to a card in the deck d within range n.
     Collect every possible optional result (new deck).
@@ -348,7 +348,7 @@ def hit_deck(d, n):
             that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
-    :param n: the hit range, int
+    :param r: the hit range, int
     :return: the new decks
     """
     is_webs = d[1][1][0].get("feature") == "webs" if "feature" in d[1][1][0] else False
@@ -364,14 +364,14 @@ def hit_deck(d, n):
         pass
 
     ds_new = []
-    if n == 0 or n > len(d) - 1:  # 0 is a substitute for the infinite hit range
-        n = len(d) - 1
+    if r == 0 or r > len(d) - 1:  # 0 is a substitute for the infinite hit range
+        r = len(d) - 1
     if d[0][0].get("type") == "hero":
         # for hero targeting monster, use the furthest shield first
-        hit_list = list(reversed(range(1, n + 1)))
+        hit_list = list(reversed(range(1, r + 1)))
     else:
         # for monster targeting hero, follow hit order
-        hit_list = list(range(1, n + 1))
+        hit_list = list(range(1, r + 1))
 
     shield_found = False
     for i in hit_list:
@@ -662,7 +662,7 @@ def iter_combs(n, k):
 
 
 # @CountCalls
-def arrow_deck(d, t=1, e=-3):
+def arrow_deck(d, n=1, e=-3):
     """
     Deal damage to a card at the end of the deck.
     Collect every possible optional result (new deck).
@@ -678,7 +678,7 @@ def arrow_deck(d, t=1, e=-3):
             that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
-    :param t: the number of targets, different cards targets are targeted
+    :param n: the number of targets, different cards targets are targeted
     :param e: number (int) of the cards att the end of the deck to be targeted possibly
     :return: new decks
     """
@@ -705,7 +705,7 @@ def arrow_deck(d, t=1, e=-3):
                 d_new = hit_card(d_new[:], i)
             else:
                 d_new = intercept(d_new[:], i, "shield")
-            if t == 2:  # double arrow
+            if n == 2:  # double arrow
                 for j in target_list:
                     if i < j \
                             and d[j][0].get("type") == "monster":
@@ -849,15 +849,16 @@ def play_card(deck):
     #   Use a more efficient data structure like a numpy array instead of a nested list
     #   Use Cython or Numba to speed up the function if it's still slow after trying the above suggestions.
     switcher = {
-        "hit": lambda d, a, n: hit_deck(d, n),  # deck, action,
-        "push": lambda d, a, r: move_deck(d, a, r),  # deck, action, range
-        "pull": lambda d, a, r: move_deck(d, a, -r),  # deck, action, range
-        "delay": lambda d, a, p: adjust_deck(d, a, p),  # deck, action, by positions
-        "quicken": lambda d, a, p: adjust_deck(d, a, -p),  # deck, action, by positions
-        "rotate": lambda d, a, n: rotate_top_card(d),  # deck
-        "heal": lambda d, a, n: revive_deck(d, a),  # deck
-        "arrow": lambda d, a, nt: arrow_deck(d, a, nt),  # deck, action, number of targets
-        "maneuver": lambda d, a, n: maneuver_deck(d),  # deck
+        "hit": lambda d, a: hit_deck(d, r=a[1]),  # deck, range,
+        "push": lambda d, a: move_deck(d, r=a[1], t=a[2]),  # deck, range, target
+        "pull": lambda d, a: move_deck(d, r=-a[1], t=a[2]),  # deck, range, target
+        "delay": lambda d, a: adjust_deck(d, p=a[1], t=a[2]),  # deck, by positions, target
+        "quicken": lambda d, a: adjust_deck(d, p=-a[1], t=a[2]),  # deck, by positions, target
+        "rotate": lambda d, a: rotate_top_card(d),  # deck
+        "heal": lambda d, a: revive_deck(d, a[0]),  # deck, action
+        "resurrect": lambda d, a: revive_deck(d, a[0]),  # deck, action
+        "arrow": lambda d, a: arrow_deck(d, n=a[1]),  # deck, number of targets
+        "maneuver": lambda d, a: maneuver_deck(d),  # deck
     }
     decks_new_i = []
     decks_new_i_prev_unchanged_rows = []
@@ -875,7 +876,7 @@ def play_card(deck):
                 # else decks have not changed by the previous action and are going to suffer the next action
             decks_new_j = [d
                            for deck_j in decks
-                           for d in switcher.get(action[0].split()[0])(deck_j[:], action[0], action[1])]
+                           for d in switcher.get(action[0])(deck_j[:], action)]
 
             # if no valid result has been generated, use the input as the outcome
             # todo: check on the following algo
