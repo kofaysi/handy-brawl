@@ -731,6 +731,7 @@ def teleport_deck(d, t):
             DELAY, QUICKEN, TELEPORT.
 
     :param d: the current deck
+    # todo change "any" to "both" for teleporting one enemy and one ally, correct the code accordingly
     :param t: the target of teleport ("ally", "enemy", "any")
     """
     ds_new = []
