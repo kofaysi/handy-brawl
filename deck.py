@@ -5,7 +5,7 @@ import copy
 import re
 
 
-def unzip(d_hash):
+def unhash(d_hash):
     """
     Separates numbers and letter in the hash and creates
 
@@ -20,9 +20,9 @@ class Deck:
 
     def __init__(self, parameter=None):
         if isinstance(parameter, str):
-            self.deck = unzip(parameter) if parameter else None
+            self.cards = unhash(parameter) if parameter else None
         if isinstance(parameter, list):
-            self.deck = parameter
+            self.cards = parameter
         # self.origin = Deck()  # The origin can be assigned without initialisation.
         self.actions = []
 
@@ -31,23 +31,33 @@ class Deck:
             # don't attempt to compare against unrelated types
             return NotImplemented
 
-        return self.deck == other.deck
+        return self.cards == other.cards
 
     def __hash__(self):
         # necessary for instances to behave sanely in dicts and sets.
-        return hash(self.zip_str)
+        return hash(self.hash_str)
+
+    def __len__(self):
+        return len(self.cards)
 
     @property
-    def zip_str(self):
+    def top_number(self):
+        self.cards[0][0]
+
+    def top_face(self):
+        self.cards[0][1]
+
+    @property
+    def hash_str(self):
         """
         The method is a property. Use assignment
-            new = Deck(other.zip_str)
-        to get the zip_str for a new deck
-            new.zip_str
+            new = Deck(other.hash_str)
+        to get the hash_str for a new deck
+            new.hash_str
 
-        :return: int zip
+        :return: int hash
         """
-        return ''.join([str(value) for card in self.deck for value in card])
+        return ''.join([str(value) for card in self.cards for value in card])
 
     def next_action(self, action):
         self.actions.append(action)

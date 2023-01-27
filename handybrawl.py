@@ -47,8 +47,9 @@ Variables:
 """
 
 from colorama import Fore, Style  # , Back
-
-import cards
+from cards import cards
+import copy
+import deck
 
 game_turns = dict()
 
@@ -68,6 +69,9 @@ class CountCalls:
     @property
     def call_count(self):
         return self._count
+
+
+faces = ["A", "B", "C", "D"]
 
 
 # @CountCalls
@@ -109,7 +113,7 @@ def flip(c):
 
 
 # @CountCalls
-def rotate(c):
+def rotate(f):
     """
     rotate the card, top side becomes the bottom and the bottom side becomes the top, sides do not change
 
@@ -120,7 +124,8 @@ def rotate(c):
     :return: a new card
     """
     # todo transcribe a werewolf feature of the face into the head of the card
-    return [c[0], c[2], c[1], c[4], c[3]]
+    faces_rotated = ["B", "A", "D", "C"]
+    return faces_rotated[faces.index(f)]
 
 
 # @CountCalls
@@ -149,7 +154,7 @@ def check_cards_unique(d) -> bool:
     :return: bool True if card numbers in the deck are unique
         bool False if card numbers in the deck are not unique
     """
-    return len(d) == len({c[0]["number"] for c in d})
+    return len(d.cards) == len({c[0] for c in d.cards})
 
 
 def unzip_hash(d_hash):
@@ -191,7 +196,7 @@ def deck_changed(d1, d2, i=1) -> bool:
     :param i: a start index to slice the lists for comparison d[start:]
     :return: bool True if decks are differing
     """
-    return d1[i:] != d2[i:]
+    return d1.cards[i:] != d2.cards[i:]
 
 
 # @CountCalls
@@ -214,8 +219,8 @@ def adjust_deck(d, p, t):
     :param t: target side
     :return: new decks
     """
-    is_venom = d[1][1][0].get("feature") == "venom" if "feature" in d[1][1][0] else False
-    first_card_type = d[0][0].get("type")
+    is_venom = cards[d.cards[1][0]][d.cards[1][1]][0].get("feature") == "venom"
+    first_card_type = cards[d.cards[0][0]]['header']["type"]
 
     # the next card displays feature "venom" and prevents from activating the top hero card
     if first_card_type == "hero" and is_venom:
@@ -225,18 +230,18 @@ def adjust_deck(d, p, t):
     ds_new = []
     # adjust_list = list(range(1, abs(p) + 1))
     step_j = 1 if p > 0 else -1
-    for i in range(1, len(d)):
-        if ((t == "ally" or t == "any") and d[0][0].get("type") == d[i][0].get("type")) \
+    for i in range(1, len(d.cards)):
+        if ((t == "ally" or t == "any") and cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]) \
                 or ((t == "enemy" or t == "any")
-                    and d[0][0].get("type") != d[i][0].get("type")
-                    and not ("feature" in d[i][1][0] and "heavy" in d[i][1][0].get("feature"))):
-            d_new = d[:]
+                    and cards[d.cards[0][0]]['header']["type"] != cards[d.cards[i][0]]['header']["type"]
+                    and not ("heavy" in cards[d.cards[i][0]][d.cards[i][1]][0].get("feature", {}))):
+            d_new = copy.deepcopy(d)
             j = i
             for _ in range(1, abs(p) + 1):
-                if 0 < j + step_j < len(d):
-                    d_new = move_card(d_new[:], j, j + step_j)
-                    trap_exist = "feature" in d[j][1][0] and "traps" in d[j][1][0].get("feature")
-                    if d[0][0].get("type") != d[j][0].get("type") and trap_exist:
+                if 0 < j + step_j < len(d.cards):
+                    d_new = move_card(d_new, j, j + step_j)
+                    trap_exist = "traps" in cards[d.cards[j][0]][d.cards[j][1]][0].get("feature", {})
+                    if cards[d.cards[0][0]]['header']["type"] != cards[d.cards[j][0]]['header']["type"] and trap_exist:
                         d_new = hit_card(d_new[:], j+step_j)
                     ds_new.append(d_new)
                 j += step_j
@@ -272,23 +277,22 @@ def move_deck(d, r, t):
     for i in list(move_range):
         if (
                 (t == "ally" or t == "any") and
-                d[0][0].get("type") == d[i][0].get("type")
+                cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]
         ) or (
                     (
                             (t == "enemy" or t == "any") and
-                            d[0][0].get("type") != d[i][0].get("type")
+                            cards[d.cards[0][0]]['header']["type"] != cards[d.cards[i][0]]['header']["type"]
                             # Heavy card cannot be moved by any enemy action.
-                            and not ("feature" in d[i][1][0]
-                                     and "heavy" in d[i][1][0].get("feature"))
+                            and "heavy" not in cards[d.cards[i][0]][d.cards[i][1]][0].get("feature", {})
                     ) and
                     # for monster: do not pull exhausted enemies
-                    not (d[0][0].get("type") == "monster"
+                    not (cards[d.cards[0][0]]['header']["type"] == "monster"
                          and r < 0
-                         and d[i][1][0].get("life") == "exhausted")
+                         and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "exhausted")
         ):
             end_position = 1 if r < 1 else len(d) - 1
-            ds_new.append(move_card(d[:], i, end_position))
-            if d[0][0].get("type") == "monster":
+            ds_new.append(move_card(d, i, end_position))
+            if cards[d.cards[0][0]]['header']["type"] == "monster":
                 break
     return ds_new if ds_new != [d] else []
 
@@ -307,13 +311,14 @@ def move_card(d, i, j):
     :param j: the j-the position to be moved to
     :return: the new deck
     """
+    d_new = copy.deepcopy(d)
     if not check_cards_unique(d):
         pass
     if i < j:
-        d[i:j + 1] = back_shift(d[i:j + 1])
+        d_new.cards[i:j + 1] = back_shift(d_new.cards[i:j + 1])
     else:
-        d[j:i + 1] = back_shift(d[j:i + 1], len(d[j:i + 1]) - 1)
-    return d
+        d_new.cards[j:i + 1] = back_shift(d.cards[j:i + 1], len(d_new.cards[j:i + 1]) - 1)
+    return d_new
 
 
 # @CountCalls
@@ -329,8 +334,9 @@ def rotate_top_card(d, i=0):
     :param i: the i-th card in the deck
     :return: list of multiple new decks
     """
-    d[i] = rotate(d[i])
-    return [d]
+    d_new = copy.deepcopy(d)
+    d_new.cards[i][1] = rotate(d_new.cards[i][1])
+    return [d_new]
 
 
 # @CountCalls
@@ -351,8 +357,8 @@ def hit_deck(d, r=0):
     :param r: the hit range, int
     :return: the new decks
     """
-    is_webs = d[1][1][0].get("feature") == "webs" if "feature" in d[1][1][0] else False
-    first_card_type = d[0][0].get("type")
+    is_webs = cards[d.cards[1][0]][d.cards[1][1]][0].get("feature") == "webs"
+    first_card_type = cards[d.cards[0][0]]['header']["type"]
 
     # the next card displays feature "venom" and prevents from activating the top hero card
     if first_card_type == "hero" and is_webs:
@@ -360,13 +366,13 @@ def hit_deck(d, r=0):
 
     if not check_cards_unique(d):
         pass
-    if get_deck_hash(d) == '5A6D7A9A8A1B4A2A3B':
+    if d.hash_str == '5A6D7A9A8A1B4A2A3B':
         pass
 
     ds_new = []
-    if r == 0 or r > len(d) - 1:  # 0 is a substitute for the infinite hit range
-        r = len(d) - 1
-    if d[0][0].get("type") == "hero":
+    if r == 0 or r > len(d.cards) - 1:  # 0 is a substitute for the infinite hit range
+        r = len(d.cards) - 1
+    if cards[d.cards[0][0]]['header']["type"] == "hero":
         # for hero targeting monster, use the furthest shield first
         hit_list = list(reversed(range(1, r + 1)))
     else:
@@ -376,56 +382,57 @@ def hit_deck(d, r=0):
     shield_found = False
     for i in hit_list:
         # Reaction: Shield: Don't target
-        if d[0][0].get("type") != d[i][0].get("type") \
-                and "reaction" in d[i][1][0] \
-                and d[i][1][0].get("reaction")[0] == "shield":
-            d_new = intercept(d[:], i, d[i][1][0].get("reaction")[1])
+        shield_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get("shield")
+        if cards[d.cards[0][0]]['header']["type"] != cards[d.cards[i][0]]['header']["type"] \
+                and shield_reaction:
+            d_new = intercept(d, i, shield_reaction)
             shield_found = True
             if not check_cards_unique(d_new):
                 pass
             if d_new != d:
                 ds_new.append(d_new)
                 # if monster's shield has been found and activated, break
-                if d[0][0].get("type") == "hero":
+                if cards[d.cards[0][0]]['header']["type"] == "hero":
                     break
 
     dodge_found = False
     found_hero = False
     for i in hit_list:
         # Reaction: Dodge: Don't target
-        if not found_hero and d[0][0].get("type") != d[i][0].get("type") \
-                and d[i][1][0].get("reaction") == "dodge":
-            if d[0][0].get("type") == "monster":
+        dodge_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get("dodge")
+        if not found_hero and cards[d.cards[0][0]]['header']["type"] != cards[d.cards[i][0]]['header']["type"] \
+                and dodge_reaction:
+            if cards[d.cards[0][0]]['header']["type"] == "monster":
                 found_hero = True
             dodge_found = True
-            d_new = intercept(d[:], i, "dodge")
+            d_new = intercept(d, i, dodge_reaction)
             if not check_cards_unique(d_new):
                 pass
             if d_new != d:
                 ds_new.append(d_new)
                 # if monster's shield has been found and activated, break
-                if d[0][0].get("type") == "hero":
+                if cards[d.cards[0][0]]['header']["type"] == "hero":
                     break
 
     # Continue collecting new deck outcomes by applying hit_card(), if it is a monster's turn,
     # or it is a hero's turn and no shield or no dodge has been found.
     # Activating ally's shield is not mandatory for the hero.
-    if d[0][0].get("type") == "monster" \
-            or (d[0][0].get("type") == "hero"
+    if cards[d.cards[0][0]]['header']["type"] == "monster" \
+            or (cards[d.cards[0][0]]['header']["type"] == "hero"
                 and not (shield_found
                          or dodge_found)):
         for i in hit_list:
-            if d[0][0].get("type") != d[i][0].get("type") \
-                    and d[i][1][0].get("life") != "exhausted":
+            if cards[d.cards[0][0]]['header']["type"] != cards[d.cards[i][0]]['header']["type"] \
+                    and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] != "exhausted":
                 # even if it is mostly not effective,
                 # hero may refuse to activate the shield or dodge and take damage instead
-                d_new = hit_card(d[:], i)
+                d_new = hit_card(d, i)
                 if not check_cards_unique(d_new):
                     pass
                 if d_new != d:
                     ds_new.append(d_new)
                     # if closest hero has been hit, break
-                    if d[0][0].get("type") == "monster":
+                    if cards[d.cards[0][0]]['header']["type"] == "monster":
                         break
     return ds_new
 
@@ -459,21 +466,21 @@ def intercept(d, i, reaction):
     """
     if not check_cards_unique(d):
         pass
-    d_new = d[:]
+    d_new = copy.deepcopy(d)
 
     switcher = {
-        "rotate": lambda c: rotate(c[:])
+        "rotate": lambda f: rotate(f)
     }
 
     # try:
-    #     action = d[i][1][0].get(reaction)
+    #     action = cards[d.cards[i][0]][d.cards[i][1]]['header'].get(reaction)
     # except KeyError:
     #     # reaction to intercept does not exist
     #     action = None
 
     if reaction or reaction != "None":
         # a switcher construction used for multiple possible shield or dodge reactions
-        d_new[i] = switcher.get(reaction)(d[i][:])
+        d_new.cards[i][1] = switcher.get(reaction)(d.cards[i][1])
         if not check_cards_unique(d_new):
             pass
     return d_new
@@ -495,17 +502,13 @@ def hit_card(d, i):
     :param i: the i-th card in the deck [0, 1...]
     :return: new deck (single)
     """
-    expected_face = ''
-    expected_life = "wounded" if d[i][1][0].get("life") == "healthy" else "exhausted"
+    # expected_face = ''
+    expected_life = "wounded" if cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "healthy" else "exhausted"
 
-    for j in range(1, 5):
-        if d[i][j][0].get("life") == expected_life:
-            expected_face = d[i][j][0].get("face")
-            break
-    expected_card = rotate_card_to_face(d[i][:], expected_face)
-    d_new = d[:]
-    d_new[i] = expected_card
+    d_new = copy.deepcopy(d)
+    d_new.cards[i][1] = faces[[cards[d.cards[i][0]][f][0]["life"] for f in faces].index(expected_life)]
     return d_new
+    # expected_card = rotate_card_to_face(d[i][:], expected_face)
 
 
 # noinspection PyShadowingNames
@@ -526,8 +529,8 @@ def revive_deck(d, a):
     :param a: action "resurrect" or "heal"
     :return: new decks
     """
-    is_webs = d[1][1][0].get("feature") == "webs" if "feature" in d[1][1][0] else False
-    first_card_type = d[0][0].get("type")
+    is_webs = cards[d.cards[1][0]][d.cards[1][1]][0].get("feature") == "webs"
+    first_card_type = cards[d.cards[0][0]]['header']["type"]
 
     # the next card displays feature "venom" and prevents from activating the top hero card
     if first_card_type == "hero" and is_webs:
@@ -536,16 +539,17 @@ def revive_deck(d, a):
     if not check_cards_unique(d):
         pass
     ds_new = []
-    for i in range(1, len(d)):
-        if d[0][0].get("type") == d[i][0].get("type"):
-            if (a == "heal" and d[i][1][0].get("life") == "wounded") \
-                    or (a == "resurrect" and d[i][1][0].get("life") == "exhausted"):
-                d_new = d[:]
-                d_new[i] = revive_card(d[i])
+    for i in range(1, len(d.cards)):
+        if cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]:
+            if (a == "heal" and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "wounded") \
+                    or (a == "resurrect" and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "exhausted"):
+                d_new = copy.deepcopy(d)
+                # was revive_card(d.cards[i])
+                d_new.cards[i][1] = 'A'
                 ds_new.append(d_new)
                 if not check_cards_unique(d_new):
                     pass
-                if d[0][0].get("type") == "monster":
+                if cards[d.cards[0][0]]['header']["type"] == "monster":
                     break
 
     return ds_new
@@ -593,12 +597,15 @@ def get_status(d):
     :return: the health status (dict('hero'=float, 'monster'=float))
     """
     status = {"hero": 0., "monster": 0.}
-    for card in d:
-        card_type = card[0].get("type")
-        card_score = score.get(card[1][0].get("life"))
+    for card in d.cards:
+        card_type = cards[card[0]]['header'].get("type")
+        card_score = score.get(cards[card[0]][card[1]][0].get("life"))
         status[card_type] += card_score
 
     return status
+
+
+lives = ['healthy', 'wounded', 'exhausted']
 
 
 # noinspection PyShadowingNames
@@ -617,23 +624,23 @@ def maneuver_deck(d):
     :param d: the current deck
     :return: list of new decks
     """
-    is_webs = d[1][1][0].get("feature") == "webs" if "feature" in d[1][1][0] else False
-    first_card_type = d[0][0].get("type")
+    is_webs = cards[d.cards[1][0]][d.cards[1][1]][0].get("feature") == "webs"
+    first_card_type = cards[d.cards[0][0]]['header']["type"]
 
     # the next card displays feature "venom" and prevents from activating the top hero card
     if first_card_type == "hero" and is_webs:
         return []
 
     ds_new = []
-    for i in range(1, len(d) - 1):
-        if (d[0][0].get("type") == d[i][0].get("type") and
-                (d[i][1][0].get("life") == d[i][2][0].get("life") or
-                 (d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "wounded") or
-                 (d[i][1][0].get("life") == "healthy" and d[i][2][0].get("life") == "exhausted") or
-                 (d[i][1][0].get("life") == "wounded" and d[i][2][0].get("life") == "exhausted"))):
-            d_new = d[:]
-            d_new[i] = rotate(d[i])
-            ds_new.append(d_new)
+    for i in range(1, len(d.cards) - 1):
+        face_rotated = rotate(d.cards[i][1])
+        if cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]:
+            life_rotated = cards[d.cards[i][0]][face_rotated]['header']['life']
+            life_current = cards[d.cards[i][0]][d.cards[i][1]]['header']['life']
+            if lives.index(life_current) <= lives.index(life_rotated):
+                d_new = copy.deepcopy(d)
+                d_new[i] = rotate(d[i])
+                ds_new.append(d_new)
     return ds_new
 
 
@@ -683,9 +690,9 @@ def arrow_deck(d, n=1, e=-3):
     :return: new decks
     """
     # the next card displays feature "webs" and prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "webs" in d[1][1][0].get("feature"):
+    if cards[d.cards[0][0]]['header']["type"] == "hero" \
+            and "feature" in cards[d.cards[1][0]][d.cards[1][1]]['header'] \
+            and "webs" in cards[d.cards[1][0]][d.cards[1][1]][0].get("feature"):
         return []
 
     ds_new = []
@@ -697,22 +704,24 @@ def arrow_deck(d, n=1, e=-3):
     # a targeted monster shall apply the shield
 
     for i in target_list:
-        d_new = d[:]
-        if d[i][0].get("type") == "monster":
+        d_new = copy.deepcopy(d)
+        if cards[d.cards[i][0]]['header']["type"] == "monster":
             # todo: rewrite using check for "reaction" existence
             # also consider "dodge" as a reaction
-            if d[i][0].get("reaction") != "shield":
-                d_new = hit_card(d_new[:], i)
+            shield_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get("shield")
+            if shield_reaction:
+                d_new = intercept(d_new[:], i, shield_reaction)
             else:
-                d_new = intercept(d_new[:], i, "shield")
+                d_new = hit_card(d_new[:], i)
             if n == 2:  # double arrow
                 for j in target_list:
                     if i < j \
-                            and d[j][0].get("type") == "monster":
-                        if d[j][0].get("reaction") != "shield":
-                            d_new = hit_card(d_new[:], j)
+                            and cards[d.cards[j][0]]['header']["type"] == "monster":
+                        shield_reaction = cards[d.cards[j][0]][d.cards[j][1]][0].get("shield")
+                        if shield_reaction:
+                            d_new = intercept(d_new[:], j, shield_reaction)
                         else:
-                            d_new = intercept(d_new[:], j, "shield")
+                            d_new = hit_card(d_new[:], j)
                         ds_new.append(d_new)
             else:
                 ds_new.append(d_new)
@@ -735,8 +744,8 @@ def teleport_deck(d, t):
     :param t: the target of teleport ("ally", "enemy", "any")
     """
     ds_new = []
-    is_venom = d[1][1][0].get("feature") == "venom" if "feature" in d[1][1][0] else False
-    first_card_type = d[0][0].get("type")
+    is_venom = cards[d.cards[1][0]][d.cards[1][1]][0].get("feature") == "venom"
+    first_card_type = cards[d.cards[0][0]]['header']["type"]
 
     # the next card displays feature "venom" and prevents from activating the top hero card
     if first_card_type == "hero" and is_venom:
@@ -745,8 +754,8 @@ def teleport_deck(d, t):
     for i in range(len(d)):
         for j in range(i+1, len(d)):
             if (t == "any"
-                    or (t == "ally" and first_card_type == d[i][0].get("type") == d[j][0].get("type"))
-                    or (t == "enemy" and first_card_type != d[i][0].get("type") == d[j][0].get("type"))):
+                    or (t == "ally" and first_card_type == cards[d.cards[i][0]]['header']["type"] == cards[d.cards[j][0]]['header']["type"])
+                    or (t == "enemy" and first_card_type != cards[d.cards[i][0]]['header']["type"] == cards[d.cards[j][0]]['header']["type"])):
                 d_new = d.copy()
                 d_new[i], d_new[j] = d_new[j], d_new[i]
                 ds_new.append(d_new)
@@ -764,7 +773,7 @@ def inspire_deck(d):
     :param d: the current deck
     """
     ds_new = []
-    is_monster_turn = d[0][0].get("type") == "monster"
+    is_monster_turn = cards[d.cards[0][0]]['header']["type"] == "monster"
     for i, _ in enumerate(d):
         ds_new_i = play_card(d[i:])
         for d_new_i in ds_new_i:
@@ -785,12 +794,12 @@ def get_deck_hash(d):
     :param d: the deck
     :return: the hash (str)
     """
-    d_id = [f"{card[0]['number']}{card[1][0]['face']}" for card in d]
+    d_id = [f"{card[0]}{card[1]}" for card in d.cards]
     return ''.join(d_id)
 
 
 # @CountCalls
-def create_deck(d_hash, cards=cards.cards):
+def create_deck(d_hash, cards=cards):
     """
     Create a deck consisting of cards based on the hash.
 
@@ -798,14 +807,15 @@ def create_deck(d_hash, cards=cards.cards):
     :param cards: the definition of all the available cards (list)
     :return: a deck, a list of cards, (list of lists)
     """
-    d_numbers, d_faces = unzip_hash(d_hash)
-    deck = [rotate_card_to_face(cards[n-1], d_faces[i].upper()) if cards[n-1][0].get("number") == n else None
-            for i, n in enumerate(d_numbers)]
-
-    if None in deck:
-        print("Wrong card order definition in Cards")
-        return None
-    return deck
+    # # d_numbers, d_faces = unzip_hash(d_hash)
+    # # deck = [rotate_card_to_face(cards[n-1], d_faces[i].upper()) if cards[n-1][0].get("number") == n else None
+    # #        for i, n in enumerate(d_numbers)]
+    #
+    # if None in deck:
+    #     print("Wrong card order definition in Cards")
+    #     return None
+    # return deck
+    return None
 
 
 def recreate_game(d_hash):
@@ -825,9 +835,10 @@ def recreate_game(d_hash):
 
 
 def report_game_status(game):
+    temp_deck = deck.Deck(game[-1])
     print(len(game_turns), ":",
           game[-1], ":",
-          get_status(create_deck(game[-1])),
+          get_status(temp_deck),
           'start deck:', game[0],
           'length of game:', len(game) - 1)
 
@@ -863,11 +874,12 @@ def play_card(deck):
     }
     decks_new_i = []
     decks_new_i_prev_unchanged_rows = []
-    for i, row in enumerate(deck[0][1][1:]):
-        decks = [deck[:]]
+
+    for i, row in enumerate(cards[deck.cards[0][0]][deck.cards[0][1]][1:]):
+        decks = [deck]
         decks_new_j = []
         for j, action in enumerate(row):
-            if deck[0][0].get("type") == "hero":
+            if cards[deck.cards[0][0]]['header']["type"] == "hero":
                 # for the hero, it is allowed not make some actions,
                 # we will drop decks which have not changed at the end of the action row
                 decks.extend(decks_new_j[:])
@@ -877,7 +889,7 @@ def play_card(deck):
                 # else decks have not changed by the previous action and are going to suffer the next action
             decks_new_j = [d
                            for deck_j in decks
-                           for d in switcher.get(action[0])(deck_j[:], action)]
+                           for d in switcher.get(action[0])(deck_j, action)]
 
             # if no valid result has been generated, use the input as the outcome
             # todo: check on the following algo
@@ -896,19 +908,19 @@ def play_card(deck):
                 decks_new_j = [deck_new_j for m, deck_new_j in enumerate(decks_new_j) if decks_new_j_changed[m]]
             decks_new_i.extend(decks_new_j)
             decks_new_i = get_unique_items(decks_new_i[:])
-            if deck[0][0].get('type') == 'monster':
+            if cards[deck.cards[0][0]]['header']['type'] == 'monster':
                 break
         # all the decks stale, no new deck show new configuration
         else:
             decks_new_i_prev_unchanged_rows.extend(decks_new_j)
         # if the last row has been reached
-        if not decks_new_i and i == len(deck[0][1][1:]) - 1:
+        if not decks_new_i and i == len(cards[deck.cards[0][0]][deck.cards[0][1]][1:]) - 1:
             if decks_new_i_prev_unchanged_rows:
                 decks_new_i = get_unique_items(decks_new_i_prev_unchanged_rows[:])
             else:
                 # when no row generated a valid results, turn back to the original deck, the input
                 # todo: check on the algo
-                decks_new_i = [deck[:]]
+                decks_new_i = [deck]
 
                 # remove duplicates and remove the original deck, if others could be created
 
@@ -937,10 +949,10 @@ card_status_symbols = dict(healthy="◼", wounded="⬓", exhausted="◻")
 def colour_card_hash(c):
     # Style.BRIGHT \
     s_out = '' \
-            + card_colours[c[0].get("name")] \
-            + "{:2d}".format(c[0].get("number")) \
-            + c[1][0].get("face") \
-            + card_status_symbols[c[1][0].get("life")] \
+            + card_colours[cards[c[0]]['header'].get("name")] \
+            + "{:2d}".format(c[0]) \
+            + c[1] \
+            + card_status_symbols[cards[c[0]][c[1]][0].get("life")] \
             + Style.RESET_ALL \
             + ' '
     return s_out
@@ -961,9 +973,9 @@ Game rules applicable:
         that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
     
     # the next card displays feature "webs" and prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "webs" in d[1][1][0].get("feature"):
+    if cards[d.cards[0][0]]['header']["type"] == "hero" \
+            and "feature" in cards[d.cards[1][0]][d.cards[1][1]]['header'] \
+            and "webs" in cards[d.cards[1][0]][d.cards[1][1]][0].get("feature"):
         return []
 """
 
@@ -977,9 +989,9 @@ Game rules applicable:
         that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
         
     # the next card displays feature "webs" and prevents from activating the top hero card
-    if d[0][0].get("type") == "hero" \
-            and "feature" in d[1][1][0] \
-            and "webs" in d[1][1][0].get("feature"):
+    if cards[d.cards[0][0]]['header']["type"] == "hero" \
+            and "feature" in cards[d.cards[1][0]][d.cards[1][1]]['header'] \
+            and "webs" in cards[d.cards[1][0]][d.cards[1][1]][0].get("feature"):
         return []
 """
 

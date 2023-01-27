@@ -9,10 +9,12 @@ todo:
     - add missing characters
     - add missing actions and conditions
 """
+import copy
 
-import cards
+# from cards import cards
 import handybrawl as hb
 import re
+import deck
 
 
 # deck_start_hash = '1A6A2A7A3A8A4A9A5A'
@@ -113,9 +115,11 @@ def request_deck():
         input_hash_cor = corrections(input_hash)
 
         try:
-            hb.get_deck_hash(hb.create_deck(input_hash_cor, cards.cards))
+            start = deck.Deck(input_hash_cor)
+            # hb.get_deck_hash(hb.create_deck(input_hash_cor, cards))
+            #
             print("The accepted hash: ", input_hash_cor)
-            numbers, _ = hb.unzip_hash(input_hash_cor)
+            numbers = [card[0] for card in start.cards]
             if not all([1 <= i <= 9 for i in numbers]):
                 print("Use card numbers for the warrior and the ogre characters, in the range from 1 to 9. "
                       "Other characters are coming soon.")
@@ -131,7 +135,7 @@ def request_deck():
             print("No corresponding card numbers could be found.")
             continue
 
-    return input_hash_cor
+    return start
 
 
 if 'deck_start_hash' not in locals():
@@ -142,15 +146,14 @@ answer = input("Do you wish to start a game with your own deck? ([Y]es/No) "
 
 # or not deck_start_hash
 if answer.lower() in {'yes', 'y', 'yeah', 'ano', 'igen'}:
-    deck_start_hash = request_deck()
+    start = request_deck()
 
-deck_start = hb.create_deck(deck_start_hash, cards.cards)
 decks_new = None
 
 
 def build_graphical_representation_to_deck(deck):
     rep = ''
-    for card in reversed(deck):
+    for card in reversed(deck.cards):
         rep += hb.colour_card_hash(card)
     return rep
 
@@ -160,9 +163,9 @@ while True:
 
     if not decks_new:
         # initialise at start
-        deck_prev = deck_start[:]
-        decks_new = [deck_prev]
-        deck_new = deck_prev = decks_new[0]
+        prev = copy.deepcopy(start)
+        decks_new = [prev]
+        deck_new = decks_new[0]
         print("Welcome to the new game with the following deck:")
         symbol_description = "Each colour represents one character.\n" \
                              "The life status is represented by square symbols:"
@@ -172,7 +175,7 @@ while True:
         decks_new.sort(key=lambda dx: (hb.get_status(dx).get("hero"), -hb.get_status(dx).get("monster")), reverse=True)
 
         # global card_colours, card_status .
-        for k, d in enumerate(reversed(decks_new)):
+        for k, d in enumerate(decks_new):
             s = build_graphical_representation_to_deck(d)
             print("{:3d}".format(k + 1), ":", s)
 
@@ -184,7 +187,7 @@ while True:
             # input("Please confirm by enter...")
 
         deck_new = decks_new[option_number - 1]
-        deck_new = hb.back_shift(deck_new[:])
+        deck_new.cards = hb.back_shift(deck_new.cards)
 
         print('The new deck to play is:')
 
@@ -195,7 +198,7 @@ while True:
         pass
 
     deck_new_hash = hb.get_deck_hash(deck_new)
-    deck_prev_hash = hb.get_deck_hash(deck_prev)
+    deck_prev_hash = hb.get_deck_hash(prev)
     status = hb.get_status(deck_new)
     print(status)
     if deck_new_hash not in hb.game_turns:
@@ -208,5 +211,5 @@ while True:
         elif status.get("hero") != 0 \
                 and status.get("monster") != 0:
             # no win or defeat, and deck changed
-            decks_new = hb.play_card(deck_new[:])
-            deck_prev = deck_new[:]
+            decks_new = hb.play_card(deck_new)
+            prev = deck_new
