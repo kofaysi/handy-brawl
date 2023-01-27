@@ -134,6 +134,8 @@ def request_deck():
         except IndexError:
             print("No corresponding card numbers could be found.")
             continue
+        except TypeError:
+            print('Empty input was detected. Please enter a valid hash.')
 
     return start
 
@@ -142,10 +144,10 @@ if 'deck_start_hash' not in locals():
     deck_start_hash = ''
 
 answer = input("Do you wish to start a game with your own deck? ([Y]es/No) "
-               "(In case of 'no', you will be served by the deck saved within the script): ")
+               "(In case of 'no', you will be served by the deck saved within the script): ") or 'Y'
 
 # or not deck_start_hash
-if answer.lower() in {'yes', 'y', 'yeah', 'ano', 'igen'}:
+if answer.lower() in {'', 'yes', 'y', 'yeah', 'ano', 'igen'}:
     start = request_deck()
 
 decks_new = None
@@ -165,7 +167,7 @@ while True:
         # initialise at start
         prev = copy.deepcopy(start)
         decks_new = [prev]
-        deck_new = decks_new[0]
+        new = decks_new[0]
         print("Welcome to the new game with the following deck:")
         symbol_description = "Each colour represents one character.\n" \
                              "The life status is represented by square symbols:"
@@ -186,30 +188,28 @@ while True:
             print("A single outcome evaluated. Proceeding automatically to a new deck...")
             # input("Please confirm by enter...")
 
-        deck_new = decks_new[option_number - 1]
-        deck_new.cards = hb.back_shift(deck_new.cards)
+        new = decks_new[option_number - 1]
+        new.cards = hb.back_shift(new.cards)
 
         print('The new deck to play is:')
 
-    s = build_graphical_representation_to_deck(deck_new)
+    s = build_graphical_representation_to_deck(new)
     print(' '*6 + s)
 
-    if hb.get_deck_hash(deck_new) == '6A3A9A8A5A7A1A2A4A':
+    if hb.get_deck_hash(new) == '6A3A9A8A5A7A1A2A4A':
         pass
 
-    deck_new_hash = hb.get_deck_hash(deck_new)
-    deck_prev_hash = hb.get_deck_hash(prev)
-    status = hb.get_status(deck_new)
+    status = hb.get_status(new)
     print(status)
-    if deck_new_hash not in hb.game_turns:
-        if deck_new_hash != deck_prev_hash:
-            hb.game_turns[deck_new_hash] = deck_prev_hash
+    if new.hash_str not in hb.game_turns:
+        if new != prev:
+            hb.game_turns[new.hash_str] = prev.hash_str
         if status.get("hero") == 0 or status.get("monster") == 0:
-            game_deck_new = hb.recreate_game(deck_new_hash)
+            game_deck_new = hb.recreate_game(new.hash_str)
             hb.report_game_status(game_deck_new)
             break
         elif status.get("hero") != 0 \
                 and status.get("monster") != 0:
             # no win or defeat, and deck changed
-            decks_new = hb.play_card(deck_new)
-            prev = deck_new
+            decks_new = hb.play_card(new)
+            prev = new

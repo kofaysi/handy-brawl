@@ -25,6 +25,7 @@ class Deck:
             self.cards = parameter
         # self.origin = Deck()  # The origin can be assigned without initialisation.
         self.actions = []
+        self.prev = None
 
     def __eq__(self, other):
         if not isinstance(other, Deck):
@@ -59,8 +60,14 @@ class Deck:
         """
         return ''.join([str(value) for card in self.cards for value in card])
 
-    def next_action(self, action):
+    def add_action(self, action):
         self.actions.append(action)
+
+    def game(self):
+        if self.prev:
+            return [self.prev] + self.prev.game()
+        else:
+            return []
 
 
 start = Deck('5A9A4A8A3A7A2A6A1A')

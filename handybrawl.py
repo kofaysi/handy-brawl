@@ -235,7 +235,7 @@ def adjust_deck(d, p, t):
                 or ((t == "enemy" or t == "any")
                     and cards[d.cards[0][0]]['header']["type"] != cards[d.cards[i][0]]['header']["type"]
                     and not ("heavy" in cards[d.cards[i][0]][d.cards[i][1]][0].get("feature", {}))):
-            d_new = copy.deepcopy(d)
+            d_new = make_next(d)
             j = i
             for _ in range(1, abs(p) + 1):
                 if 0 < j + step_j < len(d.cards):
@@ -247,6 +247,13 @@ def adjust_deck(d, p, t):
                 j += step_j
     ds_new = get_unique_items(ds_new)
     return ds_new
+
+
+def make_next(d):
+    d_new = deck.Deck(d.cards[:])
+    d_new.prev = d
+    # d_new = copy.deepcopy(d)
+    return d_new
 
 
 # @CountCalls
@@ -311,7 +318,7 @@ def move_card(d, i, j):
     :param j: the j-the position to be moved to
     :return: the new deck
     """
-    d_new = copy.deepcopy(d)
+    d_new = make_next(d)
     if not check_cards_unique(d):
         pass
     if i < j:
@@ -334,7 +341,7 @@ def rotate_top_card(d, i=0):
     :param i: the i-th card in the deck
     :return: list of multiple new decks
     """
-    d_new = copy.deepcopy(d)
+    d_new = make_next(d)
     d_new.cards[i][1] = rotate(d_new.cards[i][1])
     return [d_new]
 
@@ -466,7 +473,7 @@ def intercept(d, i, reaction):
     """
     if not check_cards_unique(d):
         pass
-    d_new = copy.deepcopy(d)
+    d_new = make_next(d)
 
     switcher = {
         "rotate": lambda f: rotate(f)
@@ -481,6 +488,7 @@ def intercept(d, i, reaction):
     if reaction or reaction != "None":
         # a switcher construction used for multiple possible shield or dodge reactions
         d_new.cards[i][1] = switcher.get(reaction)(d.cards[i][1])
+        d_new.add_action((i, reaction))
         if not check_cards_unique(d_new):
             pass
     return d_new
@@ -505,8 +513,9 @@ def hit_card(d, i):
     # expected_face = ''
     expected_life = "wounded" if cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "healthy" else "exhausted"
 
-    d_new = copy.deepcopy(d)
+    d_new = make_next(d)
     d_new.cards[i][1] = faces[[cards[d.cards[i][0]][f][0]["life"] for f in faces].index(expected_life)]
+    d_new.add_action(("hit", i))
     return d_new
     # expected_card = rotate_card_to_face(d[i][:], expected_face)
 
@@ -543,7 +552,7 @@ def revive_deck(d, a):
         if cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]:
             if (a == "heal" and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "wounded") \
                     or (a == "resurrect" and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "exhausted"):
-                d_new = copy.deepcopy(d)
+                d_new = make_next(d)
                 # was revive_card(d.cards[i])
                 d_new.cards[i][1] = 'A'
                 ds_new.append(d_new)
@@ -638,7 +647,7 @@ def maneuver_deck(d):
             life_rotated = cards[d.cards[i][0]][face_rotated]['header']['life']
             life_current = cards[d.cards[i][0]][d.cards[i][1]]['header']['life']
             if lives.index(life_current) <= lives.index(life_rotated):
-                d_new = copy.deepcopy(d)
+                d_new = make_next(d)
                 d_new[i] = rotate(d[i])
                 ds_new.append(d_new)
     return ds_new
@@ -704,7 +713,7 @@ def arrow_deck(d, n=1, e=-3):
     # a targeted monster shall apply the shield
 
     for i in target_list:
-        d_new = copy.deepcopy(d)
+        d_new = make_next(d)
         if cards[d.cards[i][0]]['header']["type"] == "monster":
             # todo: rewrite using check for "reaction" existence
             # also consider "dodge" as a reaction
@@ -890,7 +899,6 @@ def play_card(deck):
             decks_new_j = [d
                            for deck_j in decks
                            for d in switcher.get(action[0])(deck_j, action)]
-
             # if no valid result has been generated, use the input as the outcome
             # todo: check on the following algo
             if not decks_new_j:
