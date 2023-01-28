@@ -17,17 +17,19 @@ import re
 import deck
 
 
-# deck_start_hash = '1A6A2A7A3A8A4A9A5A'
-# deck_start_hash = '6A7A8A9A1A2A3A4A5A'
-# deck_start_hash = '1A2A3A4A5A6A7A8A9A'
-# deck_start_hash = '1A2A3A5A4A6A9A7A8A'
-# deck_start_hash = '1A2A3A4A6A9A8A5A7A'
-deck_start_hash = '1A6A2A7A3A8A4A9A5A'
-# deck_start_hash = '1A2B3C4D6A9A8B5C7D'
-# deck_start_hash = '1A2A10A15A6A17A8A20A24A'
-# deck_start_hash = '1C6C2D7A8A3C5D4D9C'
-# deck_start_hash = '1A6A2A8A3A'
-# deck_start_hash = '9b2b6d5c'
+# start_hash = '1A6A2A7A3A8A4A9A5A'
+# start_hash = '6A7A8A9A1A2A3A4A5A'
+# start_hash = '1A2A3A4A5A6A7A8A9A'
+# start_hash = '1A2A3A5A4A6A9A7A8A'
+# start_hash = '1A2A3A4A6A9A8A5A7A'
+start_hash = '1A6A2A7A3A8A4A9A5A'
+# start_hash = '1A2B3C4D6A9A8B5C7D'
+# start_hash = '1A2A10A15A6A17A8A20A24A'
+# start_hash = '1C6C2D7A8A3C5D4D9C'
+# start_hash = '1A6A2A8A3A'
+# start_hash = '9b2b6d5c'
+
+start = deck.Deck(start_hash)
 
 
 def request_number(minimum=1, maximum=1):
@@ -140,13 +142,13 @@ def request_deck():
     return start
 
 
-if 'deck_start_hash' not in locals():
-    deck_start_hash = ''
+if 'start_hash' not in locals():
+    start_hash = ''
 
 answer = input("Do you wish to start a game with your own deck? ([Y]es/No) "
                "(In case of 'no', you will be served by the deck saved within the script): ") or 'Y'
 
-# or not deck_start_hash
+# or not start_hash
 if answer.lower() in {'', 'yes', 'y', 'yeah', 'ano', 'igen'}:
     start = request_deck()
 
@@ -157,6 +159,13 @@ def build_graphical_representation_to_deck(deck):
     rep = ''
     for card in reversed(deck.cards):
         rep += hb.colour_card_hash(card)
+    return rep
+
+
+def build_actions_to_deck(deck):
+    rep = ''
+    for action in reversed(deck.actions):
+        rep += ' (' + ', '.join(map(str, action)) + ') '
     return rep
 
 
@@ -178,7 +187,7 @@ while True:
 
         # global card_colours, card_status .
         for k, d in enumerate(decks_new):
-            s = build_graphical_representation_to_deck(d)
+            s = build_graphical_representation_to_deck(d) + build_actions_to_deck(d)
             print("{:3d}".format(k + 1), ":", s)
 
         if len(decks_new) != 1:

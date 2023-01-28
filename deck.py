@@ -27,12 +27,12 @@ class Deck:
         self.actions = []
         self.prev = None
 
-    def __eq__(self, other):
-        if not isinstance(other, Deck):
-            # don't attempt to compare against unrelated types
-            return NotImplemented
-
-        return self.cards == other.cards
+    # def __eq__(self, other):
+    #    if not isinstance(other, Deck):
+    #        # don't attempt to compare against unrelated types
+    #        return NotImplemented
+    #
+    #    return self.cards == other.cards
 
     def __hash__(self):
         # necessary for instances to behave sanely in dicts and sets.
@@ -61,7 +61,7 @@ class Deck:
         return ''.join([str(value) for card in self.cards for value in card])
 
     def add_action(self, action):
-        self.actions.append(action)
+        self.actions += [element for element in action]
 
     def game(self):
         if self.prev:

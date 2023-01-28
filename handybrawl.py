@@ -54,23 +54,6 @@ import deck
 game_turns = dict()
 
 
-class CountCalls:
-    """
-    Use @CountCalls as a decorator to add a new method/property to a function
-    """
-    def __init__(self, func):
-        self._count = 0
-        self._func = func
-
-    def __call__(self, *args, **kwargs):
-        self._count += 1
-        return self._func(*args, **kwargs)
-
-    @property
-    def call_count(self):
-        return self._count
-
-
 faces = ["A", "B", "C", "D"]
 
 
@@ -239,10 +222,11 @@ def adjust_deck(d, p, t):
             j = i
             for _ in range(1, abs(p) + 1):
                 if 0 < j + step_j < len(d.cards):
+                    # d_new = make_next(d_new)
                     d_new = move_card(d_new, j, j + step_j)
                     trap_exist = "traps" in cards[d.cards[j][0]][d.cards[j][1]][0].get("feature", {})
                     if cards[d.cards[0][0]]['header']["type"] != cards[d.cards[j][0]]['header']["type"] and trap_exist:
-                        d_new = hit_card(d_new[:], j+step_j)
+                        d_new = hit_card(d_new, j+step_j)
                     ds_new.append(d_new)
                 j += step_j
     ds_new = get_unique_items(ds_new)
@@ -250,9 +234,10 @@ def adjust_deck(d, p, t):
 
 
 def make_next(d):
-    d_new = deck.Deck(d.cards[:])
+    d_new = copy.deepcopy(d)
+    # d_new.cards = d.cards[:]
     d_new.prev = d
-    # d_new = copy.deepcopy(d)
+    d_new.actions = []
     return d_new
 
 
@@ -325,6 +310,7 @@ def move_card(d, i, j):
         d_new.cards[i:j + 1] = back_shift(d_new.cards[i:j + 1])
     else:
         d_new.cards[j:i + 1] = back_shift(d.cards[j:i + 1], len(d_new.cards[j:i + 1]) - 1)
+    d_new.add_action([('move', i, j)])
     return d_new
 
 
@@ -343,6 +329,7 @@ def rotate_top_card(d, i=0):
     """
     d_new = make_next(d)
     d_new.cards[i][1] = rotate(d_new.cards[i][1])
+    d_new.add_action([('rotate', 0)])
     return [d_new]
 
 
@@ -488,7 +475,7 @@ def intercept(d, i, reaction):
     if reaction or reaction != "None":
         # a switcher construction used for multiple possible shield or dodge reactions
         d_new.cards[i][1] = switcher.get(reaction)(d.cards[i][1])
-        d_new.add_action((i, reaction))
+        d_new.add_action([(reaction, i)])
         if not check_cards_unique(d_new):
             pass
     return d_new
@@ -515,7 +502,7 @@ def hit_card(d, i):
 
     d_new = make_next(d)
     d_new.cards[i][1] = faces[[cards[d.cards[i][0]][f][0]["life"] for f in faces].index(expected_life)]
-    d_new.add_action(("hit", i))
+    d_new.add_action([("damage", i)])
     return d_new
     # expected_card = rotate_card_to_face(d[i][:], expected_face)
 
@@ -555,6 +542,7 @@ def revive_deck(d, a):
                 d_new = make_next(d)
                 # was revive_card(d.cards[i])
                 d_new.cards[i][1] = 'A'
+                d_new.add_action([(a, i)])
                 ds_new.append(d_new)
                 if not check_cards_unique(d_new):
                     pass
@@ -614,7 +602,7 @@ def get_status(d):
     return status
 
 
-lives = ['healthy', 'wounded', 'exhausted']
+lives = ['exhausted', 'wounded', 'healthy']
 
 
 # noinspection PyShadowingNames
@@ -646,9 +634,10 @@ def maneuver_deck(d):
         if cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]:
             life_rotated = cards[d.cards[i][0]][face_rotated]['header']['life']
             life_current = cards[d.cards[i][0]][d.cards[i][1]]['header']['life']
-            if lives.index(life_current) <= lives.index(life_rotated):
+            if lives.index(life_current) >= lives.index(life_rotated):
                 d_new = make_next(d)
-                d_new[i] = rotate(d[i])
+                d_new.cards[i][1] = rotate(d.cards[i][1])
+                d_new.add_action([('rotate', i)])
                 ds_new.append(d_new)
     return ds_new
 
@@ -728,9 +717,9 @@ def arrow_deck(d, n=1, e=-3):
                             and cards[d.cards[j][0]]['header']["type"] == "monster":
                         shield_reaction = cards[d.cards[j][0]][d.cards[j][1]][0].get("shield")
                         if shield_reaction:
-                            d_new = intercept(d_new[:], j, shield_reaction)
+                            d_new = intercept(d_new, j, shield_reaction)
                         else:
-                            d_new = hit_card(d_new[:], j)
+                            d_new = hit_card(d_new, j)
                         ds_new.append(d_new)
             else:
                 ds_new.append(d_new)
@@ -762,9 +751,15 @@ def teleport_deck(d, t):
 
     for i in range(len(d)):
         for j in range(i+1, len(d)):
-            if (t == "any"
-                    or (t == "ally" and first_card_type == cards[d.cards[i][0]]['header']["type"] == cards[d.cards[j][0]]['header']["type"])
-                    or (t == "enemy" and first_card_type != cards[d.cards[i][0]]['header']["type"] == cards[d.cards[j][0]]['header']["type"])):
+            if ((t == "both" and cards[d.cards[i][0]]['header']["type"] != cards[d.cards[j][0]]['header']["type"])
+                    or (t == "ally"
+                        and first_card_type
+                        == cards[d.cards[i][0]]['header']["type"]
+                        == cards[d.cards[j][0]]['header']["type"])
+                    or (t == "enemy"
+                        and first_card_type
+                        != cards[d.cards[i][0]]['header']["type"]
+                        == cards[d.cards[j][0]]['header']["type"])):
                 d_new = d.copy()
                 d_new[i], d_new[j] = d_new[j], d_new[i]
                 ds_new.append(d_new)
@@ -939,7 +934,15 @@ def play_card(deck):
     # sort results by their decreasing her status, and increasing monster status
     decks_new_i.sort(key=lambda d: (get_status(d).get("hero"), -get_status(d).get("monster")), reverse=True)
 
-    return get_unique_items(decks_new_i[:])
+    decks_new_i = get_unique_items(decks_new_i[:])
+
+    for deck_new_i in decks_new_i:
+        game = deck_new_i.game()
+        if len(game) > 0:
+            deck_new_i.add_action([actions for pointer in game[:game.index(deck)-1] for actions in pointer.actions])
+            deck_new_i.prev = deck
+
+    return decks_new_i
 
 
 card_colours = dict(warrior=Fore.BLUE,
