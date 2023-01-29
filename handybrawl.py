@@ -235,7 +235,6 @@ def adjust_deck(d, p, t):
 
 def make_next(d):
     d_new = copy.deepcopy(d)
-    # d_new.cards = d.cards[:]
     d_new.prev = d
     d_new.actions = []
     return d_new
@@ -308,9 +307,10 @@ def move_card(d, i, j):
         pass
     if i < j:
         d_new.cards[i:j + 1] = back_shift(d_new.cards[i:j + 1])
+        d_new.add_action([('move down', i)])
     else:
         d_new.cards[j:i + 1] = back_shift(d.cards[j:i + 1], len(d_new.cards[j:i + 1]) - 1)
-    d_new.add_action([('move', i, j)])
+        d_new.add_action([('move up', i)])
     return d_new
 
 
@@ -569,16 +569,20 @@ def revive_card(c):
 # @CountCalls
 def get_unique_items(lst) -> "list":
     """
-    Get unique items out of the lst (list).
+    Get unique deck items out of the lst (list).
+    Because __eq__() is overwritten to compare hash_str attributes, the two objects are compared.
 
     :param lst: a list of items possibly containing duplicates
     :return: a list of unique items
     """
-    uniques = []
-    for item in lst:
-        if item not in uniques:
-            uniques.append(item)
-    return uniques
+    return list(set(item for item in lst))
+#    uniques = []
+#    for item in lst:
+#
+#        if not any([item.hash_str == item2.hash_str for item2 in uniques]):
+#            uniques.append(item)
+#    return uniques
+
 
 
 score = {"healthy": 1., "wounded": 0.5, "exhausted": 0.}
@@ -939,7 +943,7 @@ def play_card(deck):
     for deck_new_i in decks_new_i:
         game = deck_new_i.game()
         if len(game) > 0:
-            deck_new_i.add_action([actions for pointer in game[:game.index(deck)-1] for actions in pointer.actions])
+            deck_new_i.add_action([actions for pointer in game[:game.index(deck)] for actions in pointer.actions])
             deck_new_i.prev = deck
 
     return decks_new_i

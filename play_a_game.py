@@ -156,17 +156,23 @@ decks_new = None
 
 
 def build_graphical_representation_to_deck(deck):
-    rep = ''
-    for card in reversed(deck.cards):
-        rep += hb.colour_card_hash(card)
-    return rep
+    """
+    Builds a graphical representation of the deck.
+
+    :param deck: A deck object
+    :return: A string representing the graphical representation of the deck
+    """
+    return ''.join([hb.colour_card_hash(card) for card in reversed(deck.cards)])
 
 
 def build_actions_to_deck(deck):
-    rep = ''
-    for action in reversed(deck.actions):
-        rep += ' (' + ', '.join(map(str, action)) + ') '
-    return rep
+    """
+    Builds a string representation of the actions in a deck.
+
+    :param deck: A deck object
+    :return: A string representing the actions in the deck
+    """
+    return ''.join(' (' + ', '.join(map(str, action)) + ')' for action in reversed(deck.actions))
 
 
 while True:

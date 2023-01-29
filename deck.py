@@ -41,6 +41,10 @@ class Deck:
     def __len__(self):
         return len(self.cards)
 
+    def __eq__(self, other):
+        # use 'is' to compare for identity of two deck objects
+        return self.hash_str == other.hash_str
+
     @property
     def top_number(self):
         self.cards[0][0]
