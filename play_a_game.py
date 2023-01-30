@@ -155,14 +155,16 @@ if answer.lower() in {'', 'yes', 'y', 'yeah', 'ano', 'igen'}:
 decks_new = None
 
 
-def build_graphical_representation_to_deck(deck):
+def build_graphical_representation_to_deck(deck, actions=False):
     """
     Builds a graphical representation of the deck.
 
+    :param actions: bool to add actions
     :param deck: A deck object
     :return: A string representing the graphical representation of the deck
     """
-    return ''.join([hb.colour_card_hash(card) for card in reversed(deck.cards)])
+    return ''.join([hb.colour_card_hash(card) for card in reversed(deck.cards)]) \
+           + (build_actions_to_deck(d) if actions else '')
 
 
 def build_actions_to_deck(deck):
@@ -193,7 +195,7 @@ while True:
 
         # global card_colours, card_status .
         for k, d in enumerate(decks_new):
-            s = build_graphical_representation_to_deck(d) + build_actions_to_deck(d)
+            s = build_graphical_representation_to_deck(d, actions=True)
             print("{:3d}".format(k + 1), ":", s)
 
         if len(decks_new) != 1:
