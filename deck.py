@@ -49,6 +49,7 @@ class Deck:
     def top_number(self):
         self.cards[0][0]
 
+    @property
     def top_face(self):
         self.cards[0][1]
 

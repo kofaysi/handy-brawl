@@ -16,7 +16,7 @@ Functions:
 - adjust_deck(d : list, a : str, p : str) -> list:
 - move_deck(d : list, a : str, r : str) -> list:
 - move_card(d : list, i : int, j : int) -> list:
-- rotate_top_card(d : list, i=0 : int) -> list:
+- rotate_card(d : list, i=0 : int) -> list:
 - hit_deck(d : list, n : int) -> list:
 - intercept(d : list, i : int, reaction) -> list:
 - hit_card(d : list, i : int) -> list:
@@ -58,44 +58,6 @@ faces = ["A", "B", "C", "D"]
 
 
 # @CountCalls
-def rotate_card_to_face(c, f):
-    """
-    rotate a card c to a desired face f
-
-    :param c: a card
-    :param f: a face ["A", "B", "C", "D"]
-    :return: the new card
-    """
-    c_new = c
-    face_current = c_new[1][0].get("face")
-    if face_current != f:
-        c_new = rotate(c[:])
-        face_current = c_new[1][0].get("face")
-        if face_current != f:
-            c_new = flip(c[:])
-            face_current = c_new[1][0].get("face")
-            if face_current != f:
-                c_new = flip(rotate(c[:]))
-    # todo transcribe a werewolf feature of the face into the head of the card
-    return c_new
-
-
-# @CountCalls
-def flip(c):
-    """
-    Flip the card, back side becomes the front and front side becomes the back (back-flip)
-
-    Game rules applicable:
-        Flip: Flip this card along the long edge.
-
-    :param c: a card
-    :return: a new card
-    """
-    # todo transcribe a werewolf feature of the face into the head of the card
-    return [c[0], c[3], c[4], c[1], c[2]]
-
-
-# @CountCalls
 def rotate(f):
     """
     rotate the card, top side becomes the bottom and the bottom side becomes the top, sides do not change
@@ -103,8 +65,8 @@ def rotate(f):
     Game rules applicable:
         Rotate: Rotate this card 180° without changing the side. This action is mandatory.
 
-    :param c: a card
-    :return: a new card
+    :param f: the face of the card to be rotated
+    :return: the new face
     """
     # todo transcribe a werewolf feature of the face into the head of the card
     faces_rotated = ["B", "A", "D", "C"]
@@ -138,35 +100,6 @@ def check_cards_unique(d) -> bool:
         bool False if card numbers in the deck are not unique
     """
     return len(d.cards) == len({c[0] for c in d.cards})
-
-
-def unzip_hash(d_hash):
-    """
-    process the hash char by char and collect the numbers and faces in two individual lists
-
-    :param d_hash: the hash of a deck
-    :return: two lists, a list of numbers and a list of faces
-    """
-    faces = []
-    numbers = []
-    hash_new = ''
-    # create a new has in which train of alphas are separated by a separator ' ' (blank space) from train of numerics
-    # import re is avoided on purpose. the function runs seldom.
-    for i, s in enumerate(d_hash):
-        if i > 0 and d_hash[i - 1].isalpha() ^ s.isalpha():
-            hash_new += ' '
-        hash_new += s
-
-    # split the string by the separator ' '
-    hash_list = hash_new.split(' ')
-
-    # collect str and int to separate lists
-    for item in hash_list:
-        if item.isalpha():
-            faces.append(item)
-        else:  # elif item.isnumeric()
-            numbers.append(int(item))
-    return numbers, faces
 
 
 # @CountCalls
@@ -214,7 +147,8 @@ def adjust_deck(d, p, t):
     # adjust_list = list(range(1, abs(p) + 1))
     step_j = 1 if p > 0 else -1
     for i in range(1, len(d.cards)):
-        if ((t == "ally" or t == "any") and cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]) \
+        if ((t == "ally" or t == "any")
+            and cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]) \
                 or ((t == "enemy" or t == "any")
                     and cards[d.cards[0][0]]['header']["type"] != cards[d.cards[i][0]]['header']["type"]
                     and not ("heavy" in cards[d.cards[i][0]][d.cards[i][1]][0].get("feature", {}))):
@@ -315,7 +249,7 @@ def move_card(d, i, j):
 
 
 # @CountCalls
-def rotate_top_card(d, i=0):
+def rotate_card(d, i=0):
     """
     rotate() the i-th card in the deck, default is the top card (i=0)
 
@@ -329,7 +263,7 @@ def rotate_top_card(d, i=0):
     """
     d_new = make_next(d)
     d_new.cards[i][1] = rotate(d_new.cards[i][1])
-    d_new.add_action([('rotate', 0)])
+    d_new.add_action([('rotate', i)])
     return [d_new]
 
 
@@ -539,10 +473,7 @@ def revive_deck(d, a):
         if cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]:
             if (a == "heal" and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "wounded") \
                     or (a == "resurrect" and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "exhausted"):
-                d_new = make_next(d)
-                # was revive_card(d.cards[i])
-                d_new.cards[i][1] = 'A'
-                d_new.add_action([(a, i)])
+                d_new = revive_card(a, d, i)
                 ds_new.append(d_new)
                 if not check_cards_unique(d_new):
                     pass
@@ -552,18 +483,23 @@ def revive_deck(d, a):
     return ds_new
 
 
-def revive_card(c):
+def revive_card(a, d, i):
     """
-    Turn the card to its starting ("A") position.
+    Turn the i-th card in the deck to its starting ("A") position.
 
     Game rules applicable:
         Heal: Return any [half leaf] (wounded) to its starting position.
         Resurrect: Return closest ally card to its starting position.
 
-    :param c: a card
+    :param d: the current deck
+    :param i: the index of the card to be revived
+    :param a: the action to be logged with the deck
     :return: a new card
     """
-    return rotate_card_to_face(c[:], 'A')
+    d_new = make_next(d)
+    d_new.cards[i][1] = 'A'
+    d_new.add_action([(a, i)])
+    return d_new
 
 
 # @CountCalls
@@ -582,7 +518,6 @@ def get_unique_items(lst) -> "list":
 #        if not any([item.hash_str == item2.hash_str for item2 in uniques]):
 #            uniques.append(item)
 #    return uniques
-
 
 
 score = {"healthy": 1., "wounded": 0.5, "exhausted": 0.}
@@ -639,9 +574,7 @@ def maneuver_deck(d):
             life_rotated = cards[d.cards[i][0]][face_rotated]['header']['life']
             life_current = cards[d.cards[i][0]][d.cards[i][1]]['header']['life']
             if lives.index(life_current) >= lives.index(life_rotated):
-                d_new = make_next(d)
-                d_new.cards[i][1] = rotate(d.cards[i][1])
-                d_new.add_action([('rotate', i)])
+                d_new = rotate_card(d, i)
                 ds_new.append(d_new)
     return ds_new
 
@@ -806,26 +739,6 @@ def get_deck_hash(d):
     return ''.join(d_id)
 
 
-# @CountCalls
-def create_deck(d_hash, cards=cards):
-    """
-    Create a deck consisting of cards based on the hash.
-
-    :param d_hash: the unique hash (str)
-    :param cards: the definition of all the available cards (list)
-    :return: a deck, a list of cards, (list of lists)
-    """
-    # # d_numbers, d_faces = unzip_hash(d_hash)
-    # # deck = [rotate_card_to_face(cards[n-1], d_faces[i].upper()) if cards[n-1][0].get("number") == n else None
-    # #        for i, n in enumerate(d_numbers)]
-    #
-    # if None in deck:
-    #     print("Wrong card order definition in Cards")
-    #     return None
-    # return deck
-    return None
-
-
 def recreate_game(d_hash):
     """
     Recreate the game sequence of the given deck hash.
@@ -874,7 +787,7 @@ def play_card(deck):
         "pull": lambda d, a: move_deck(d, r=-a[1], t=a[2]),  # deck, range, target
         "delay": lambda d, a: adjust_deck(d, p=a[1], t=a[2]),  # deck, by positions, target
         "quicken": lambda d, a: adjust_deck(d, p=-a[1], t=a[2]),  # deck, by positions, target
-        "rotate": lambda d, a: rotate_top_card(d),  # deck
+        "rotate": lambda d, a: rotate_card(d),  # deck
         "heal": lambda d, a: revive_deck(d, a[0]),  # deck, action
         "resurrect": lambda d, a: revive_deck(d, a[0]),  # deck, action
         "arrow": lambda d, a: arrow_deck(d, n=a[1]),  # deck, number of targets
