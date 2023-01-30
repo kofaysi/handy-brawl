@@ -23,41 +23,42 @@ def play_card_recursive(deck):
     if deck.hash_str == '3A7C2A4B8C5A6C':
         pass
 
-    global winner_game_length, game_turns, winner_deck_hash
+    global winner_game_length, game_turns, winner
     for deck_i in decks_new:
         if deck_i.hash_str == '3A7C2A4B8C5A6C':
             pass
+        # todo: deepcopy issue: it copies also the prev attributes recursively.
+        #   Find the way to reduce the load.
         deck_i_new = copy.deepcopy(deck_i)
-        # todo: change the has as well, not only the deck
+        # todo: change the hash as well, not only the deck
         deck_i_new.cards = hb.back_shift(deck_i_new.cards)
-        deck_i_new_hash = deck_i_new.hash_str
         status = hb.get_status(deck_i)
         if deck_test != deck:
             pass
 
-        if deck_i_new_hash not in hb.game_turns and deck_i_new_hash != start.hash_str:
-            hb.game_turns[deck_i_new_hash] = deck.hash_str
-            game_deck_i_new = hb.recreate_game(deck_i_new_hash)
-            hb.report_game_status(game_deck_i_new)
+        if deck_i_new.hash_str not in hb.game_turns and deck_i_new.hash_str != start.hash_str:
+            hb.game_turns[deck_i_new.hash_str] = deck.hash_str
+            game_deck_i_new = hb.recreate_game(deck_i_new.hash_str)
+            # hb.report_game_status(game_deck_i_new)
 
             if status.get("hero") == 0 or status.get("monster") == 0:
                 if status.get("monster") == 0:
                     hb.report_game_status(game_deck_i_new)
                     if len(game_deck_i_new) - 1 < winner_game_length:
                         winner_game_length = len(game_deck_i_new) - 1
-                        winner_deck_hash = deck_i_new_hash
+                        winner = copy.deepcopy(deck_i_new)
             elif len(game_deck_i_new) < winner_game_length:
                 # print(len(game_deck_i_new) - 1)
                 try:
                     # make a new turn with the deck, expect +1 on len(recreate_game())
                     play_card_recursive(deck_i_new)
                 except RecursionError:
-                    print(deck_i_new_hash, ":", status, "recursion overflow")
+                    print(deck_i_new.hash_str, ":", status, "recursion overflow")
             else:
                 pass
         else:
             pass
-    return winner_deck_hash
+    return winner
 
 
 # record start time
@@ -70,23 +71,23 @@ t_start = time.time()
 # start_hash = '9A8A7A6A5A4A3A2A1A' # no winning game
 # start_hash = '2A3A4A5A6A7A8A'
 # start_hash = '1A2A3A4A6A9A8A5A7A'
-deck_start_hash = '1A6A2A7A3A8A4A'
+start_hash = '1A6A2A7A3A8A4A'
 # start_hash = '10A15A11A16A12A17A13A18A14A'
 # start_hash = '9b2b6d5c'
 
 # deck_start = hb.create_deck(start_hash, cards)
 
-start = deck.Deck(deck_start_hash)
+start = deck.Deck(start_hash)
 
 game_turns = dict()
-winner_game_length = 10
-winner_deck_hash = None
+winner_game_length = 12
+winner = deck.Deck()
 print("Searching for the first possible winning outcome. "
       "Then searching further for the solution with the highest hero's life.")
 
-winner_hash = play_card_recursive(start)
+winner = play_card_recursive(start)
 
-winner_game = hb.recreate_game(winner_hash)
+winner_game = hb.recreate_game(winner.hash_str)
 print("The game with the least turns and the highest hero life flows the following:")
 pprint.pprint(winner_game)
 

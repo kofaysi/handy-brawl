@@ -742,7 +742,7 @@ def get_deck_hash(d):
 def recreate_game(d_hash):
     """
     Recreate the game sequence of the given deck hash.
-    The global dict game_hase is used to collect the deck chain.
+    The global dict game_turns is used to collect the deck chain.
     The deck hash with no existing key with the same name, is the starting/first deck.
 
     :param d_hash: a hash of the deck
