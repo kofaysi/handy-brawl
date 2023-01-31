@@ -5,22 +5,31 @@ import copy
 import re
 
 
-def unhash(d_hash):
+def hash2deck(d_hash):
     """
     Separates numbers and letter in the hash and creates
 
     :param d_hash: the hash of a deck
     :return: two lists, a list of numbers and a list of faces
     """
-    matches = re.findall(r'\d+|\D+', d_hash)
-    return [[int(matches[i]), matches[i + 1]] for i in range(0, len(matches) - 1, 2)]
+    faces = {'A', 'B', 'C', 'D'}
+    hash_new = ''
+    for i, s in enumerate(d_hash):
+        if i > 0 and (d_hash[i - 1] in faces) ^ (s in faces):
+            hash_new += ' '
+        hash_new += s
+    # hash_new = [w for i, s in enumerate(d_hash) if (i > 0 and (d_hash[i - 1] in faces) ^ (s in faces)) else w += s]
+
+    # split the string by the separator ' '
+    hash_list = hash_new.split(' ')
+    return [[int(hash_list[i]), hash_list[i+1]] for i in range(0, len(hash_list) - 1, 2)]
 
 
 class Deck:
 
     def __init__(self, parameter=None):
         if isinstance(parameter, str):
-            self.cards = unhash(parameter) if parameter else None
+            self.cards = hash2deck(parameter) if parameter else None
         if isinstance(parameter, list):
             self.cards = parameter
         # self.origin = Deck()  # The origin can be assigned without initialisation.
