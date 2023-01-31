@@ -5,9 +5,7 @@ and so the highest life score for hero using recursion.
 It takes about 10 minutes to find the lowest maximum on
     - Intel® Core™ i5-5300U CPU @ 2.30GHz × 4
 """
-import copy
 
-from cards import cards
 import handybrawl as hb
 import pprint
 import time
@@ -18,7 +16,7 @@ def play_card_recursive(deck):
     deck_test = hb.make_copy(deck)
     decks_new = hb.play_card(deck)
 
-    decks_new.sort(key=lambda d: (hb.get_status(d).get("hero"), -hb.get_status(d).get("monster")), reverse=True)
+    decks_new.sort(key=lambda d: (hb.get_status(d).get('hero'), -hb.get_status(d).get('monster')), reverse=True)
 
     global winner_game_length, game_turns, winner
     for deck_i in decks_new:
@@ -33,8 +31,8 @@ def play_card_recursive(deck):
             game_deck_i_new = hb.recreate_game(deck_i_new.hash_str)
             # hb.report_game_status(game_deck_i_new)
 
-            if status.get("hero") == 0 or status.get("monster") == 0:
-                if status.get("monster") == 0:
+            if status.get('hero') == 0 or status.get('monster') == 0:
+                if status.get('monster') == 0:
                     hb.report_game_status(game_deck_i_new)
                     if len(game_deck_i_new) - 1 < winner_game_length:
                         winner_game_length = len(game_deck_i_new) - 1
@@ -45,7 +43,7 @@ def play_card_recursive(deck):
                     # make a new turn with the deck, expect +1 on len(recreate_game())
                     play_card_recursive(deck_i_new)
                 except RecursionError:
-                    print(deck_i_new.hash_str, ":", status, "recursion overflow")
+                    print(deck_i_new.hash_str, ':', status, 'recursion overflow')
     return winner
 
 
@@ -71,17 +69,17 @@ start = deck.Deck(start_hash)
 game_turns = dict()
 winner_game_length = 12
 winner = deck.Deck()
-print("Searching for the first possible winning outcome. "
-      "Then searching further for the solution with the highest hero's life.")
+print('Searching for the first possible winning outcome. '
+      'Then searching further for the solution with the highest hero\'s life.')
 
 winner = play_card_recursive(start)
 
 winner_game = hb.recreate_game(winner.hash_str)
-print("The game with the least turns and the highest hero life flows the following:")
+print('The game with the least turns and the highest hero life flows the following:')
 pprint.pprint(winner_game)
 
 # record end time
 t_end = time.time()
 
 # print the difference between start and end time in milliseconds
-print("The time of execution of above program is :", (t_end-t_start) * 10**3, "ms")
+print('The time of execution of above program is :', (t_end-t_start) * 10**3, 'ms')

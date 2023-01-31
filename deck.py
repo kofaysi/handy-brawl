@@ -1,8 +1,6 @@
 """
+Definition of the deck class.
 """
-# import handybrawl as hb
-#import copy
-# import re
 
 
 def hash2deck(d_hash):
@@ -37,12 +35,12 @@ class Deck:
         self.prev = None
 
     def __eq__(self, other):
-    # use 'is' to compare for identity of two deck objects
-       if not isinstance(other, Deck):
-           # don't attempt to compare against unrelated types
-           return NotImplemented
+        # use 'is' to compare for identity of two deck objects
+        if not isinstance(other, Deck):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
 
-       return self.cards == other.cards
+        return self.cards == other.cards
 
     def __hash__(self):
         # necessary for instances to behave sanely in dicts and sets.
