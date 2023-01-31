@@ -53,11 +53,11 @@ class Deck:
 
     @property
     def top_number(self):
-        self.cards[0][0]
+        return self.cards[0][0]
 
     @property
     def top_face(self):
-        self.cards[0][1]
+        return self.cards[0][1]
 
     @property
     def hash_str(self):
@@ -69,7 +69,7 @@ class Deck:
 
         :return: int hash
         """
-        return ''.join([str(value) for card in self.cards for value in card])
+        return ''.join([str(card[0]) + card[1] for card in self.cards])
 
     def add_action(self, action):
         self.actions += [element for element in action]
