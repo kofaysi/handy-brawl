@@ -884,8 +884,11 @@ def play_card(deck):
     for deck_new_i in decks_new_i:
         game = deck_new_i.game()
         if len(game) > 0:
-            deck_new_i.add_action([actions for pointer in game[:game.index(deck)] for actions in pointer.actions])
-            deck_new_i.prev = deck
+            try:
+                deck_new_i.add_action([actions for pointer in game[:game.index(deck)] for actions in pointer.actions])
+                deck_new_i.prev = deck
+            except ValueError:
+                pass
 
     return decks_new_i
 
