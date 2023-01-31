@@ -1,0 +1,179 @@
+/usr/bin/python3.10 /home/milan/PycharmProjects/handy-brawl/play_a_game.py 
+Do you wish to start a game with your own deck? ([Y]es/No) (In case of 'no', you will be served by the deck saved within the script): y
+This application is a hobby type of project by Milan Žroutík <zroutik@e.email>.
+
+This application is simulating the Handy Brawl game designed by Igor Zuber.
+A card overview is required to play the game properly.
+The cards design and available actions on faces are not displayed.
+Download the cards and the rules from the files section at https://boardgamegeek.com/boardgame/362692/handy-brawl.
+
+The hash for a deck is a string consisting of alternating integers and characters [A, B, C, D].
+The physical cards in the physical deck are played from top to bottom. The virtual deck with cards (and their faces) are displayed from right to left.
+Card numbers are represented by integers and the faces of the cards by letters.
+Lower case letters are allowed. Spaces are allowed.
+Missing letters represent the face 'A' of the card.
+    (Spaces between numbers are required in such case.)
+Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.
+The visualisation od the deck (5A◼  9A◼  4A◼  8A◼  3A◼  7A◼  2A◼  6A◼  1A◼)
+ and the hash to the deck (1A6A2A7A3A8A4A9A5A) have reversed order of the cards.
+ Some examples of a valid hash (top card of the deck first, bottom card of the deck last):
+    - 1A6A2A7A3A8A4A9A5A
+    - 1A 6A 2A 7A 3A 8A 4A 9A 5A
+    - 1 6 2 7 3 8 4 9 5
+
+Enter a hash for the deck to play (start entering the top card first, proceed the list from left to right): 1A6A2A7A3A8A4A
+The accepted hash:  1A6A2A7A3A8A4A
+If the hash has been parsed incorrectly, start the application over.
+Welcome to the new game with the following deck:
+Each colour represents one character.
+The life status is represented by square symbols:
+{'healthy': '◼', 'wounded': '⬓', 'exhausted': '◻'}
+       4A◼  8A◼  3A◼  7A◼  2A◼  6A◼  1A◼ 
+{'hero': 4.0, 'monster': 3.0}
+  1 :  4A◼  8A◼  3A◼  7A◼  2A◼  6D⬓  1A◼  (damage, 1)
+  2 :  8A◼  4A◼  3A◼  7A◼  2A◼  6A◼  1B◼  (move down, 6) (rotate, 0)
+  3 :  4A◼  8A◼  3A◼  2A◼  7A◼  6A◼  1B◼  (move down, 3) (rotate, 0)
+  4 :  4A◼  8A◼  2A◼  3A◼  7A◼  6A◼  1B◼  (move down, 3) (move down, 4) (rotate, 0)
+  5 :  3A◼  4A◼  8A◼  7A◼  2A◼  6A◼  1B◼  (move down, 5) (move down, 6) (rotate, 0)
+  6 :  4A◼  8A◼  3A◼  7A◼  2A◼  6A◼  1A◼ 
+  7 :  4A◼  8A◼  3A◼  7A◼  6A◼  2A◼  1B◼  (move down, 2) (rotate, 0)
+  8 :  4A◼  3A◼  8A◼  7A◼  2A◼  6A◼  1B◼  (move down, 5) (rotate, 0)
+  9 :  4A◼  8A◼  3A◼  6A◼  7A◼  2A◼  1B◼  (move down, 2) (move down, 3) (rotate, 0)
+Choose deck variant to play: 1
+The new deck to play is:
+       1A◼  4A◼  8A◼  3A◼  7A◼  2A◼  6D⬓ 
+{'hero': 4.0, 'monster': 2.5}
+  1 :  1A◼  4B◼  8A◼  3A◼  7A◼  2D⬓  6C◻  (damage, 1) (rotate, 5) (rotate, 0)
+  2 :  1A◼  4A◼  8A◼  3A◼  7A◼  2C◻  6C◻  (damage, 1) (damage, 1) (rotate, 0)
+Choose deck variant to play: 2
+The new deck to play is:
+       6C◻  1A◼  4A◼  8A◼  3A◼  7A◼  2C◻ 
+{'hero': 3.0, 'monster': 2.0}
+  1 :  6C◻  1A◼  3A◼  4A◼  8A◼  7A◼  2C◻  (move down, 3) (move down, 4)
+  2 :  1A◼  6C◻  4A◼  8A◼  3A◼  7A◼  2C◻  (move up, 7)
+  3 :  6C◻  1A◼  8A◼  3A◼  4A◼  7A◼  2C◻  (move up, 5) (move up, 4)
+  4 :  6C◻  1A◼  8A◼  4A◼  3A◼  7A◼  2C◻  (move up, 5)
+  5 :  6C◻  1A◼  4A◼  8A◼  7A◼  3A◼  2C◻  (move up, 3)
+  6 :  1A◼  4A◼  6C◻  8A◼  3A◼  7A◼  2C◻  (move up, 7) (move up, 6)
+  7 :  6C◻  4A◼  1A◼  8A◼  3A◼  7A◼  2C◻  (move up, 6)
+  8 :  6C◻  1A◼  4A◼  8A◼  3A◼  7A◼  2C◻  (damage, 1) (damage, 1) (rotate, 0)
+  9 :  6C◻  8A◼  1A◼  4A◼  3A◼  7A◼  2C◻  (move down, 4) (move down, 5)
+ 10 :  4A◼  6C◻  1A◼  8A◼  3A◼  7A◼  2C◻  (move down, 5) (move down, 6)
+ 11 :  6C◻  4A◼  8A◼  1A◼  3A◼  7A◼  2C◻  (move up, 6) (move up, 5)
+ 12 :  6C◻  1A◼  4A◼  3A◼  8A◼  7A◼  2C◻  (move up, 4)
+ 13 :  6C◻  1A◼  4A◼  3A◼  7A◼  8A◼  2C◻  (move up, 4) (move up, 3)
+Choose deck variant to play: 9
+The new deck to play is:
+       2C◻  6C◻  8A◼  1A◼  4A◼  3A◼  7A◼ 
+{'hero': 3.0, 'monster': 2.0}
+  1 :  2C◻  6C◻  8A◼  1A◼  4B◼  3A◼  7B◼  (rotate, 2) (rotate, 0)
+  2 :  2C◻  6C◻  8A◼  1A◼  4A◼  3D⬓  7B◼  (damage, 1) (rotate, 0)
+Choose deck variant to play: 1
+The new deck to play is:
+       7B◼  2C◻  6C◻  8A◼  1A◼  4B◼  3A◼ 
+{'hero': 3.0, 'monster': 2.0}
+  1 :  7B◼  2C◻  8A◼  6C◻  1A◼  4B◼  3B◼  (move down, 4) (rotate, 0)
+  2 :  7B◼  2C◻  6C◻  1A◼  8A◼  4B◼  3B◼  (move down, 3) (rotate, 0)
+  3 :  7B◼  2C◻  6C◻  8A◼  1A◼  4B◼  3A◼  (rotate, 2) (rotate, 0)
+  4 :  2C◻  6C◻  7B◼  8A◼  1A◼  4B◼  3B◼  (move up, 7) (move up, 6) (rotate, 0)
+  5 :  7B◼  2C◻  6C◻  4B◼  8A◼  1A◼  3B◼  (move down, 2) (move down, 3) (rotate, 0)
+  6 :  7B◼  6C◻  2C◻  8A◼  1A◼  4B◼  3B◼  (move down, 5) (rotate, 0)
+  7 :  7B◼  8A◼  2C◻  6C◻  1A◼  4B◼  3B◼  (move down, 4) (move down, 5) (rotate, 0)
+  8 :  6C◻  7B◼  2C◻  8A◼  1A◼  4B◼  3B◼  (move down, 5) (move down, 6) (rotate, 0)
+  9 :  7B◼  2C◻  8A◼  1A◼  6C◻  4B◼  3B◼  (move up, 5) (move up, 4) (rotate, 0)
+ 10 :  7B◼  2C◻  6C◻  1A◼  4B◼  8A◼  3B◼  (move up, 4) (move up, 3) (rotate, 0)
+ 11 :  7B◼  2C◻  6C◻  8A◼  4B◼  1A◼  3B◼  (move down, 2) (rotate, 0)
+ 12 :  2C◻  7B◼  6C◻  8A◼  1A◼  4B◼  3B◼  (move down, 6) (rotate, 0)
+ 13 :  7B◼  6C◻  8A◼  2C◻  1A◼  4B◼  3B◼  (move up, 6) (move up, 5) (rotate, 0)
+ 14 :  7B◼  2C◻  1A◼  6C◻  8A◼  4B◼  3B◼  (move down, 3) (move down, 4) (rotate, 0)
+Choose deck variant to play: 8
+The new deck to play is:
+       3B◼  6C◻  7B◼  2C◻  8A◼  1A◼  4B◼ 
+{'hero': 3.0, 'monster': 2.0}
+  1 :  3B◼  6C◻  7B◼  2C◻  8D⬓  1A◼  4B◼  (damage, 2)
+  2 :  3B◼  7B◼  2C◻  6C◻  8A◼  1A◼  4A◼  (move down, 5) (move up, 5) (rotate, 0)
+  3 :  3B◼  6C◻  2C◻  7B◼  8A◼  1A◼  4A◼  (move down, 4) (rotate, 0)
+  4 :  3B◼  6C◻  7B◼  8A◼  2C◻  1A◼  4A◼  (move down, 3) (rotate, 0)
+  5 :  3B◼  2C◻  6C◻  7B◼  8A◼  1A◼  4A◼  (move down, 4) (move up, 6) (rotate, 0)
+  6 :  3B◼  6C◻  2C◻  8A◼  7B◼  1A◼  4A◼  (move down, 4) (move up, 4) (rotate, 0)
+  7 :  3B◼  7B◼  6C◻  2C◻  8A◼  1A◼  4A◼  (move down, 5) (rotate, 0)
+  8 :  6C◻  3B◼  7B◼  2C◻  8A◼  1A◼  4A◼  (move down, 6) (rotate, 0)
+  9 :  6C◻  3B◼  7B◼  2C◻  1A◼  8A◼  4A◼  (move down, 2) (move up, 7) (rotate, 0)
+ 10 :  3B◼  7B◼  6C◻  2C◻  1A◼  8A◼  4A◼  (move down, 2) (move up, 6) (rotate, 0)
+ 11 :  3B◼  7B◼  6C◻  8A◼  2C◻  1A◼  4A◼  (move down, 3) (move up, 6) (rotate, 0)
+ 12 :  7B◼  3B◼  6C◻  2C◻  8A◼  1A◼  4A◼  (move down, 5) (move up, 7) (rotate, 0)
+ 13 :  6C◻  3B◼  2C◻  7B◼  8A◼  1A◼  4A◼  (move down, 6) (move up, 5) (rotate, 0)
+ 14 :  3B◼  6C◻  7B◼  2C◻  1A◼  8A◼  4A◼  (move down, 2) (rotate, 0)
+ 15 :  3B◼  6C◻  7B◼  1A◼  2C◻  8A◼  4A◼  (move down, 2) (move up, 4) (rotate, 0)
+ 16 :  6C◻  7B◼  3B◼  2C◻  8A◼  1A◼  4A◼  (move down, 6) (move up, 6) (rotate, 0)
+ 17 :  3B◼  6C◻  2C◻  7B◼  1A◼  8A◼  4A◼  (move down, 2) (move up, 5) (rotate, 0)
+ 18 :  6C◻  3B◼  7B◼  8A◼  2C◻  1A◼  4A◼  (move down, 6) (move up, 4) (rotate, 0)
+ 19 :  3B◼  6C◻  7B◼  2C◻  8A◼  1A◼  4B◼  (move down, 5) (move down, 6) (rotate, 0)
+ 20 :  3B◼  6C◻  7B◼  8A◼  1A◼  2C◻  4A◼  (move down, 3) (move up, 3) (rotate, 0)
+ 21 :  3B◼  6C◻  8A◼  7B◼  2C◻  1A◼  4A◼  (move down, 3) (move up, 5) (rotate, 0)
+Choose deck variant to play: 1
+The new deck to play is:
+       4B◼  3B◼  6C◻  7B◼  2C◻  8D⬓  1A◼ 
+{'hero': 3.0, 'monster': 1.5}
+  1 :  4B◼  3B◼  6C◻  7B◼  2C◻  8C◻  1A◼  (damage, 1)
+  2 :  4B◼  3B◼  6C◻  2C◻  7B◼  8D⬓  1B◼  (move down, 3) (rotate, 0)
+  3 :  4B◼  3B◼  6C◻  7B◼  8D⬓  2C◻  1B◼  (move down, 2) (rotate, 0)
+  4 :  3B◼  4B◼  6C◻  7B◼  2C◻  8D⬓  1B◼  (move down, 6) (rotate, 0)
+  5 :  4B◼  3B◼  6C◻  8D⬓  7B◼  2C◻  1B◼  (move down, 2) (move down, 3) (rotate, 0)
+  6 :  6C◻  4B◼  3B◼  7B◼  2C◻  8D⬓  1B◼  (move down, 5) (move down, 6) (rotate, 0)
+  7 :  4B◼  7B◼  3B◼  6C◻  2C◻  8D⬓  1B◼  (move down, 4) (move down, 5) (rotate, 0)
+  8 :  4B◼  6C◻  3B◼  7B◼  2C◻  8D⬓  1B◼  (move down, 5) (rotate, 0)
+  9 :  4B◼  3B◼  6C◻  7B◼  2C◻  8D⬓  1A◼  (damage, 2)
+ 10 :  4B◼  3B◼  7B◼  6C◻  2C◻  8D⬓  1B◼  (move down, 4) (rotate, 0)
+ 11 :  4B◼  3B◼  2C◻  6C◻  7B◼  8D⬓  1B◼  (move down, 3) (move down, 4) (rotate, 0)
+Choose deck variant to play: 1
+The new deck to play is:
+       1A◼  4B◼  3B◼  6C◻  7B◼  2C◻  8C◻ 
+{'hero': 3.0, 'monster': 1.0}
+  1 :  4B◼  3B◼  6C◻  7B◼  2C◻  1D⬓  8C◻  (move up, 7) (damage, 1)
+A single outcome evaluated. Proceeding automatically to a new deck...
+The new deck to play is:
+       8C◻  4B◼  3B◼  6C◻  7B◼  2C◻  1D⬓ 
+{'hero': 2.5, 'monster': 1.0}
+  1 :  8C◻  4B◼  6C◻  3B◼  7B◼  2C◻  1D⬓  (move up, 5)
+  2 :  8C◻  4B◼  3B◼  6C◻  7A◼  2C◻  1D⬓  (rotate, 2)
+  3 :  4B◼  3B◼  8C◻  6C◻  7B◼  2C◻  1D⬓  (move up, 7) (move up, 6)
+  4 :  8C◻  4B◼  3B◼  7B◼  2C◻  6C◻  1D⬓  (move up, 4) (move up, 3)
+  5 :  8C◻  4B◼  6C◻  7B◼  3B◼  2C◻  1D⬓  (move up, 5) (move up, 4)
+  6 :  8C◻  3B◼  4B◼  6C◻  7B◼  2C◻  1D⬓  (move up, 6)
+  7 :  8C◻  3B◼  6C◻  4B◼  7B◼  2C◻  1D⬓  (move up, 6) (move up, 5)
+  8 :  8C◻  4B◼  3B◼  7B◼  6C◻  2C◻  1D⬓  (move up, 4)
+  9 :  4B◼  8C◻  3B◼  6C◻  7B◼  2C◻  1D⬓  (move up, 7)
+ 10 :  8C◻  4B◼  3B◼  6C◻  7B◼  2C◻  1D⬓  (move up, 7) (damage, 1)
+ 11 :  8C◻  4B◼  3B◼  6C◻  2C◻  7B◼  1D⬓  (move up, 3)
+Choose deck variant to play: 2
+The new deck to play is:
+       1D⬓  8C◻  4B◼  3B◼  6C◻  7A◼  2C◻ 
+{'hero': 2.5, 'monster': 1.0}
+  1 :  1D⬓  4B◼  3B◼  8C◻  6C◻  7A◼  2C◻  (move up, 6) (move up, 5)
+  2 :  1D⬓  8C◻  3B◼  4B◼  6C◻  7A◼  2C◻  (move up, 5)
+  3 :  1D⬓  8C◻  3B◼  6C◻  4B◼  7A◼  2C◻  (move up, 5) (move up, 4)
+  4 :  8C◻  4B◼  1D⬓  3B◼  6C◻  7A◼  2C◻  (move up, 7) (move up, 6)
+  5 :  1D⬓  4B◼  8C◻  3B◼  6C◻  7A◼  2C◻  (move up, 6)
+  6 :  1D⬓  8C◻  4B◼  3B◼  7A◼  6C◻  2C◻  (move up, 3)
+  7 :  4B◼  1D⬓  8C◻  3B◼  6C◻  7A◼  2C◻  (move down, 5) (move down, 6)
+  8 :  1D⬓  8C◻  4B◼  3B◼  6C◻  7A◼  2C◻  (rotate, 2)
+  9 :  1D⬓  8C◻  6C◻  4B◼  3B◼  7A◼  2C◻  (move down, 3) (move down, 4)
+ 10 :  1D⬓  8C◻  4B◼  6C◻  3B◼  7A◼  2C◻  (move up, 4)
+ 11 :  8C◻  1D⬓  4B◼  3B◼  6C◻  7A◼  2C◻  (move up, 7)
+ 12 :  1D⬓  3B◼  8C◻  4B◼  6C◻  7A◼  2C◻  (move down, 4) (move down, 5)
+ 13 :  1D⬓  8C◻  4B◼  6C◻  7A◼  3B◼  2C◻  (move up, 4) (move up, 3)
+Choose deck variant to play: 13
+The new deck to play is:
+       2C◻  1D⬓  8C◻  4B◼  6C◻  7A◼  3B◼ 
+{'hero': 2.5, 'monster': 1.0}
+  1 :  2C◻  1D⬓  8C◻  4B◼  6C◻  7C◻  3A◼  (damage, 1) (damage, 1) (rotate, 0)
+  2 :  2C◻  1D⬓  8C◻  4B◼  6C◻  7D⬓  3A◼  (damage, 1) (rotate, 0)
+  3 :  2C◻  1D⬓  8C◻  4B◼  6C◻  7A◼  3B◼  (move up, 4) (move up, 3)
+Choose deck variant to play: 1
+The new deck to play is:
+       3A◼  2C◻  1D⬓  8C◻  4B◼  6C◻  7C◻ 
+{'hero': 2.5, 'monster': 0.0}
+11 : 7C6C4B8C1D2C3A : {'hero': 2.5, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 11
+
+Process finished with exit code 0

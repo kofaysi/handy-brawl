@@ -852,11 +852,11 @@ def play_card(deck):
                 # todo: check on the algo
                 decks_new_i = [deck]
 
-                # remove duplicates and remove the original deck, if others could be created
-
-        # decks_new_i = [i for i in decks_new_i if deck_changed(i, deck)]
-        # if len(decks_new_i) == 0:
-        #    decks_new_i.append(deck)
+    # the hero has an option not to apply any action and do nothing
+    if cards[deck.cards[0][0]]['header']['type'] == 'hero':
+        d_new = make_next(deck)
+        d_new.add_action([('do nothing',)])
+        decks_new_i.append(d_new)
 
     # sort results by their decreasing her status, and increasing monster status
     decks_new_i.sort(key=lambda d: (get_status(d).get('hero'), -get_status(d).get('monster')), reverse=True)
