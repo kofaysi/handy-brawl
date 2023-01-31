@@ -265,8 +265,7 @@ def move_card(d, i, j):
     :return: the new deck
     """
     d_new = make_next(d)
-    if not check_cards_unique(d):
-        pass
+
     if i < j:
         d_new.cards[i:j + 1] = back_shift(d_new.cards[i:j + 1])
         d_new.add_action([('move down', i+1)])
@@ -320,11 +319,6 @@ def hit_deck(d, r=0):
     if first_card_type == "hero" and is_webs:
         return []
 
-    if not check_cards_unique(d):
-        pass
-    if d.hash_str == '5A6D7A9A8A1B4A2A3B':
-        pass
-
     ds_new = []
     if r == 0 or r > len(d.cards) - 1:  # 0 is a substitute for the infinite hit range
         r = len(d.cards) - 1
@@ -343,8 +337,7 @@ def hit_deck(d, r=0):
                 and shield_reaction:
             d_new = intercept(d, i, shield_reaction)
             shield_found = True
-            if not check_cards_unique(d_new):
-                pass
+
             if d_new != d:
                 ds_new.append(d_new)
                 # if monster's shield has been found and activated, break
@@ -362,8 +355,7 @@ def hit_deck(d, r=0):
                 found_hero = True
             dodge_found = True
             d_new = intercept(d, i, dodge_reaction)
-            if not check_cards_unique(d_new):
-                pass
+
             if d_new != d:
                 ds_new.append(d_new)
                 # if monster's shield has been found and activated, break
@@ -383,8 +375,7 @@ def hit_deck(d, r=0):
                 # even if it is mostly not effective,
                 # hero may refuse to activate the shield or dodge and take damage instead
                 d_new = hit_card(d, i)
-                if not check_cards_unique(d_new):
-                    pass
+
                 if d_new != d:
                     ds_new.append(d_new)
                     # if closest hero has been hit, break
@@ -420,8 +411,7 @@ def intercept(d, i, reaction):
     :param reaction: a string describing the action after activating the intercept()
     :return: the new deck
     """
-    if not check_cards_unique(d):
-        pass
+
     d_new = make_next(d)
 
     switcher = {
@@ -438,8 +428,7 @@ def intercept(d, i, reaction):
         # a switcher construction used for multiple possible shield or dodge reactions
         d_new.cards[i][1] = switcher.get(reaction)(d.cards[i][1])
         d_new.add_action([(reaction, i)])
-        if not check_cards_unique(d_new):
-            pass
+
     return d_new
 
 
@@ -494,8 +483,6 @@ def revive_deck(d, a):
     if first_card_type == "hero" and is_webs:
         return []
 
-    if not check_cards_unique(d):
-        pass
     ds_new = []
     for i in range(1, len(d.cards)):
         if cards[d.cards[0][0]]['header']["type"] == cards[d.cards[i][0]]['header']["type"]:
@@ -503,8 +490,6 @@ def revive_deck(d, a):
                     or (a == "resurrect" and cards[d.cards[i][0]][d.cards[i][1]][0]["life"] == "exhausted"):
                 d_new = revive_card(a, d, i)
                 ds_new.append(d_new)
-                if not check_cards_unique(d_new):
-                    pass
                 if cards[d.cards[0][0]]['header']["type"] == "monster":
                     break
 
@@ -540,12 +525,6 @@ def get_unique_items(lst) -> "list":
     :return: a list of unique items
     """
     return list(set(item for item in lst))
-#    uniques = []
-#    for item in lst:
-#
-#        if not any([item.hash_str == item2.hash_str for item2 in uniques]):
-#            uniques.append(item)
-#    return uniques
 
 
 score = {"healthy": 1., "wounded": 0.5, "exhausted": 0.}
@@ -716,15 +695,18 @@ def teleport_deck(d, t):
 
     for i in range(len(d)):
         for j in range(i+1, len(d)):
-            if ((t == "both" and cards[d.cards[i][0]]['header']["type"] != cards[d.cards[j][0]]['header']["type"])
-                    or (t == "ally"
-                        and first_card_type
-                        == cards[d.cards[i][0]]['header']["type"]
-                        == cards[d.cards[j][0]]['header']["type"])
-                    or (t == "enemy"
-                        and first_card_type
-                        != cards[d.cards[i][0]]['header']["type"]
-                        == cards[d.cards[j][0]]['header']["type"])):
+            if i < j \
+                    and ((t == "both"
+                          and cards[d.cards[i][0]]['header']["type"]
+                          != cards[d.cards[j][0]]['header']["type"])
+                         or (t == "ally"
+                             and first_card_type
+                             == cards[d.cards[i][0]]['header']["type"]
+                             == cards[d.cards[j][0]]['header']["type"])
+                         or (t == "enemy"
+                             and first_card_type
+                             != cards[d.cards[i][0]]['header']["type"]
+                             == cards[d.cards[j][0]]['header']["type"])):
                 d_new = d.copy()
                 d_new[i], d_new[j] = d_new[j], d_new[i]
                 ds_new.append(d_new)

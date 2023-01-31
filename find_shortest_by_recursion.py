@@ -20,17 +20,9 @@ def play_card_recursive(deck):
 
     decks_new.sort(key=lambda d: (hb.get_status(d).get("hero"), -hb.get_status(d).get("monster")), reverse=True)
 
-    if deck.hash_str == '3A7C2A4B8C5A6C':
-        pass
-
     global winner_game_length, game_turns, winner
     for deck_i in decks_new:
-        if deck_i.hash_str == '3A7C2A4B8C5A6C':
-            pass
-        # todo: deepcopy issue: it copies also the prev attributes recursively.
-        #   Find the way to reduce the load.
         deck_i_new = hb.make_copy(deck_i)
-        # todo: change the hash as well, not only the deck
         deck_i_new.cards = hb.back_shift(deck_i_new.cards)
         status = hb.get_status(deck_i)
         if deck_test != deck:
@@ -54,10 +46,6 @@ def play_card_recursive(deck):
                     play_card_recursive(deck_i_new)
                 except RecursionError:
                     print(deck_i_new.hash_str, ":", status, "recursion overflow")
-            else:
-                pass
-        else:
-            pass
     return winner
 
 
@@ -71,8 +59,8 @@ t_start = time.time()
 # start_hash = '9A8A7A6A5A4A3A2A1A' # no winning game
 # start_hash = '2A3A4A5A6A7A8A'
 # start_hash = '1A2A3A4A6A9A8A5A7A'
-# start_hash = '1A6A2A7A3A8A4A'
-start_hash = '1A6A2A9A3A'
+start_hash = '1A6A2A7A3A8A4A'
+# start_hash = '1A6A2A9A3A'
 # start_hash = '10A15A11A16A12A17A13A18A14A'
 # start_hash = '9b2b6d5c'
 
@@ -81,7 +69,7 @@ start_hash = '1A6A2A9A3A'
 start = deck.Deck(start_hash)
 
 game_turns = dict()
-winner_game_length = 20
+winner_game_length = 12
 winner = deck.Deck()
 print("Searching for the first possible winning outcome. "
       "Then searching further for the solution with the highest hero's life.")
