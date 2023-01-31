@@ -1,8 +1,8 @@
 """
 """
 # import handybrawl as hb
-import copy
-import re
+#import copy
+# import re
 
 
 def hash2deck(d_hash):
@@ -29,19 +29,20 @@ class Deck:
 
     def __init__(self, parameter=None):
         if isinstance(parameter, str):
-            self.cards = hash2deck(parameter) if parameter else None
+            self.cards = hash2deck(parameter)
         if isinstance(parameter, list):
             self.cards = parameter
         # self.origin = Deck()  # The origin can be assigned without initialisation.
         self.actions = []
         self.prev = None
 
-    # def __eq__(self, other):
-    #    if not isinstance(other, Deck):
-    #        # don't attempt to compare against unrelated types
-    #        return NotImplemented
-    #
-    #    return self.cards == other.cards
+    def __eq__(self, other):
+    # use 'is' to compare for identity of two deck objects
+       if not isinstance(other, Deck):
+           # don't attempt to compare against unrelated types
+           return NotImplemented
+
+       return self.cards == other.cards
 
     def __hash__(self):
         # necessary for instances to behave sanely in dicts and sets.
@@ -49,10 +50,6 @@ class Deck:
 
     def __len__(self):
         return len(self.cards)
-
-    def __eq__(self, other):
-        # use 'is' to compare for identity of two deck objects
-        return self.hash_str == other.hash_str
 
     @property
     def top_number(self):
