@@ -79,8 +79,3 @@ class Deck:
             return [self.prev] + self.prev.game()
         else:
             return []
-
-
-start = Deck('5A9A4A8A3A7A2A6A1A')
-new = copy.deepcopy(start)
-pass
