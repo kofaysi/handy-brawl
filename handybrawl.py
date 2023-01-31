@@ -70,7 +70,6 @@ if caller_file.__contains__('play_a_game.py'):
     card_status_symbols = dict(healthy="◼", wounded="⬓", exhausted="◻")
 
 from cards import cards
-import copy
 import deck
 
 game_turns = dict()
@@ -190,9 +189,16 @@ def adjust_deck(d, p, t):
 
 
 def make_next(d):
-    d_new = copy.deepcopy(d)
+    d_new = make_copy(d)
     d_new.prev = d
     d_new.actions = []
+    return d_new
+
+
+def make_copy(d):
+    d_new = deck.Deck(d.hash_str)
+    d_new.actions = d.actions
+    d_new.prev = d.prev
     return d_new
 
 
