@@ -46,7 +46,29 @@ Variables:
     Dictionary of card names and colours for displaying in terminal.
 """
 
-from colorama import Fore, Style  # , Back
+import inspect
+
+caller_file = None
+if __name__ != '__main__':
+    for frame in inspect.stack()[1:]:
+        if frame.filename[0] != '<':
+            caller_file = frame.filename
+            break
+
+if caller_file.__contains__('play_a_game.py'):
+    from colorama import Fore, Style  # , Back
+
+    card_colours = dict(warrior=Fore.BLUE,
+                        ogre=Fore.GREEN,
+                        huntress=Fore.LIGHTGREEN_EX,
+                        vampire=Fore.LIGHTBLUE_EX,
+                        pyromancer=Fore.LIGHTYELLOW_EX,
+                        spider=Fore.LIGHTMAGENTA_EX,
+                        werewolf=Fore.LIGHTBLACK_EX,
+                        demon=Fore.LIGHTCYAN_EX)
+
+    card_status_symbols = dict(healthy="◼", wounded="⬓", exhausted="◻")
+
 from cards import cards
 import copy
 import deck
@@ -860,18 +882,6 @@ def play_card(deck):
             deck_new_i.prev = deck
 
     return decks_new_i
-
-
-card_colours = dict(warrior=Fore.BLUE,
-                    ogre=Fore.GREEN,
-                    huntress=Fore.LIGHTGREEN_EX,
-                    vampire=Fore.LIGHTBLUE_EX,
-                    pyromancer=Fore.LIGHTYELLOW_EX,
-                    spider=Fore.LIGHTMAGENTA_EX,
-                    werewolf=Fore.LIGHTBLACK_EX,
-                    demon=Fore.LIGHTCYAN_EX)
-
-card_status_symbols = dict(healthy="◼", wounded="⬓", exhausted="◻")
 
 
 def colour_card_hash(c):
