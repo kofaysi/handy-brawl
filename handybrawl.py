@@ -638,12 +638,13 @@ def arrow_deck(d, n=1, e=-3):
         return []
 
     ds_new = []
-    # if targeting positions at the end of the deck
     if e < 0:
-        target_list = list(range(len(d) + e - 1, len(d) + 1))
-    else:  # target positions at the beginning of the deck (exercise)
-        target_list = list(range(1, e + 1))
-    # a targeted monster shall apply the shield
+        # targeting positions at the end of the deck
+        # start resolving damages from the targets closest to the bottom of the deck
+        target_list = reversed(range(len(d) + e - 1, len(d) + 1))
+    else:
+        # target positions at the beginning of the deck (possible future actions)
+        target_list = reversed(list(range(1, e + 1)))
 
     for i in target_list:
         d_new = make_next(d)
