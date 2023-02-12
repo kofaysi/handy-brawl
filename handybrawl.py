@@ -245,6 +245,9 @@ def move_deck(d, r, t):
         ):
             end_position = 1 if r < 1 else len(d) - 1
             ds_new.append(move_card(d, i, end_position))
+            dodge_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
+            if dodge_reaction:
+                ds_new.append(intercept(d, i, dodge_reaction))
             if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 break
     return ds_new if ds_new != [d] else []
