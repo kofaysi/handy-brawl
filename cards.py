@@ -2,13 +2,12 @@
 content of the file
     A tuple of all cards ordered by the number of the cards
 
-
 deck : tuple
     A deck consists of a tuple of cards.
     The deck is represented as a tuple of tuples (cards) from top (start=0) to bottom (end=len(deck)-1).
 
 card : tuple
-    A card consists of a tuple of one header (dict) and four faces.
+    A card consists of a tuple of one header (dict) and four sections.
 
 header (to the card) : dict
     The card header (dict) identifies and specifies the card and contains the following keys:
@@ -16,13 +15,13 @@ header (to the card) : dict
     - type : str ('hero', 'monster')
     - number : int, the card number
 
-face : tuple
-    A face consists of a list of one header and one or more rows (of actions).
+section : tuple
+    A section consists of a list of one header and one or more rows (of actions).
 
-header (to the face) : dict
-    The face header (dict) identifies and specifies the face and contains the following keys:
+header (to the section) : dict
+    The section header (dict) identifies and specifies the section and contains the following keys:
 
-    - face : str ('A', 'B', 'C', 'D')
+    - section : str ('A', 'B', 'C', 'D')
     - life : str ('healthy', 'wounded', 'exhausted')
     - feature : set of str (optional)
     - reaction : str (optional)

@@ -62,7 +62,7 @@ def request_number(minimum=1, maximum=1):
 def request_deck():
     game_description = "This application is simulating the Handy Brawl game designed by Igor Zuber.\n" \
                        "A card overview is required to play the game properly.\n" \
-                       "The cards design and available actions on faces are not displayed.\n" \
+                       "The cards design and available actions on sections are not displayed.\n" \
                        "Download the cards and the rules from the files section at " \
                        "https://boardgamegeek.com/boardgame/362692/handy-brawl." \
 
@@ -70,10 +70,10 @@ def request_deck():
 
     instructions = "The hash for a deck is a string consisting of alternating integers and characters [A, B, C, D].\n" \
                    "The physical cards in the physical deck are played from top to bottom. " \
-                   "The virtual deck with cards (and their faces) are displayed from right to left.\n" \
-                   "Card numbers are represented by integers and the faces of the cards by letters.\n" \
+                   "The virtual deck with cards (and their sections) are displayed from right to left.\n" \
+                   "Card numbers are represented by integers and the sections of the cards by letters.\n" \
                    "Lower case letters are allowed. Spaces are allowed.\n" \
-                   "Missing letters represent the face 'A' of the card.\n" \
+                   "Missing letters represent the section 'A' of the card.\n" \
                    "    (Spaces between numbers are required in such case.)\n" \
                    "Use card numbers for the warrior and the ogre characters, in the range from 1 to 9.\n" \
                    "The visualisation od the deck (5A◼  9A◼  4A◼  8A◼  3A◼  7A◼  2A◼  6A◼  1A◼)\n " \
@@ -92,7 +92,7 @@ def request_deck():
         s_hash = re.sub(r'(\d)\s+(?=[ABCD])', r'\1', s_hash)
         # replace spaces between numbers without chars by char 'A'
         s_hash = re.sub(r'(\d)\s+(?=\d)', r'\1A', s_hash)
-        # add face A to the number without chars by char 'A' and at the end of the string
+        # add section A to the number without chars by char 'A' and at the end of the string
         s_hash = re.sub(r'(\d)$', r'\1A', s_hash)
         # remove spaces
         s_hash = re.sub(r'([ABCD])\s*(?=\d)', r'\1', s_hash)

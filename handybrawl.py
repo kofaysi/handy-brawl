@@ -5,7 +5,7 @@ The deck is represented as a list with lists (cards) from top (start=0) to botto
 
 Functions:
 
-- rotate_card_to_face(c : list, f : str) -> list:
+- rotate_card_to_section(c : list, f : str) -> list:
 - flip(c : list) -> list:
 - rotate(c : list) -> list:
 - rotate_flip(c : list) -> list:
@@ -75,7 +75,7 @@ if caller_file.__contains__('play_a_game.py'):
 game_turns = dict()
 
 
-faces = ['A', 'B', 'C', 'D']
+sections = ['A', 'B', 'C', 'D']
 
 
 # @CountCalls
@@ -86,12 +86,12 @@ def rotate(f):
     Game rules applicable:
         Rotate: Rotate this card 180° without changing the side. This action is mandatory.
 
-    :param f: the face of the card to be rotated
-    :return: the new face
+    :param f: the section of the card to be rotated
+    :return: the new section
     """
-    # todo transcribe a werewolf feature of the face into the head of the card
-    faces_rotated = ['B', 'A', 'D', 'C']
-    return faces_rotated[faces.index(f)]
+    # todo transcribe a werewolf feature of the section into the head of the card
+    sections_rotated = ['B', 'A', 'D', 'C']
+    return sections_rotated[sections.index(f)]
 
 
 # @CountCalls
@@ -114,7 +114,7 @@ def back_shift(tup, n=1):
 # @CountCalls
 def check_cards_unique(d) -> bool:
     """
-    check cards in the deck are unique, only numbers are checked for uniqueness, faces are ignored
+    check cards in the deck are unique, only numbers are checked for uniqueness, sections are ignored
 
     :param d: a deck
     :return: bool True if card numbers in the deck are unique
@@ -448,14 +448,14 @@ def hit_card(d, i):
     :param i: the i-th card in the deck [0, 1...]
     :return: new deck (single)
     """
-    # expected_face = ''
+    # expected_section = ''
     expected_life = 'wounded' if cards[d.cards[i][0]][d.cards[i][1]][0]['life'] == 'healthy' else 'exhausted'
 
     d_new = make_next(d)
-    d_new.cards[i][1] = faces[[cards[d.cards[i][0]][f][0]['life'] for f in faces].index(expected_life)]
+    d_new.cards[i][1] = sections[[cards[d.cards[i][0]][f][0]['life'] for f in sections].index(expected_life)]
     d_new.add_action([('damage', i)])
     return d_new
-    # expected_card = rotate_card_to_face(d[i][:], expected_face)
+    # expected_card = rotate_card_to_section(d[i][:], expected_section)
 
 
 # noinspection PyShadowingNames
@@ -576,9 +576,9 @@ def maneuver_deck(d):
 
     ds_new = []
     for i in range(1, len(d.cards) - 1):
-        face_rotated = rotate(d.cards[i][1])
+        section_rotated = rotate(d.cards[i][1])
         if cards[d.cards[0][0]]['header']['type'] == cards[d.cards[i][0]]['header']['type']:
-            life_rotated = cards[d.cards[i][0]][face_rotated]['header']['life']
+            life_rotated = cards[d.cards[i][0]][section_rotated]['header']['life']
             life_current = cards[d.cards[i][0]][d.cards[i][1]]['header']['life']
             if lives.index(life_current) >= lives.index(life_rotated):
                 d_new = rotate_card(d, i)
@@ -740,7 +740,7 @@ def inspire_deck(d):
 def get_deck_hash(d):
     """
     Create a unique string identifying the deck.
-    The string consists of numbers and faces in the order of the cards appearing in the deck.
+    The string consists of numbers and sections in the order of the cards appearing in the deck.
 
     :param d: the deck
     :return: the hash (str)
