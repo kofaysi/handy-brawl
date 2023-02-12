@@ -205,7 +205,7 @@ def make_copy(d):
 # @CountCalls
 def move_deck(d, r, t):
     """
-    move_card() any possible card within the deck
+    move_card() for any possible card within the deck
 
     Game rules applicable:
     (all needs rewording)
@@ -214,7 +214,7 @@ def move_deck(d, r, t):
         Push: Move the closest enemy card in range X to the bottom of the deck. (needs rewording)
     monster:
         Pull: Move the furthest card in range X behind the active card.
-              Don't target enemy cards. (needs rewording)
+              Don't target exhausted enemy cards. (needs rewording)
         Push: Move the closest enemy card in range to the bottom of the deck.
 
     :param d: current deck
