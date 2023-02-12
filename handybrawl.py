@@ -208,13 +208,12 @@ def move_deck(d, r, t):
     move_card() for any possible card within the deck
 
     Game rules applicable:
-    (all needs rewording)
     hero:
-        Pull: Move the furthest card in range X behind the active card.
-        Push: Move the closest enemy card in range X to the bottom of the deck. (needs rewording)
+        Quicken: Move ANY card up to X spaces towards the top of the deck.
+        Delay: Move ANY card up to X spaces towards the bottom of the deck.
     monster:
         Pull: Move the furthest card in range X behind the active card.
-              Don't target exhausted enemy cards. (needs rewording)
+              Don't target exhausted enemy cards.
         Push: Move the closest enemy card in range to the bottom of the deck.
 
     :param d: current deck
@@ -285,7 +284,6 @@ def rotate_card(d, i=0):
 
     Game rules applicable:
         Rotate: Rotate this card 180° without changing the side. This action is mandatory.
-        (rewording) This action cannot be skipped.
 
     :param d: the current deck
     :param i: the i-th card in the deck
@@ -309,7 +307,7 @@ def hit_deck(d, r=0):
             Don't target
         Feature: Webs
             Prevents an enemy card directly in front of this card from performing actions
-            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :param r: the hit range, int
@@ -395,16 +393,13 @@ def intercept(d, i, reaction):
     Game rules applicable:
     hero:
         Reaction: Shield
-            If in range of you MAY intercept and negate the damage.
-            (rewording) If in range of DAMAGE, you MAY intercept and negate the damage.
+            If in range of DAMAGE, you MAY intercept and negate the damage.
             If you do so, activate all icons after the arrow.
-            (rewording) If you do so, activate all actions after the arrow.
         Reaction: Dodge
             If targeted by an enemy action, you MAY negate it.
-            (rewording) If targeted by an enemy action, you MAY intercept and negate it.
             If you do so, activate all actions after the arrow.
     monster:
-        Reaction: Block (reword or use a different icon)
+        Reaction: Block
             If in range of targeting an ally card, intercept and negate the damage.
             If you do so, activate all icons after the arrow.
             If multiple BLOCKS available, use the furthest.
@@ -473,7 +468,7 @@ def revive_deck(d, a):
         Resurrect: Return closest ally card to its starting position.
         Feature: Webs
             Prevents an enemy card directly in front of this card from performing actions
-            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :param a: action 'resurrect' or 'heal'
@@ -565,7 +560,7 @@ def maneuver_deck(d):
         Maneuver: Rotate other ally card in a way that its health level doesn't increase.
         Feature: Webs
             Prevents an enemy card directly in front of this card from performing actions
-            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :return: list of new decks
@@ -623,11 +618,10 @@ def arrow_deck(d, n=1, e=-3):
     Game rules applicable:
     hero:
         Arrow: Deal damage to any one of the 3 (and) bottom cards.
-        Double arrow: Two arrow actions that cannot target the same card (you may still skip one of them).
-        (rewording) Two arrow actions that shall target different cards (targeting only one card is allowed).
+        Double arrow: Two arrow actions that shall target different cards (targeting only one card is allowed).
         Feature: Webs
             Prevents an enemy card directly in front of this card from performing actions
-            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE (reword) RESURRECT, FIREBALL, ABLAZE.
+            that change cards rotation: HIT, ARROW, MANEUVER, HEAL, RESURRECT, FIREBALL, ABLAZE.
 
     :param d: the current deck
     :param n: the number of targets, different cards targets are targeted
@@ -915,7 +909,8 @@ Game rules applicable:
 # def set_ablaze:
 """
 Game rules applicable:
-    Set ablaze: Choose 2 different cards that was used to pay the cost and damage all cards in between them.
+    Set ablaze: Choose 2 different cards that was used to pay the cost and damage all cards in between them, 
+    including ally/hero cards.
     Condition: Fire Cost
     Feature: Webs
         Prevents an enemy card directly in front of this card from performing actions
