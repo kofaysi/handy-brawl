@@ -108,7 +108,7 @@ def request_deck():
         input_deck = deck.Deck()
         try:
             input_hash = str(input('Enter a hash for the deck to play '
-                                   '(start entering the top card first, proceed the list from left to right): '))
+                                   '(start entering the top card first, proceed to the bottom of the deck): '))
         except ValueError:
             print("The input has been captured.")
             # better try again... Return to the start of the loop
@@ -146,7 +146,7 @@ def request_deck():
 if 'start_hash' not in locals():
     start_hash = ''
 
-answer = input("Do you wish to start a game with your own deck? ([Y]es/No) "
+answer = input("Do you wish to start a game with your own deck? ([Y]es/no) "
                "(In case of 'no', you will be served by the deck saved within the script): ") or 'Y'
 
 # or not start_hash
@@ -187,8 +187,8 @@ while True:
         prev = hb.make_copy(start)
         decks_new = [prev]
         new = decks_new[0]
-        print("Welcome to the new game with the following deck:")
-        symbol_description = "Each colour represents one character.\n" \
+        print("Welcome to the new game with the following deck.")
+        symbol_description = "Each colour represents one of the characters.\n" \
                              "The life status is represented by square symbols:"
         print(symbol_description)
         print(hb.card_status_symbols)
