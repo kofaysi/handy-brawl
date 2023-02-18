@@ -105,6 +105,7 @@ def request_deck():
     print()
 
     while True:
+        input_deck = deck.Deck()
         try:
             input_hash = str(input('Enter a hash for the deck to play '
                                    '(start entering the top card first, proceed the list from left to right): '))
@@ -116,12 +117,12 @@ def request_deck():
         input_hash_cor = corrections(input_hash)
 
         try:
-            start = deck.Deck(input_hash_cor)
+            input_deck = deck.Deck(input_hash_cor)
             # hb.get_deck_hash(hb.create_deck(input_hash_cor, cards))
             #
             print("The accepted hash: ", input_hash_cor)
             numbers = [card[0] for card in start.cards]
-            if not all([1 <= i <= 9 for i in numbers]):
+            if not all([1 <= number <= 9 for number in numbers]):
                 print("Use card numbers for the warrior and the ogre characters, in the range from 1 to 9. "
                       "Other characters are coming soon.")
                 continue
@@ -137,8 +138,9 @@ def request_deck():
             continue
         except TypeError:
             print('Empty input was detected. Please enter a valid hash.')
+            continue
 
-    return start
+    return input_deck
 
 
 if 'start_hash' not in locals():
@@ -152,28 +154,29 @@ if answer.lower() in {'', 'yes', 'y', 'yeah', 'ano', 'igen'}:
     start = request_deck()
 
 decks_new = None
+prev = deck.Deck()
 
 
-def build_graphical_representation_to_deck(deck, actions=False):
+def build_graphical_representation_to_deck(d, actions=False):
     """
     Builds a graphical representation of the deck.
 
     :param actions: bool to add actions
-    :param deck: A deck object
+    :param d: A deck object
     :return: A string representing the graphical representation of the deck
     """
-    return ''.join([hb.colour_card_hash(card) for card in reversed(deck.cards)]) \
+    return ''.join([hb.colour_card_hash(card) for card in reversed(d.cards)]) \
            + (build_actions_to_deck(d) if actions else '')
 
 
-def build_actions_to_deck(deck):
+def build_actions_to_deck(d):
     """
     Builds a string representation of the actions in a deck.
 
-    :param deck: A deck object
+    :param d: A deck object
     :return: A string representing the actions in the deck
     """
-    return ''.join(' (' + ', '.join(map(str, action)) + ')' for action in reversed(deck.actions))
+    return ''.join(' (' + ', '.join(map(str, action)) + ')' for action in reversed(d.actions))
 
 
 while True:
