@@ -244,9 +244,9 @@ def move_deck(d, r, t):
         ):
             end_position = 1 if r < 1 else len(d) - 1
             ds_new.append(move_card(d, i, end_position))
-            dodge_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
-            if dodge_reaction:
-                ds_new.append(intercept(d, i, dodge_reaction))
+            reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
+            if reactions:
+                ds_new.append(intercept(d, i, reactions))
             if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 break
     return ds_new if ds_new != [d] else []
@@ -333,27 +333,27 @@ def hit_deck(d, r=0):
     shield_found = False
     for i in hit_list:
         # Reaction: Shield: Don't target
-        shield_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
+        reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
         if cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i][0]]['header']['type'] \
-                and shield_reaction:
-            d_new = intercept(d, i, shield_reaction)
+                and reactions:
+            d_new = intercept(d, i, reactions)
+            ds_new.append(d_new)
             shield_found = True
-
-            if d_new != d:
-                ds_new.append(d_new)
-                # if monster's shield has been found and activated, break
-                if cards[d.cards[0][0]]['header']['type'] == 'hero':
-                    break
+            # if monster's shield has been found and activated, break
+            if cards[d.cards[0][0]]['header']['type'] == 'hero':
+                break
 
     dodge_found = False
     found_hero = False
     for i in hit_list:
         # Reaction: Dodge: Don't target
-        dodge_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
+        reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
         if not found_hero and cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i][0]]['header']['type'] \
-                and dodge_reaction:
+                and reactions:
             if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 found_hero = True
+            d_new = intercept(d, i, reactions)
+            ds_new.append(d_new)
             dodge_found = True
             d_new = intercept(d, i, dodge_reaction)
 
@@ -386,7 +386,7 @@ def hit_deck(d, r=0):
 
 
 # @CountCalls
-def intercept(d, i, reaction):
+def intercept(d, i, reactions):
     """
     rotate() the i-th card in the deck as a result of the shield property/reaction of the card
 
@@ -406,7 +406,7 @@ def intercept(d, i, reaction):
 
     :param d: the current deck
     :param i: the i-th card
-    :param reaction: a string describing the action after activating the intercept()
+    :param reactions: a set of strings describing the actions after activating the intercept()
     :return: the new deck
     """
 
@@ -422,8 +422,9 @@ def intercept(d, i, reaction):
     #     # reaction to intercept does not exist
     #     action = None
 
-    if reaction or reaction != 'None':
-        # a switcher construction used for multiple possible shield or dodge reactions
+    # if reactions or reactions != 'None':
+    # a switcher construction used for multiple possible shield or dodge reactions
+    for reaction in reactions:
         d_new.cards[i][1] = switcher.get(reaction)(d.cards[i][1])
         d_new.add_action([(reaction, i)])
 
@@ -648,18 +649,18 @@ def arrow_deck(d, n=1, e=-3):
         if cards[d.cards[i][0]]['header']['type'] == 'monster':
             # todo: rewrite using check for 'reaction' existence
             # also consider 'dodge' as a reaction
-            shield_reaction = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
-            if shield_reaction:
-                d_new = intercept(d_new[:], i, shield_reaction)
+            reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
+            if reactions:
+                d_new = intercept(d_new[:], i, reactions)
             else:
                 d_new = hit_card(d_new[:], i)
             if n == 2:  # double arrow
                 for j in target_list:
                     if i < j \
                             and cards[d.cards[j][0]]['header']['type'] == 'monster':
-                        shield_reaction = cards[d.cards[j][0]][d.cards[j][1]][0].get('shield')
-                        if shield_reaction:
-                            d_new = intercept(d_new, j, shield_reaction)
+                        reactions = cards[d.cards[j][0]][d.cards[j][1]][0].get('shield')
+                        if reactions:
+                            d_new = intercept(d_new, j, reactions)
                         else:
                             d_new = hit_card(d_new, j)
                         ds_new.append(d_new)
