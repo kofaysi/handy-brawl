@@ -195,19 +195,33 @@ while True:
     else:
         decks_new.sort(key=lambda dx: (hb.get_status(dx).get("hero"), -hb.get_status(dx).get("monster")), reverse=True)
 
-        # global card_colours, card_status .
-        for k, d in enumerate(decks_new):
-            s = build_graphical_representation_to_deck(d, actions=True)
-            print("{:3d}".format(k + 1), ":", s)
+        # place the "no change, no action, do nothing" deck first
+        for i, deck_new_i in enumerate(decks_new):
+            if deck_new_i.actions[0][0] is None:
+                decks_new.insert(0, decks_new.pop(i))
+                break
 
-        if len(decks_new) != 1:
-            option_number = request_number(maximum=len(decks_new))
+        # decide, if the
+        if hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'monster':
+            first_variant_index = 1
         else:
-            option_number = 1
+            first_variant_index = 0
+
+        # global card_colours, card_status
+        for k, deck in enumerate(decks_new):
+            if k >= first_variant_index:
+                s = build_graphical_representation_to_deck(deck, actions=True)
+                print("{:3d}".format(k), ":", s)
+
+        if (hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'monster' and len(decks_new) != 2) or \
+                (hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'hero' and len(decks_new) != 1):
+            option_number = request_number(minimum=first_variant_index, maximum=len(decks_new))
+        else:
+            option_number = first_variant_index
             print("A single outcome evaluated. Proceeding automatically to a new deck...")
             # input("Please confirm by enter...")
 
-        new = decks_new[option_number - 1]
+        new = decks_new[option_number]
         new.cards = hb.back_shift(new.cards)
 
         print('The new deck to play is:')

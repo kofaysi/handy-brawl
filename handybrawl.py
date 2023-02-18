@@ -844,17 +844,18 @@ def play_card(deck):
                 # todo: check on the algo
                 decks_new_i = [deck]
 
-    # the hero has an option not to apply any action and do nothing
-    if cards[deck.cards[0][0]]['header']['type'] == 'hero':
-        d_new = make_next(deck)
-        d_new.add_action([('do nothing',)])
-        decks_new_i.append(d_new)
-
     # sort results by their decreasing her status, and increasing monster status
     decks_new_i.sort(key=lambda d: (get_status(d).get('hero'), -get_status(d).get('monster')), reverse=True)
 
+    # the hero has an option not to apply any action and do nothing
+    # if cards[deck.cards[0][0]]['header']['type'] == 'hero':
+    d_new = make_next(deck)
+    d_new.add_action([(None,)])
+    decks_new_i.append(d_new)
+
     decks_new_i = get_unique_items(decks_new_i[:])
 
+    # squash the actions into a single turn
     for deck_new_i in decks_new_i:
         game = deck_new_i.game()
         if len(game) > 0:
