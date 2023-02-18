@@ -355,13 +355,6 @@ def hit_deck(d, r=0):
             d_new = intercept(d, i, reactions)
             ds_new.append(d_new)
             dodge_found = True
-            d_new = intercept(d, i, dodge_reaction)
-
-            if d_new != d:
-                ds_new.append(d_new)
-                # if monster's shield has been found and activated, break
-                if cards[d.cards[0][0]]['header']['type'] == 'hero':
-                    break
 
     # Continue collecting new deck outcomes by applying hit_card(), if it is a monster's turn,
     # or it is a hero's turn and no shield or no dodge has been found.
