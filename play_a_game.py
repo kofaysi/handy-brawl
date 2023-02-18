@@ -9,7 +9,6 @@ todo:
     - add missing characters
     - add missing actions and conditions
 """
-import copy
 
 # from cards import cards
 import handybrawl as hb
@@ -182,7 +181,7 @@ while True:
 
     if not decks_new:
         # initialise at start
-        prev = copy.deepcopy(start)
+        prev = hb.make_copy(start)
         decks_new = [prev]
         new = decks_new[0]
         print("Welcome to the new game with the following deck:")
