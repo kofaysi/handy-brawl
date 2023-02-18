@@ -378,316 +378,310 @@ cards = {1: {  # card 1
     'header': dict(name='vampire', type='monster'),
     'A': (
         dict(life='healthy'),
-        (),
-        ()
+        (('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('flip', None, 'self')),
+        (('hit', 6, 'enemy'), ('rotate', None, 'self'))
     ),
     'B': (
         dict(life='healthy'),
-        (),
-        (),
-        ()
+        (('pull', 3, 'ally'), ('pull', 3, 'ally')),
+        (('hit', 3, 'enemy'), ('hit', 3, 'enemy'), ('hit', 3, 'enemy'), ('rotate', None, 'self'))
     ),
     'C': (
         dict(life='wounded'),
-        (),
-        ()
+        (('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('rotate', None, 'self')),
+        (('hit', 5, 'enemy'),)
     ),
     'D': (
         dict(life='exhausted'),
-        (),
-        (),
-        ()
+        (('push', 3, 'enemy'),),
+        (('hit', 5, 'enemy'),)
     )
 }, 16: {
     'header': dict(name='vampire', type='monster'),
     'A': (
         dict(life='healthy'),
-        (),
-        ()
+        (('inspire', None, 'ally'), ('rotate', None, 'self'))
     ),
     'B': (
         dict(life='healthy'),
-        (),
-        (),
-        ()
+        (('inspire', None, 'ally'), ('rotate', None, 'self'))
     ),
     'C': (
         dict(life='wounded'),
-        (),
-        ()
+        ('push', 2, 'enemy'),
+        (('hit', 5, 'enemy'),)
     ),
     'D': (
         dict(life='exhausted'),
-        (),
-        (),
-        ()
+        (('inspire', None, 'ally'),)
     )
 }, 17: {
     'header': dict(name='vampire', type='monster'),
     'A': (
         dict(life='healthy'),
-        (),
-        ()
+        (('pull', 3, 'enemy'), ('hit', 1, 'enemy'), ('push', 3, 'enemy'), ('rotate', None, 'self')),
+        (('hit', 5, 'enemy'), ('rotate', None, 'self'))
     ),
     'B': (
         dict(life='healthy'),
-        (),
-        (),
-        ()
+        (('hit', 0, 'enemy'), ('hit', 0, 'enemy'), ('flip', None, 'self'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted'),
+        (('hit', 5, 'enemy'),),
+        (('pull', 5, 'ally'),)
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='wounded'),
+        (('pull', 5, 'ally'), ('flip', None, 'self')),
+        (('pull', 0, 'ally'),)
     )
 }, 18: {
     'header': dict(name='vampire', type='monster'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', feature={'heavy'}, shield={}),
+        (('wounded', '>2', (('resurrect', None, 'ally'), ('resurrect', None, 'ally'), ('resurrect', None, 'ally'),
+                            ('rotate', None, 'self'))),),
+        (('hit', 0, 'enemy'), ('push', 5, 'enemy'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='healthy', feature={'heavy'}, shield={}),
+        (('wounded', '>2', (('resurrect', None, 'ally'), ('resurrect', None, 'ally'), ('resurrect', None, 'ally'),
+                            ('flip', None, 'self'))),),
+        (('push', 0, 'enemy'), ('push', 0, 'enemy'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted'),
+        (('push', 0, 'enemy'), ('push', 0, 'enemy'))
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='wounded', feature={'heavy'}, shield={}),
+        (('wounded', '>2', (('resurrect', None, 'ally'), ('resurrect', None, 'ally'), ('resurrect', None, 'ally'),
+                            ('rotate', None, 'self'))),),
+        (('push', 0, 'enemy'),)
     )
 }, 19: {
     'header': dict(name='pyromancer', type='hero'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', fire={'rotate'}),
+        (('pay fire', 2, (('heal', None, 'ally'), ('heal', None, 'ally'), ('rotate', None, 'self'))),),
+        (('pay fire', 1, (('maneuver', None, 'ally'), ('maneuver', None, 'ally'), ('delay', 2, 'any'),
+                          ('rotate', None, 'self'))),),
+        (('delay', 1, 'any'), ('quicken', 1, 'any'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='wounded'),
+        (('pay fire', 3, (('ablaze', None, 'all'), ('rotate', None, 'self'))),),
+        (('pay fire', 2, (('hit', 3, 'any'), ('hit', 3, 'any'))),),
+        (('delay', 1, 'any'), ('quicken', 1, 'any'), ('rotate', None, 'self'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted'),
+        (('pay fire', 3, (('teleport', None, 'enemy'), ('hit', 2, 'any'))),),
+        (('pay fire', 2, (('teleport', None, 'both'), ('rotate', None, 'self'))),),
+        (('teleport', None, 'ally'), ('rotate', None, 'self'))
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='exhausted', fire={'rotate'}),
+        (('pay fire', 4, (('resurrect', None, 'ally'), ('rotate', None, 'self'))),),
+        (('maneuver', None, 'ally'), ('delay', 2, 'any'))
     )
 }, 20: {
     'header': dict(name='pyromancer', type='hero'),
     'A': (
         dict(life='healthy'),
-        (),
-        ()
+        (('pay fire', 2, (('ablaze', None, 'all'),)),),
+        (('pay fire', 1, (('hit', 4, 'any'),)),),
+        (('heal', None, 'ally'), ('maneuver', None, 'ally'), ('rotate', None, 'self'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='wounded', fire={'rotate'}),
+        (('pay fire', 2, (('ablaze', None, 'all'), ('rotate', None, 'self'))),),
+        (('pay fire', 1, (('fireball', None, 'any'),)),),
+        (('delay', 1, 'any'), ('quicken', 1, 'any'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted', fire={'rotate'}),
+        (('pay fire', 4, (('hit', 6, 'any'), ('hit', 6, 'any'), ('hit', 6, 'any'))),),
+        (('pay fire', 2, (('resurrect', None, 'any'), ('heal', None, 'ally'), ('rotate', None, 'self'))),),
+        (('delay', 1, 'any'), ('quicken', 1, 'any'))
     ),
     'D': (
         dict(life='exhausted'),
-        (),
-        (),
-        ()
+        (('pay fire', 2, (('fireball', None, 'any'), ('rotate', None, 'self'))),),
+        (('pay fire', 1, (('hit', 3, 'any'),)),),
+        (('heal', None, 'ally'), ('maneuver', None, 'ally'))
     )
 }, 21: {
     'header': dict(name='pyromancer', type='hero'),
     'A': (
         dict(life='healthy'),
-        (),
-        ()
+        (('pay fire', 2, (('fireball', None, 'any'), ('rotate', None, 'self'))),),
+        (('pay fire', 1, (('heal', None, 'ally'), ('heal', None, 'ally'), ('rotate', None, 'self'))),),
+        (('heal', None, 'ally'), ('maneuver', None, 'ally'), ('rotate', None, 'self'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='wounded', fire={'rotate'}),
+        (('pay fire', 2, (('resurrect', None, 'any'), ('rotate', None, 'self'))),),
+        (('pay fire', 1, (('delay', 1, 'any'), ('quicken', 1, 'any'))),),
+        (('heal', None, 'ally'), ('maneuver', None, 'ally'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted'),
+        (('pay fire', 3, (('flip', None, 'self'),)),),
+        (('pay fire', 2, (('teleport', None, 'both'),)),),
+        (('delay', 2, 'any'), ('maneuver', None, 'ally'), ('rotate', None, 'self'))
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='exhausted', fire={'rotate'}),
+        (('pay fire', 3, (('resurrect', None, 'ally'),)),),
+        (('pay fire', 2, (('ablaze', None, 'all'),)),),
+        (('heal', None, 'ally'), ('rotate', None, 'self'))
     )
 }, 22: {
     'header': dict(name='pyromancer', type='hero'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', fire={'rotate'}),
+        (('pay fire', 2, (('teleport', None, 'both'),)),),
+        (('pay fire', 2, (('teleport', None, 'ally'),)),),
+        (('delay', 1, 'any'), ('quicken', 1, 'any'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='wounded'),
+        (('pay fire', 2, (('hit', 5, 'any'), ('heal', None, 'ally'))),),
+        (('pay fire', 1, (('teleport', None, 'enemy'), ('rotate', None, 'self'))),),
+        (('maneuver', None, 'ally'), ('heal', None, 'ally'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted', fire={'rotate'}),
+        (('pay fire', 2, (('fireball', None, 'any'), ('maneuver', None, 'ally'), ('rotate', None, 'self'))),),
+        (('pay fire', 1, (('hit', 1, 'any'), ('rotate', None, 'self'))),),
+        (('maneuver', None, 'ally'), ('maneuver', None, 'ally'))
     ),
     'D': (
         dict(life='exhausted'),
-        (),
-        (),
-        ()
+        (('pay fire', 2, (('ablaze', None, 'all'),)),),
+        (('pay fire', 1, (('delay', 2, 'any'), ('quicken', 2, 'any'))),),
+        (('delay', 1, 'any'), ('quicken', 1, 'any'), ('rotate', None, 'self'))
     )
 }, 23: {
     'header': dict(name='pyromancer', type='hero'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', fire={'rotate'}),
+        (('pay fire', 3, (('fireball', None, 'any'), ('fireball', None, 'any'))),),
+        (('pay fire', 2, (('ablaze', None, 'all'), ('heal', None, 'ally'), ('flip', None, 'self'))),),
+        (('delay', 1, 'any'), ('maneuver', None, 'ally'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='wounded'),
+        (('pay fire', 2, (('resurrect', None, 'ally'), ('rotate', None, 'self'))),),
+        (('pay fire', 2, (('hit', 5, 'any'), ('rotate', None, 'self'))),),
+        (('teleport', None, 'ally'),)
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted', fire={'rotate'}),
+        (('pay fire', 2, (('ablaze', None, 'all'),)),),
+        (('pay fire', 1, (('heal', None, 'ally'), ('delay', 1, 'any'), ('rotate', None, 'self'))),),
+        (('quicken', 1, 'any'), ('maneuver', None, 'ally'))
     ),
     'D': (
         dict(life='exhausted'),
-        (),
-        (),
-        ()
+        (('pay fire', 2, (('hit', 3, 'any'), ('flip', None, 'self'))),),
+        (('teleport', None, 'ally'), ('rotate', None, 'self'))
     )
 }, 24: {
     'header': dict(name='spider', type='monster'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', feature={'venom'}),
+        (('swarm', None, (('hit', 3, 'enemy'), ('pull', 3, 'ally'))),),
+        (('hit', 5, 'enemy'), ('rotate', None, 'self'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='healthy', feature={'venom'}),
+        (('swarm', None, (('hit', 2, 'enemy'), ('push', 2, 'enemy'))),),
+        (('push', 3, 'enemy'), ('hit', 2, 'enemy'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted', feature={'webs'}),
+        (('swarm', None, (('heal', None, 'ally'),)),),
+        (('hit', 0, 'enemy'),)
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='wounded', feature={'venom'}),
+        (('swarm', None, (('pull', 4, 'ally'), ('push', 3, 'enemy'))),),
+        (('hit', 3, 'enemy'),),
+        (('resurrect', None, 'ally'),)
     )
 }, 25: {
     'header': dict(name='spider', type='monster'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', feature={'venom'}),
+        (('swarm', None, (('heal', None, 'ally'), ('rotate', None, 'self'))),),
+        (('push', 3, 'enemy'), ('hit', 3, 'enemy'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='healthy', feature={'venom'}),
+        (('swarm', None, (('hit', 3, 'enemy'), ('push', 2, 'enemy'))),),
+        (('hit', 5, 'enemy'), ('rotate', None, 'self'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted', feature={'venom'}),
+        (('swarm', None, (('push', 3, 'enemy'), ('pull', 5, 'ally'))),),
+        (('push', 5, 'enemy'), ('hit', 2, 'enemy'))
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='wounded', feature={'webs'}),
+        (('swarm', None, (('hit', 5, 'enemy'),)),),
+        (('hit', 5, 'enemy'),)
     )
 }, 26: {
     'header': dict(name='spider', type='monster'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', feature={'venom'}),
+        (('swarm', None, (('hit', 0, 'enemy'),)),),
+        (('pull', 4, 'enemy'), ('hit', 2, 'enemy'), ('rotate', None, 'self')),
+        (('hit', 5, 'enemy'),)
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='healthy', feature={'webs'}),
+        (('swarm', None, (('hit', 4, 'enemy'),)),),
+        (('push', 0, 'enemy'), ('push', 0, 'enemy'), ('push', 0, 'ally'), ('rotate', None, 'self'))
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted', feature={'webs'}),
+        (('swarm', None, (('resurrect', None, 'ally'),)),),
+        (('heal', None, 'self'), ('push', 2, 'enemy')),
+        (('hit', 4, 'enemy'), ('push', 4, 'enemy')),
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='wounded', feature={'venom'}),
+        (('swarm', None, (('hit', 3, 'enemy'),)),),
+        (('pull', 6, 'enemy'), ('pull', 6, 'enemy'))
     )
 }, 27: {
     'header': dict(name='spider', type='monster'),
     'A': (
-        dict(life='healthy'),
-        (),
-        ()
+        dict(life='healthy', feature={'webs'}),
+        (('swarm', None, (('hit', 5, 'enemy'),)),),
+        (('hit', 3, 'enemy'), ('rotate', None, 'self')),
+        (('push', 3, 'enemy'), ('push', 3, 'enemy'))
     ),
     'B': (
-        dict(life='healthy'),
-        (),
-        (),
-        ()
+        dict(life='healthy', feature={'venom'}, shield={'rotate'}),
+        (('swarm', None, (('hit', 5, 'enemy'), ('hit', 5, 'enemy'))),)
     ),
     'C': (
-        dict(life='wounded'),
-        (),
-        ()
+        dict(life='exhausted', feature={'venom'}),
+        (('swarm', None, (('hit', 0, 'enemy'),)),),
+        (('hit', 5, 'enemy'), ('pull', 5, 'ally'))
     ),
     'D': (
-        dict(life='exhausted'),
-        (),
-        (),
-        ()
+        dict(life='wounded', feature={'webs'}),
+        (('swarm', None, (('hit', 0, 'enemy'),)),),
+        (('hit', 5, 'enemy'), ('pull', 5, 'ally'))
     )
 }, 28: {
-    'header': dict(name='werewolf', type='monster'),
+    'header': dict(name='cursed', type='werewolf'),
     'A': (
         dict(life='healthy'),
         (),
