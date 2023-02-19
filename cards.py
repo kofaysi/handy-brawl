@@ -62,6 +62,8 @@ action : tuple(str, int, str)
     - teleport any
     - fireball
     - ablaze
+    - void
+    - death
     - condition, this is a special action
         for which the second item in the tuple is a list of actions:
         example (condition, (('fire', 2, 'ally'), ('ablaze', None, 'enemy'), ('hit', 2, 'enemy'),))
@@ -71,6 +73,7 @@ action : tuple(str, int, str)
     - 'ally'
     - 'any'
     - 'both' (for 'teleport')
+    - 'all' (for 'ablaze')
 """
 
 cards = {1: {  # card 1
@@ -801,103 +804,103 @@ cards = {1: {  # card 1
     'header': dict(name='demon', type='monster'),
     'A': (
         dict(life='healthy'),
-        ('rage', '>3', (('pull', 0, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'))),
-        ('rage', '>2', (('pull', 0, 'enemy'), ('hit', 1, 'enemy'))),
+        ('count rage', '>3', (('pull', 0, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'))),
+        ('count rage', '>2', (('pull', 0, 'enemy'), ('hit', 1, 'enemy'))),
         (('push', 3, 'enemy'), ('push', 3, 'enemy'))
     ),
     'B': (
         dict(life='healthy', rage=2),
-        ('rage', '>3', (('pull', 5, 'ally'), ('rotate', None, 'self'))),
-        ('rage', '>2', (('pull', 5, 'ally'), ('push', 5, 'enemy'))),
+        ('count rage', '>3', (('pull', 5, 'ally'), ('rotate', None, 'self'))),
+        ('count rage', '>2', (('pull', 5, 'ally'), ('push', 5, 'enemy'))),
         (('hit', 3, 'enemy'), ('push', 3, 'enemy'))
     ),
     'C': (
         dict(life='exhausted', rage=2, shield={'rotate'}),
-        (('rage', '>4', (('void', None, 'enemy'),)),),
-        (('rage', '>2', (('hit', 1, 'enemy'), ('hit', 2, 'enemy'), ('hit', 3, 'enemy'))),),
+        (('count rage', '>4', (('void', None, 'enemy'),)),),
+        (('count rage', '>2', (('hit', 1, 'enemy'), ('hit', 2, 'enemy'), ('hit', 3, 'enemy'))),),
         (('hit', 2, 'enemy'), ('hit', 2, 'enemy'), ('rotate', None, 'self'))
     ),
     'D': (
         dict(life='exhausted', rage=1, shield={'rotate'}),
-        (('rage', '>4', (('death', None, 'enemy'),)),),
-        (('rage', '>3', (('claws', 4, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>4', (('death', None, 'enemy'),)),),
+        (('count rage', '>3', (('claws', 4, 'enemy'), ('rotate', None, 'self'))),),
         (('quicken', 5, 'ally'), ('rotate', None, 'self'))
     )
 }, 34: {
     'header': dict(name='demon', type='monster'),
     'A': (
         dict(life='healthy'),
-        (('rage', '>5', (('death', None, 'enemy'),)),),
-        (('rage', '>3', (('void', None, 'enemy'),)),),
+        (('count rage', '>5', (('death', None, 'enemy'),)),),
+        (('count rage', '>3', (('void', None, 'enemy'),)),),
         (('hit', 0, 'enemy'),)
     ),
     'B': (
         dict(life='healthy', rage=1),
-        (('rage', '>4', (('void', None, 'enemy'), ('rotate', None, 'self'))),),
-        (('rage', '>4', (('hit', 0, 'enemy'),)),),
+        (('count rage', '>4', (('void', None, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>4', (('hit', 0, 'enemy'),)),),
         (('claws', 3, 'enemy'),)
     ),
     'C': (
         dict(life='wounded', rage=2, shield={'rotate'}),
-        (('rage', '>4', (('death', None, 'enemy'),)),),
-        (('rage', '>3', (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('push', 1, 'enemy'))),),
+        (('count rage', '>4', (('death', None, 'enemy'),)),),
+        (('count rage', '>3', (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('push', 1, 'enemy'))),),
         (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'))
     ),
     'D': (
         dict(life='exhausted', rage=1, shield={'rotate'}),
-        (('rage', '>4', (('death', None, 'enemy'),)),),
-        (('rage', '>2', (('hit', 0, 'enemy'), ('push', 0, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>4', (('death', None, 'enemy'),)),),
+        (('count rage', '>2', (('hit', 0, 'enemy'), ('push', 0, 'enemy'), ('rotate', None, 'self'))),),
         (('hit', 0, 'enemy'), ('rotate', None, 'self'))
     )
 }, 35: {
     'header': dict(name='demon', type='monster'),
     'A': (
         dict(life='healthy'),
-        (('rage', '>5', (('claws', 0, 'enemy'),)),),
-        (('rage', '>2', (('claws', 0, 'enemy'),)),),
+        (('count rage', '>5', (('claws', 0, 'enemy'),)),),
+        (('count rage', '>2', (('claws', 0, 'enemy'),)),),
         (('claws', 2, 'enemy'),),
     ),
     'B': (
         dict(life='healthy'),
-        (('rage', '>4', (('claws', 6, 'enemy'), ('rotate', None, 'self'))),),
-        (('rage', '>3', (('claws', 4, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>4', (('claws', 6, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>3', (('claws', 4, 'enemy'), ('rotate', None, 'self'))),),
         (('hit', 0, 'enemy'),)
     ),
     'C': (
         dict(life='exhausted', rage=1, shield={'rotate'}),
-        (('rage', '>4', (('death', None, 'enemy'),)),),
+        (('count rage', '>4', (('death', None, 'enemy'),)),),
         (('claws', 4, 'enemy'), ('rotate', None, 'self'))
     ),
     'D': (
         dict(life='exhausted', rage=1, shield={'rotate'}),
-        (('rage', '>5', (('death', None, 'enemy'),)),),
-        (('rage', '>3', (('hit', 0, 'enemy'), ('hit', 0, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>5', (('death', None, 'enemy'),)),),
+        (('count rage', '>3', (('hit', 0, 'enemy'), ('hit', 0, 'enemy'), ('rotate', None, 'self'))),),
         (('hit', 0, 'enemy'), ('rotate', None, 'self'))
     )
 }, 36: {
     'header': dict(name='demon', type='monster'),
     'A': (
         dict(life='healthy', rage=0),
-        (('rage', '>3', (('void', None, 'enemy'),)),),
-        (('rage', '>2', (('hit', 4, 'enemy'), ('hit', 4, 'enemy'))),),
+        (('count rage', '>3', (('void', None, 'enemy'),)),),
+        (('count rage', '>2', (('hit', 4, 'enemy'), ('hit', 4, 'enemy'))),),
         (('hit', 0, 'enemy'),)
     ),
     'B': (
         dict(life='exhausted', rage=1),
-        (('rage', '>4', (('hit', 0, 'enemy'), ('hit', 0, 'enemy'), ('rotate', None, 'self'))),),
-        (('rage', '>3', (('hit', 0, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>4', (('hit', 0, 'enemy'), ('hit', 0, 'enemy'), ('rotate', None, 'self'))),),
+        (('count rage', '>3', (('hit', 0, 'enemy'), ('rotate', None, 'self'))),),
         (('hit', 4, 'enemy'),)
     ),
     'C': (
         dict(life='healthy', rage=3, shield={'rotate'}),
-        (('rage', '>5', (('death', None, 'enemy'),)),),
-        (('rage', '>3', (('void', None, 'enemy'),)),),
+        (('count rage', '>5', (('death', None, 'enemy'),)),),
+        (('count rage', '>3', (('void', None, 'enemy'),)),),
         (('pull', 5, 'ally'), ('rotate', None, 'self'))
     ),
     'D': (
         dict(life='exhausted', rage=1, shield={'rotate'}),
-        (('rage', '>4', (('void', None, 'enemy'),)),),
-        (('rage', '>3', (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('pull', 5, 'enemy'), ('hit', 1, 'enemy'),
+        (('count rage', '>4', (('void', None, 'enemy'),)),),
+        (('count rage', '>3', (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('pull', 5, 'enemy'), ('hit', 1, 'enemy'),
                          ('rotate', None, 'self'))),),
         (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('rotate', None, 'self'))
     )}}
