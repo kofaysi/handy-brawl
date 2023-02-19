@@ -783,18 +783,6 @@ def play_card(deck):
     #   Use set or frozenset instead of list to keep track of unique items
     #   Use a more efficient data structure like a numpy array instead of a nested list
     #   Use Cython or Numba to speed up the function if it's still slow after trying the above suggestions.
-    switcher = {
-        'hit': lambda d, a: hit_deck(d, r=a[1]),  # deck, range,
-        'push': lambda d, a: move_deck(d, r=a[1], t=a[2]),  # deck, range, target
-        'pull': lambda d, a: move_deck(d, r=-a[1], t=a[2]),  # deck, range, target
-        'delay': lambda d, a: adjust_deck(d, p=a[1], t=a[2]),  # deck, by positions, target
-        'quicken': lambda d, a: adjust_deck(d, p=-a[1], t=a[2]),  # deck, by positions, target
-        'rotate': lambda d, a: rotate_card(d),  # deck
-        'heal': lambda d, a: revive_deck(d, a[0]),  # deck, action
-        'resurrect': lambda d, a: revive_deck(d, a[0]),  # deck, action
-        'arrow': lambda d, a: arrow_deck(d, n=a[1]),  # deck, number of targets
-        'maneuver': lambda d, a: maneuver_deck(d),  # deck
-    }
     decks_new_i = []
     decks_new_i_prev_unchanged_rows = []
 
@@ -812,7 +800,7 @@ def play_card(deck):
                 # else decks have not changed by the previous action and are going to suffer the next action
             decks_new_j = [d
                            for deck_j in decks
-                           for d in switcher.get(action[0])(deck_j, action)]
+                           for d in play_action(deck_j, action)]
             # if no valid result has been generated, use the input as the outcome
             # todo: check on the following algo
             if not decks_new_j:
@@ -866,6 +854,30 @@ def play_card(deck):
                 pass
 
     return decks_new_i
+
+
+def play_action(d, a):
+    """
+
+    :param d: deck
+    :param a: action
+    :return: list of decks
+    """
+
+    switcher = {
+        'hit': lambda d, a: hit_deck(d, r=a[1]),  # deck, range,
+        'push': lambda d, a: move_deck(d, r=a[1], t=a[2]),  # deck, range, target
+        'pull': lambda d, a: move_deck(d, r=-a[1], t=a[2]),  # deck, range, target
+        'delay': lambda d, a: adjust_deck(d, p=a[1], t=a[2]),  # deck, by positions, target
+        'quicken': lambda d, a: adjust_deck(d, p=-a[1], t=a[2]),  # deck, by positions, target
+        'rotate': lambda d, a: rotate_card(d),  # deck
+        'heal': lambda d, a: revive_deck(d, a[0]),  # deck, action
+        'resurrect': lambda d, a: revive_deck(d, a[0]),  # deck, action
+        'arrow': lambda d, a: arrow_deck(d, n=a[1]),  # deck, number of targets
+        'maneuver': lambda d, a: maneuver_deck(d),  # deck
+    }
+
+    return switcher.get(a[0])(d, a)
 
 
 def colour_card_hash(c):
