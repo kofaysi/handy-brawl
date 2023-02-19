@@ -321,7 +321,7 @@ def hit_deck(d, r=0):
         return []
 
     ds_new = []
-    if r == 0 or r > len(d.cards) - 1:  # 0 is a substitute for the infinite hit range
+    if r == 'inf' or r > len(d.cards) - 1:  # the infinite hit range or correction for overshoot
         r = len(d.cards) - 1
     if cards[d.cards[0][0]]['header']['type'] == 'hero':
         # for hero targeting monster, use the furthest shield first
