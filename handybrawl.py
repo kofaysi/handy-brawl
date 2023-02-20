@@ -856,11 +856,11 @@ def play_card(deck):
     return decks_new_i
 
 
-def play_action(d, a):
+def play_action(deck, action):
     """
 
-    :param d: deck
-    :param a: action
+    :param deck: deck
+    :param action: action
     :return: list of decks
     """
 
@@ -875,9 +875,16 @@ def play_action(d, a):
         'resurrect': lambda d, a: revive_deck(d, a[0]),  # deck, action
         'arrow': lambda d, a: arrow_deck(d, n=a[1]),  # deck, number of targets
         'maneuver': lambda d, a: maneuver_deck(d),  # deck
+        'inspire': lambda d, a: inspire_deck(d, t=a[2]),  # deck, target
+        'teleport': lambda d, a: teleport_deck(d, t=a[2]),  # deck, target
+        'count rage': lambda d, a: condition(d, c=a[1], a=a[2]),  # deck, count, actions
+        'pay fire': lambda d, a: condition(d, c=a[1], a=a[2]),  # deck, count, actions
+        'death': lambda d, a: death_deck(d, t=a[2]),  # deck, target
+        'void': lambda d, a: void_deck(d, t=a[2]),  # deck, target
+        'claws': lambda d, a: claws_deck(d, r=a[1], t=a[2]),  # deck, range, target
     }
 
-    return switcher.get(a[0])(d, a)
+    return switcher.get(a[0])(deck, action)
 
 
 def colour_card_hash(c):
