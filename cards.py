@@ -87,11 +87,11 @@ cards = {1: {  # card 1
     'A': (
         dict(life='healthy'),
         (('hit', 2, 'enemy'),),
-        (('delay', 2, 'any'), ('rotate', 0, 'self'),)
+        (('delay', 2, 'any'), ('rotate', 0, 'self'))
     ),
     'B': (
-        dict(life='healthy', shield=(('rotate', 0, 'self'),)),
-        (('delay', 1, 'any'), ('hit', 2, 'enemy'),),
+        dict(life='healthy', shield=(('rotate', None, 'self'),)),
+        (('delay', 1, 'any'), ('hit', 2, 'enemy')),
         (('delay', 2, 'any'),)
     ),
     'C': (
@@ -108,12 +108,12 @@ cards = {1: {  # card 1
     'header': dict(name='warrior', type='hero'),
     'A': (
         dict(life='healthy'),
-        (('hit', 2, 'enemy'), ('rotate', 0, 'self'),),
+        (('hit', 2, 'enemy'), ('rotate', 0, 'self')),
         (('delay', 2, 'any'),)
     ),
     'B': (
-        dict(life='healthy', shield=(('rotate', 0, 'self'),)),
-        (('heal', 'any', 'ally'), ('rotate', 0, 'self'),),
+        dict(life='healthy', shield=(('rotate', None, 'self'),)),
+        (('heal', 'any', 'ally'), ('rotate', 0, 'self')),
         (('quicken', 2, 'any'),)
     ),
     'C': (
@@ -123,19 +123,19 @@ cards = {1: {  # card 1
     ),
     'D': (
         dict(life='wounded'),
-        (('heal', 'any', 'ally'), ('rotate', 0, 'self'),),
+        (('heal', 'any', 'ally'), ('rotate', 0, 'self')),
         (('delay', 3, 'any'),)
     )
 }, 3: {
     'header': dict(name='warrior', type='hero'),
     'A': (
         dict(life='healthy'),
-        (('delay', 2, 'any'), ('rotate', 0, 'self'),),
-        (('quicken', 2, 'any'), ('rotate', 0, 'self'),)
+        (('delay', 2, 'any'), ('rotate', 0, 'self')),
+        (('quicken', 2, 'any'), ('rotate', 0, 'self'))
     ),
     'B': (
         dict(life='healthy'),
-        (('hit', 4, 'enemy'), ('hit', 4, 'enemy'), ('rotate', 0, 'self'),)
+        (('hit', 4, 'enemy'), ('hit', 4, 'enemy'), ('rotate', 0, 'self'))
     ),
     'C': (
         dict(life='exhausted'),
@@ -150,14 +150,14 @@ cards = {1: {  # card 1
 }, 4: {
     'header': dict(name='warrior', type='hero'),
     'A': (
-        dict(life='healthy', shield=(('rotate', 0, 'self'),)),
+        dict(life='healthy', shield=(('rotate', None, 'self'),)),
         (('hit', 4, 'enemy'),),
         (('quicken', 2, 'any'),)
     ),
     'B': (
         dict(life='healthy'),
         (('hit', 2, 'enemy'),),
-        (('delay', 1, 'any'), ('quicken', 1, 'any'), ('rotate', 0, 'self'),)
+        (('delay', 1, 'any'), ('quicken', 1, 'any'), ('rotate', 0, 'self'))
     ),
     'C': (
         dict(life='wounded'),
@@ -172,17 +172,17 @@ cards = {1: {  # card 1
 }, 5: {
     'header': dict(name='warrior', type='hero'),
     'A': (
-        dict(life='healthy', shield=(('rotate', 0, 'self'),)),
-        (('quicken', 2, 'any'), ('hit', 2, 'enemy'),)
+        dict(life='healthy', shield=(('rotate', None, 'self'),)),
+        (('quicken', 2, 'any'), ('hit', 2, 'enemy'))
     ),
     'B': (
         dict(life='healthy'),
-        (('hit', 2, 'enemy'), ('rotate', 0, 'self'),),
-        (('quicken', 2, 'any'), ('rotate', 0, 'self'),)
+        (('hit', 2, 'enemy'), ('rotate', 0, 'self')),
+        (('quicken', 2, 'any'), ('rotate', 0, 'self'))
     ),
     'C': (
         dict(life='wounded'),
-        (('delay', 3, 'any'), ('hit', 2, 'enemy'), ('hit', 2, 'enemy'), ('rotate', 0, 'self'),),
+        (('delay', 3, 'any'), ('hit', 2, 'enemy'), ('hit', 2, 'enemy'), ('rotate', 0, 'self')),
         (('quicken', 2, 'any'),)
     ),
     'D': (
@@ -194,11 +194,11 @@ cards = {1: {  # card 1
     'header': dict(name='ogre', type='monster'),
     'A': (
         dict(life='healthy'),
-        (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('rotate', 0, 'self'),)
+        (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('rotate', 0, 'self'))
     ),
     'B': (
-        dict(life='healthy', shield=(('rotate', 0, 'self'),)),
-        (('hit', 4, 'enemy'), ('push', 3, 'enemy'),),
+        dict(life='healthy', shield=(('rotate', None, 'self'),)),
+        (('hit', 4, 'enemy'), ('push', 3, 'enemy')),
     ),
     'C': (
         dict(life='exhausted'),
@@ -206,55 +206,55 @@ cards = {1: {  # card 1
     ),
     'D': (
         dict(life='wounded', feature={'heavy'}, shield=()),
-        (('hit', 'inf', 'enemy'), ('hit', 'inf', 'enemy'), ('rotate', 0, 'self'),),
+        (('hit', 'inf', 'enemy'), ('hit', 'inf', 'enemy'), ('rotate', 0, 'self')),
     )
 }, 7: {
     'header': dict(name='ogre', type='monster'),
     'A': (
         dict(life='healthy', feature={'heavy'}),
-        (('hit', 4, 'enemy'), ('rotate', 0, 'self'),),
+        (('hit', 4, 'enemy'), ('rotate', 0, 'self')),
     ),
     'B': (
-        dict(life='healthy', shield=(('rotate', 0, 'self'),)),
-        (('heal', 'any', 'ally'), ('rotate', 0, 'self'),),
-        (('hit', 7, 'enemy'), ('rotate', 0, 'self'),)
+        dict(life='healthy', shield=(('rotate', None, 'self'),)),
+        (('heal', 'any', 'ally'), ('rotate', 0, 'self')),
+        (('hit', 7, 'enemy'), ('rotate', 0, 'self'))
     ),
     'C': (
         dict(life='exhausted'),
-        (('hit', 5, 'enemy'), ('pull', 4, 'ally'),),
+        (('hit', 5, 'enemy'), ('pull', 4, 'ally')),
     ),
     'D': (
         dict(life='wounded'),
-        (('push', 3, 'enemy'), ('hit', 5, 'enemy'),)
+        (('push', 3, 'enemy'), ('hit', 5, 'enemy'))
     )
 }, 8: {
     'header': dict(name='ogre', type='monster'),
     'A': (
         dict(life='healthy'),
-        (('hit', 4, 'enemy'), ('rotate', 0, 'self'),),
+        (('hit', 4, 'enemy'), ('rotate', 0, 'self')),
     ),
     'B': (
         dict(life='healthy', feature={'heavy'}),
-        (('heal', 'any', 'ally'), ('rotate', 0, 'self'),),
-        (('hit', 5, 'enemy'), ('rotate', 0, 'self'),)
+        (('heal', 'any', 'ally'), ('rotate', 0, 'self')),
+        (('hit', 5, 'enemy'), ('rotate', 0, 'self'))
     ),
     'C': (
         dict(life='exhausted'),
-        (('pull', 6, 'enemy'), ('hit', 1, 'enemy'),),
+        (('pull', 6, 'enemy'), ('hit', 1, 'enemy')),
     ),
     'D': (
         dict(life='wounded'),
-        (('pull', 4, 'enemy'), ('hit', 1, 'enemy'),)
+        (('pull', 4, 'enemy'), ('hit', 1, 'enemy'))
     )
 }, 9: {
     'header': dict(name='ogre', type='monster'),
     'A': (
         dict(life='healthy'),
-        (('push', 3, 'enemy'), ('push', 3, 'enemy'), ('rotate', 0, 'self'),)
+        (('push', 3, 'enemy'), ('push', 3, 'enemy'), ('rotate', 0, 'self'))
     ),
     'B': (
         dict(life='healthy', reaction=('shield', 'rotate'),),
-        (('hit', 5, 'enemy'), ('rotate', 0, 'self'),),
+        (('hit', 5, 'enemy'), ('rotate', 0, 'self')),
     ),
     'C': (
         dict(life='exhausted', feature={'heavy'}),
@@ -262,19 +262,19 @@ cards = {1: {  # card 1
     ),
     'D': (
         dict(life='wounded'),
-        (('heal', 'any', 'ally'), ('heal', 'any', 'ally'), ('heal', 'any', 'ally'), ('rotate', 0, 'self'),),
+        (('heal', 'any', 'ally'), ('heal', 'any', 'ally'), ('heal', 'any', 'ally'), ('rotate', 0, 'self')),
         (('pull', 5, 'ally'),)
     )
 }, 10: {
     'header': dict(name='huntress', type='hero'),
     'A': (
         dict(life='healthy', feature={'trap'}),
-        (('arrow', 1, 'enemy'), ('rotate', 0, 'self'),),
-        (('delay', 2, 'ally'), ('maneuver', 'any', 'ally'),)
+        (('arrow', 1, 'enemy'), ('rotate', 0, 'self')),
+        (('delay', 2, 'ally'), ('maneuver', 'any', 'ally'))
     ),
     'B': (
         dict(life='healthy', feature={'trap'}),
-        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'), ('rotate', 0, 'self'),),
+        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'), ('rotate', 0, 'self')),
         (('heal', 'any', 'ally'),)
     ),
     'C': (
@@ -292,60 +292,60 @@ cards = {1: {  # card 1
 }, 11: {
     'header': dict(name='huntress', type='hero'),
     'A': (
-        dict(life='healthy', dodge='rotate'),
-        (('arrow', 1, 'enemy'), ('rotate', 0, 'self'),),
-        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'), ('rotate', 0, 'self'),),
-        (('hit', 1, 'enemy'), ('rotate', 0, 'self'),)
+        dict(life='healthy', dodge=(('rotate', None, 'self'),)),
+        (('arrow', 1, 'enemy'), ('rotate', 0, 'self')),
+        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'), ('rotate', 0, 'self')),
+        (('hit', 1, 'enemy'), ('rotate', 0, 'self'))
     ),
     'B': (
         dict(life='healthy'),
         (('delay', 2, 'hero'),),
         (('quicken', 2, 'enemy'),),
-        (('maneuver', 'any', 'ally'), ('maneuver', 'any', 'ally'),)
+        (('maneuver', 'any', 'ally'), ('maneuver', 'any', 'ally'))
     ),
     'C': (
         dict(life='wounded'),
-        (('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('rotate', 0, 'self'),),
-        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'),)
+        (('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('rotate', 0, 'self')),
+        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'))
     ),
     'D': (
         dict(life='exhausted'),
-        (('hit', 1, 'enemy'), ('maneuver', 'any', 'ally'), ('delay', 2, 'hero'),)
+        (('hit', 1, 'enemy'), ('maneuver', 'any', 'ally'), ('delay', 2, 'hero'))
     )
 }, 12: {
     'header': dict(name='huntress', type='hero'),
     'A': (
-        dict(life='healthy', dodge='rotate'),
-        (('maneuver', 'any', 'ally'), ('quicken', 2, 'enemy'), ('rotate', 0, 'self'),),
-        (('delay', 1, 'any'), ('rotate', 0, 'self'),)
+        dict(life='healthy', dodge=(('rotate', None, 'self'),)),
+        (('maneuver', 'any', 'ally'), ('quicken', 2, 'enemy'), ('rotate', 0, 'self')),
+        (('delay', 1, 'any'), ('rotate', 0, 'self'))
     ),
     'B': (
         dict(life='healthy', feature={'trap'}),
         (('arrow', 2, 'enemy'),),
-        (('delay', 2, 'hero'), ('maneuver', 'any', 'ally'),)
+        (('delay', 2, 'hero'), ('maneuver', 'any', 'ally'))
     ),
     'C': (
         dict(life='wounded', feature={'trap'}),
-        (('delay', 2, 'hero'), ('arrow', 1, 'enemy'),),
+        (('delay', 2, 'hero'), ('arrow', 1, 'enemy')),
         (('maneuver', 'any', 'ally'),)
     ),
     'D': (
         dict(life='exhausted', feature={'trap'}),
-        (('delay', 2, 'hero'), ('quicken', 2, 'enemy'),),
-        (('maneuver', 'any', 'ally'), ('hit', 1, 'enemy'),)
+        (('delay', 2, 'hero'), ('quicken', 2, 'enemy')),
+        (('maneuver', 'any', 'ally'), ('hit', 1, 'enemy'))
     )
 }, 13: {
     'header': dict(name='huntress', type='hero'),
     'A': (
         dict(life='healthy', feature={'trap'}),
-        (('maneuver', 'any', 'ally'), ('rotate', 0, 'self'),),
+        (('maneuver', 'any', 'ally'), ('rotate', 0, 'self')),
         (('hit', 1, 'enemy'),),
         (('delay', 1, 'any'),)
     ),
     'B': (
         dict(life='healthy'),
-        (('arrow', 1, 'enemy'), ('rotate', 0, 'self'),),
-        (('maneuver', 'any', 'ally'), ('hit', 1, 'enemy'), ('rotate', 0, 'self'),),
+        (('arrow', 1, 'enemy'), ('rotate', 0, 'self')),
+        (('maneuver', 'any', 'ally'), ('hit', 1, 'enemy'), ('rotate', 0, 'self')),
         (('quicken', 2, 'enemy'),)
     ),
     'C': (
@@ -357,25 +357,25 @@ cards = {1: {  # card 1
     'D': (
         dict(life='wounded'),
         (('arrow', 1, 'enemy'),),
-        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'),)
+        (('quicken', 2, 'enemy'), ('maneuver', 'any', 'ally'))
     )
 }, 14: {
     'header': dict(name='huntress', type='hero'),
     'A': (
-        dict(life='healthy', dodge='rotate'),
-        (('arrow', 1, 'enemy'), ('rotate', 0, 'self'),),
-        (('quicken', 2, 'enemy'), ('rotate', 0, 'self'),)
+        dict(life='healthy', dodge=(('rotate', None, 'self'),)),
+        (('arrow', 1, 'enemy'), ('rotate', 0, 'self')),
+        (('quicken', 2, 'enemy'), ('rotate', 0, 'self'))
     ),
     'B': (
         dict(life='healthy'),
         (('arrow', 2, 'enemy'),),
-        (('delay', 2, 'hero'), ('maneuver', 'any', 'ally'),),
+        (('delay', 2, 'hero'), ('maneuver', 'any', 'ally')),
         (('heal', 'any', 'ally'),)
     ),
     'C': (
         dict(life='wounded', feature={'trap'}),
-        (('delay', 2, 'hero'), ('quicken', 2, 'enemy'),),
-        (('maneuver', 'any', 'ally'), ('hit', 1, 'enemy'),)
+        (('delay', 2, 'hero'), ('quicken', 2, 'enemy')),
+        (('maneuver', 'any', 'ally'), ('hit', 1, 'enemy'))
     ),
     'D': (
         dict(life='exhausted'),
@@ -676,7 +676,7 @@ cards = {1: {  # card 1
         (('push', 3, 'enemy'), ('push', 3, 'enemy'))
     ),
     'B': (
-        dict(life='healthy', feature={'venom'}, shield=(('rotate', 0, 'self'),)),
+        dict(life='healthy', feature={'venom'}, shield=(('rotate', None, 'self'),)),
         (('swarm', None, (('hit', 5, 'enemy'), ('hit', 5, 'enemy'))),)
     ),
     'C': (
@@ -703,7 +703,7 @@ cards = {1: {  # card 1
         (('teleport', 'any', 'enemy'),)
     ),
     'C': (
-        dict(life='wounded', shield=(('rotate', 0, 'self'),), type={'werewolf'}),
+        dict(life='wounded', shield=(('rotate', None, 'self'),), type={'werewolf'}),
         (('claws', 3, 'enemy'), ('rotate', 0, 'self'))
     ),
     'D': (
@@ -726,7 +726,7 @@ cards = {1: {  # card 1
         (('heal', 'any', 'self'),)
     ),
     'C': (
-        dict(life='wounded', shield=(('rotate', 0, 'self'),), type={'werewolf'}),
+        dict(life='wounded', shield=(('rotate', None, 'self'),), type={'werewolf'}),
         (('claws', 3, 'enemy'), ('rotate', 0, 'self')),
         (('pull', 'inf', 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'))
     ),
@@ -748,7 +748,7 @@ cards = {1: {  # card 1
         (('heal', 'any', 'eny'), ('inspire', 'any', 'enemy'))
     ),
     'C': (
-        dict(life='wounded', shield=(('rotate', 0, 'self'),), type={'werewolf'}),
+        dict(life='wounded', shield=(('rotate', None, 'self'),), type={'werewolf'}),
         (('hit', 2, 'enemy'), ('hit', 2, 'enemy'), ('rotate', 0, 'self')),
         (('claws', 4, 'enemy'), )
     ),
@@ -772,7 +772,7 @@ cards = {1: {  # card 1
         (('teleport', 'any', 'both'), ('maneuver', 'any', 'ally'))
     ),
     'C': (
-        dict(life='wounded', shield=(('rotate', 0, 'self'),), type={'werewolf'}),
+        dict(life='wounded', shield=(('rotate', None, 'self'),), type={'werewolf'}),
         (('hit', 2, 'enemy'), ('hit', 2, 'enemy'), ('push', 2, 'enemy'), ('rotate', 0, 'self')),
         (('hit', 'inf', 'enemy'), ('hit', 'inf', 'enemy'))
     ),
@@ -796,7 +796,7 @@ cards = {1: {  # card 1
         (('quicken', 1, 'any'), ('delay', 1, 'any'))
     ),
     'C': (
-        dict(life='wounded', shield=(('rotate', 0, 'self'),), type={'werewolf'}),
+        dict(life='wounded', shield=(('rotate', None, 'self'),), type={'werewolf'}),
         (('pull', 6, 'enemy'), ('hit', 3, 'enemy'), ('hit', 3, 'enemy'), ('hit', 3, 'enemy'), ('rotate', 0, 'self')),
         (('hit', 'inf', 'enemy'),)
     ),
@@ -821,13 +821,13 @@ cards = {1: {  # card 1
         (('hit', 3, 'enemy'), ('push', 3, 'enemy'))
     ),
     'C': (
-        dict(life='exhausted', rage=2, shield=(('rotate', 0, 'self'),)),
+        dict(life='exhausted', rage=2, shield=(('rotate', None, 'self'),)),
         (('count rage', '>4', (('void', 'any', 'enemy'),)),),
         (('count rage', '>2', (('hit', 1, 'enemy'), ('hit', 2, 'enemy'), ('hit', 3, 'enemy'))),),
         (('hit', 2, 'enemy'), ('hit', 2, 'enemy'), ('rotate', 0, 'self'))
     ),
     'D': (
-        dict(life='exhausted', rage=1, shield=(('rotate', 0, 'self'),)),
+        dict(life='exhausted', rage=1, shield=(('rotate', None, 'self'),)),
         (('count rage', '>4', (('death', 'all', 'enemy'),)),),
         (('count rage', '>3', (('claws', 4, 'enemy'), ('rotate', 0, 'self'))),),
         (('quicken', 5, 'ally'), ('rotate', 0, 'self'))
@@ -847,13 +847,13 @@ cards = {1: {  # card 1
         (('claws', 3, 'enemy'),)
     ),
     'C': (
-        dict(life='wounded', rage=2, shield=(('rotate', 0, 'self'),)),
+        dict(life='wounded', rage=2, shield=(('rotate', None, 'self'),)),
         (('count rage', '>4', (('death', 'all', 'enemy'),)),),
         (('count rage', '>3', (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'), ('push', 1, 'enemy'))),),
         (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('hit', 1, 'enemy'))
     ),
     'D': (
-        dict(life='exhausted', rage=1, shield=(('rotate', 0, 'self'),)),
+        dict(life='exhausted', rage=1, shield=(('rotate', None, 'self'),)),
         (('count rage', '>4', (('death', 'all', 'enemy'),)),),
         (('count rage', '>2', (('hit', 'inf', 'enemy'), ('push', 'inf', 'enemy'), ('rotate', 0, 'self'))),),
         (('hit', 'inf', 'enemy'), ('rotate', 0, 'self'))
@@ -873,12 +873,12 @@ cards = {1: {  # card 1
         (('hit', 'inf', 'enemy'),)
     ),
     'C': (
-        dict(life='exhausted', rage=1, shield=(('rotate', 0, 'self'),)),
+        dict(life='exhausted', rage=1, shield=(('rotate', None, 'self'),)),
         (('count rage', '>4', (('death', 'all', 'enemy'),)),),
         (('claws', 4, 'enemy'), ('rotate', 0, 'self'))
     ),
     'D': (
-        dict(life='exhausted', rage=1, shield=(('rotate', 0, 'self'),)),
+        dict(life='exhausted', rage=1, shield=(('rotate', None, 'self'),)),
         (('count rage', '>5', (('death', 'all', 'enemy'),)),),
         (('count rage', '>3', (('hit', 'inf', 'enemy'), ('hit', 'inf', 'enemy'), ('rotate', 0, 'self'))),),
         (('hit', 'inf', 'enemy'), ('rotate', 0, 'self'))
@@ -898,13 +898,13 @@ cards = {1: {  # card 1
         (('hit', 4, 'enemy'),)
     ),
     'C': (
-        dict(life='healthy', rage=3, shield=(('rotate', 0, 'self'),)),
+        dict(life='healthy', rage=3, shield=(('rotate', None, 'self'),)),
         (('count rage', '>5', (('death', 'all', 'enemy'),)),),
         (('count rage', '>3', (('void', 'any', 'enemy'),)),),
         (('pull', 5, 'ally'), ('rotate', 0, 'self'))
     ),
     'D': (
-        dict(life='exhausted', rage=1, shield=(('rotate', 0, 'self'),)),
+        dict(life='exhausted', rage=1, shield=(('rotate', None, 'self'),)),
         (('count rage', '>4', (('void', 'any', 'enemy'),)),),
         (('count rage', '>3', (('pull', 5, 'enemy'), ('hit', 1, 'enemy'), ('pull', 5, 'enemy'), ('hit', 1, 'enemy'),
                                ('rotate', 0, 'self'))),),

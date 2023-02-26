@@ -80,7 +80,8 @@ def request_deck():
                    "Some examples of a valid hash (top card of the deck first, bottom card of the deck last):\n" \
                    "    - 1A6A2A7A3A8A4A9A5A\n" \
                    "    - 1A 6A 2A 7A 3A 8A 4A 9A 5A\n" \
-                   "    - 1 6 2 7 3 8 4 9 5"
+                   "    - 1 6 2 7 3 8 4 9 5\n" \
+                   "    - 10A6A11A7A12A8A13A9A14A"
 
     def corrections(s_hash: str) -> str:
         # make the hash uppercase
@@ -203,7 +204,7 @@ while True:
 
         # decide, if the
         if hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'monster':
-            first_variant_index = 1
+            first_variant_index = min(1, len(decks_new)-1)
         else:
             first_variant_index = 0
 
@@ -213,8 +214,8 @@ while True:
                 s = build_graphical_representation_to_deck(deck, actions=True)
                 print("{:3d}".format(k), ":", s)
 
-        if (hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'monster' and len(decks_new) != 2) or \
-                (hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'hero' and len(decks_new) != 1):
+        if (hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'monster' and len(decks_new) > 2) or \
+                (hb.cards[decks_new[0].cards[0][0]]['header']['type'] == 'hero' and len(decks_new) > 1):
             option_number = request_number(minimum=first_variant_index, maximum=len(decks_new))
         else:
             option_number = first_variant_index

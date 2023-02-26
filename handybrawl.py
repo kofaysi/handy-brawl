@@ -273,10 +273,10 @@ def move_card(d, i, j):
 
     if i < j:
         d_new.cards[i:j + 1] = back_shift(d_new.cards[i:j + 1])
-        d_new.add_action([('move down', i+1)])
+        d_new.add_action([('move down', str(j) + "<-" + str(i))])
     else:
         d_new.cards[j:i + 1] = back_shift(d.cards[j:i + 1], len(d_new.cards[j:i + 1]) - 1)
-        d_new.add_action([('move up', i+1)])
+        d_new.add_action([('move up', str(i) + "->" + str(j))])
     return d_new
 
 
@@ -295,7 +295,7 @@ def rotate_card(d, i=0):
     d_new = make_next(d)
     d_new.cards[i][1] = rotate(d_new.cards[i][1])
     d_new.add_action([('rotate', i)])
-    return [d_new]
+    return d_new
 
 
 # @CountCalls
@@ -579,8 +579,8 @@ def maneuver_deck(d):
     for i in range(1, len(d.cards) - 1):
         section_rotated = rotate(d.cards[i][1])
         if cards[d.cards[0][0]]['header']['type'] == cards[d.cards[i][0]]['header']['type']:
-            life_rotated = cards[d.cards[i][0]][section_rotated]['header']['life']
-            life_current = cards[d.cards[i][0]][d.cards[i][1]]['header']['life']
+            life_rotated = cards[d.cards[i][0]][section_rotated][0]['life']
+            life_current = cards[d.cards[i][0]][d.cards[i][1]][0]['life']
             if lives.index(life_current) >= lives.index(life_rotated):
                 d_new = rotate_card(d, i)
                 ds_new.append(d_new)
@@ -632,46 +632,51 @@ def arrow_deck(d, n=1, e=-3):
     :return: new decks
     """
     # the next card displays feature 'webs' and prevents from activating the top hero card
-    if cards[d.cards[0][0]]['header']['type'] == 'hero' \
-            and 'feature' in cards[d.cards[1][0]][d.cards[1][1]]['header'] \
-            and 'webs' in cards[d.cards[1][0]][d.cards[1][1]][0].get('feature'):
+    is_webs = cards[d.cards[1][0]][d.cards[1][1]][0].get('feature') == 'webs'
+    first_card_type = cards[d.cards[0][0]]['header']['type']
+
+    # the next card displays feature 'venom' and prevents from activating the top hero card
+    if first_card_type == 'hero' and is_webs:
         return []
 
     ds_new = []
     if e < 0:
         # targeting positions at the end of the deck
         # start resolving damages from the targets closest to the bottom of the deck
-        target_list = reversed(range(len(d) + e - 1, len(d) + 1))
+        target_list = reversed(range(len(d) + e, len(d)))
     else:
         # target positions at the beginning of the deck (possible future actions)
         target_list = reversed(list(range(1, e + 1)))
 
     for i in target_list:
         d_new = make_next(d)
+        shield_found = 'shield' in cards[d.cards[i][0]][d.cards[i][1]][0]
         if cards[d.cards[i][0]]['header']['type'] == 'monster':
-            reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
-            if reactions:
-                if reactions[0][2] == 'self':
-                    d_new = play_action(d, (reactions[0][0], i, reactions[0][2]))[0]
-                else:
-                    d_new = play_action(d, reactions)[0]
+            if shield_found:
+                reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
+                if reactions:
+                    if reactions[0][2] == 'self':
+                        d_new = play_action(d, (reactions[0][0], i, reactions[0][2]))[0]
+                    else:
+                        d_new = play_action(d, reactions)[0]
             else:
-                d_new = hit_card(d_new[:], i)
+                d_new = hit_card(d_new, i)
+            ds_new.append(d_new)
             if n == 2:  # double arrow
                 for j in target_list:
                     if i < j \
                             and cards[d.cards[j][0]]['header']['type'] == 'monster':
-                        reactions = cards[d.cards[j][0]][d.cards[j][1]][0].get('shield')
-                        if reactions:
-                            if reactions[0][2] == 'self':
-                                d_new = play_action(d, (reactions[0][0], i, reactions[0][2]))[0]
-                            else:
-                                d_new = play_action(d, reactions)[0]
+                        shield_found = 'shield' in cards[d.cards[j][0]][d.cards[j][1]][0]
+                        if shield_found:
+                            reactions = cards[d.cards[j][0]][d.cards[j][1]][0].get('shield')
+                            if reactions:
+                                if reactions[0][2] == 'self':
+                                    d_new = play_action(d, (reactions[0][0], i, reactions[0][2]))[0]
+                                else:
+                                    d_new = play_action(d, reactions)[0]
                         else:
                             d_new = hit_card(d_new, j)
                         ds_new.append(d_new)
-            else:
-                ds_new.append(d_new)
     return ds_new
 
 
@@ -821,7 +826,10 @@ def play_card(d):
             # if no valid result has been generated, use the input as the outcome
             # todo: check on the following algo
             if not decks_new_j:
-                decks_new_j = decks[:]
+                decks_new_j = decks
+                for d in decks_new_j:
+                    d.add_action([(None,)])
+
             # todo: the rotate is mandatory, but not all last actions are mandatory;
             # check, whether outcomes are generated with and without the last action, for hero only
             decks_new_j = get_unique_items(decks_new_j)
@@ -928,7 +936,7 @@ def play_action(deck, action):
         'pull': lambda d, a: move_deck(d, r=-a[1], t=a[2]),  # deck, range, target
         'delay': lambda d, a: adjust_deck(d, p=a[1], t=a[2]),  # deck, by positions, target
         'quicken': lambda d, a: adjust_deck(d, p=-a[1], t=a[2]),  # deck, by positions, target
-        'rotate': lambda d, a: rotate_card(d, i=a[1]),  # deck
+        'rotate': lambda d, a: [rotate_card(d, i=a[1])],  # deck
         'heal': lambda d, a: revive_deck(d, a[0]),  # deck, action
         'resurrect': lambda d, a: revive_deck(d, a[0]),  # deck, action
         'arrow': lambda d, a: arrow_deck(d, n=a[1]),  # deck, number of targets
@@ -972,9 +980,11 @@ Game rules applicable:
         that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
     
     # the next card displays feature 'webs' and prevents from activating the top hero card
-    if cards[d.cards[0][0]]['header']['type'] == 'hero' \
-            and 'feature' in cards[d.cards[1][0]][d.cards[1][1]]['header'] \
-            and 'webs' in cards[d.cards[1][0]][d.cards[1][1]][0].get('feature'):
+    is_webs = cards[d.cards[1][0]][d.cards[1][1]][0].get('feature') == 'webs'
+    first_card_type = cards[d.cards[0][0]]['header']['type']
+
+    # the next card displays feature 'venom' and prevents from activating the top hero card
+    if first_card_type == 'hero' and is_webs:
         return []
 """
 
@@ -989,9 +999,11 @@ Game rules applicable:
         that change cards rotation: HIT, ARROW, MANEUVER, HEAL, REVIVE, FIREBALL, ABLAZE.
         
     # the next card displays feature 'webs' and prevents from activating the top hero card
-    if cards[d.cards[0][0]]['header']['type'] == 'hero' \
-            and 'feature' in cards[d.cards[1][0]][d.cards[1][1]]['header'] \
-            and 'webs' in cards[d.cards[1][0]][d.cards[1][1]][0].get('feature'):
+    is_webs = cards[d.cards[1][0]][d.cards[1][1]][0].get('feature') == 'webs'
+    first_card_type = cards[d.cards[0][0]]['header']['type']
+
+    # the next card displays feature 'venom' and prevents from activating the top hero card
+    if first_card_type == 'hero' and is_webs:
         return []
 """
 
