@@ -1,0 +1,61 @@
+C:\Tool\Python310\python.exe C:\repo\handy-brawl-fix_ref_0_and_inf\find_shortest_by_recursion.py
+Searching for the first possible winning outcome. Then searching further for the solution with the highest hero's life.
+36825 : 8C7C4A6C1B2B3A : {'hero': 4.0, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 11
+36883 : 2A7C8C4B6C1D3A : {'hero': 3.5, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 10
+The game with the least turns and the highest hero life flows the following:
+['1A6A2A7A3A8A4A',
+ '6D2A7A3A8A4A1A',
+ '2A7A3A8A4A1A6D',
+ '7D3A8A4A1A6D2B',
+ '3A8A4A1A6D2B7D',
+ '8A4A6D1A2B7D3B',
+ '4A6D1A2A7D3B8B',
+ '6D1A2A7C3B8B4A',
+ '1D2A7C3B8B4B6C',
+ '3B2A7C8B4B6C1D',
+ '2A7C8C4B6C1D3A']
+The time of execution of above program is : 50669.35062408447 ms
+
+Process finished with exit code 0
+
+
+C:\Tool\Python311\python.exe C:\repo\handy-brawl-fix_ref_0_and_inf\find_shortest_by_recursion.py
+Searching for the first possible winning outcome. Then searching further for the solution with the highest hero's life.
+11 : 7C8C1A4A6C2A3A : {'hero': 4.0, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 11
+8581 : 2A7C8C1D4B6C3A : {'hero': 3.5, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 10
+The game with the least turns and the highest hero life flows the following:
+['1A6A2A7A3A8A4A',
+ '6D2A7A3A8A4A1A',
+ '2A7A3A8A4A1A6D',
+ '7D3A8A4A1A6D2B',
+ '3A8A4A1A6D2B7D',
+ '8A1A4A6D2B7D3B',
+ '1D4A6D2B7D3B8B',
+ '4A6D2B7C3B8B1D',
+ '6D3B2B7C8B1D4A',
+ '3B2A7C8B1D4B6C',
+ '2A7C8C1D4B6C3A']
+The time of execution of above program is : 67889.86587524414 ms
+
+Process finished with exit code 0
+
+
+C:\Tool\Python311\python.exe C:\repo\handy-brawl-fix_ref_0_and_inf\find_shortest_by_recursion.py
+Searching for the first possible winning outcome. Then searching further for the solution with the highest hero's life.
+11241 : 7C8C6C1D2B3B4A : {'hero': 3.5, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 11
+402494 : 7C6C8C1D2B4A3A : {'hero': 3.5, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 10
+The game with the least turns and the highest hero life flows the following:
+['1A6A2A7A3A8A4A',
+ '2A7A6A3A8A4A1B',
+ '7A6D3A8A4A1B2B',
+ '6D3A8A4A1B2B7A',
+ '3A8A4A1A2A7A6C',
+ '8A1A2A4A7A6C3B',
+ '1D2A4A7A6C3B8B',
+ '2A4A7D6C3B8B1D',
+ '4A7C6C3B8B1D2B',
+ '3B7C6C8B1D2B4A',
+ '7C6C8C1D2B4A3A']
+The time of execution of above program is : 65248.98028373718 ms
+
+Process finished with exit code 0

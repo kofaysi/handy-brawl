@@ -1,0 +1,19 @@
+C:\Tool\Python311\python.exe C:\repo\handy-brawl-fix_ref_0_and_inf\find_shortest_by_recursion.py
+Searching for the first possible winning outcome. Then searching further for the solution with the highest hero's life.
+52586 : 8C7C6C1D2B3B4A : {'hero': 3.5, 'monster': 0.0} start deck: 1A6A2A7A3A8A4A length of game: 11
+The game with the least turns and the highest hero life flows the following:
+['1A6A2A7A3A8A4A',
+ '6D2A7A3A8A4A1A',
+ '2A7A3A8A4A1A6D',
+ '7D3A8A4A1A6D2B',
+ '8A4B1A6D2B3A7D',
+ '4B1A6D2B3A7D8A',
+ '6D1A2B3A8A7D4A',
+ '1D2A3A8A7D4A6C',
+ '2A3A8D7D4A6C1D',
+ '3A8C7D4A6C1D2B',
+ '4A8C7D6C1D2B3B',
+ '8C7C6C1D2B3B4A']
+The time of execution of above program is : 82396.54111862183 ms
+
+Process finished with exit code 0

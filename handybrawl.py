@@ -245,12 +245,11 @@ def move_deck(d, r, t):
             end_position = 1 if r < 1 else len(d) - 1
             ds_new.append(move_card(d, i, end_position))
             reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
-            if reactions and reactions[1] == 0:
-                # d_new = intercept(d, i, reactions)
-                ds_new.append(play_action(d, (reactions[0], i, reactions[2])))
-                #ds_new.append(intercept(d, i, reactions))
-            else:
-                ds_new.append(play_action(d, reactions))
+            if reactions:
+                if reactions[0][2] == 'self':
+                    ds_new.extend(play_action(d, (reactions[0][0], i, reactions[0][2])))
+                else:
+                    ds_new.extend(play_action(d, reactions))
             if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 break
     return ds_new if ds_new != [d] else []
@@ -337,16 +336,16 @@ def hit_deck(d, r=0):
     shield_found = False
     for i in hit_list:
         # Reaction: Shield: Don't target
-        reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
+        shield_found = 'shield' in cards[d.cards[i][0]][d.cards[i][1]][0]
         if cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i][0]]['header']['type'] \
-                and reactions:
-            if reactions and reactions[1] == 0:
-                # d_new = intercept(d, i, reactions)
-                ds_new.append(play_action(d, (reactions[0], i, reactions[2])))
-                #ds_new.append(intercept(d, i, reactions))
-            else:
-                ds_new.append(play_action(d, reactions))
-            shield_found = True
+                and shield_found:
+            reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
+            if reactions:
+                if reactions[0][2] == 'self':
+                    ds_new.extend(play_action(d, (reactions[0][0], i, reactions[0][2])))
+                else:
+                    ds_new.extend(play_action(d, reactions))
+            # shield_found = True
             # if monster's shield has been found and activated, break
             if cards[d.cards[0][0]]['header']['type'] == 'hero':
                 break
@@ -355,18 +354,18 @@ def hit_deck(d, r=0):
     found_hero = False
     for i in hit_list:
         # Reaction: Dodge: Don't target
-        reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
+        dodge_found = 'dodge' in cards[d.cards[i][0]][d.cards[i][1]][0]
         if not found_hero and cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i][0]]['header']['type'] \
-                and reactions:
+                and dodge_found:
+            reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
             if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 found_hero = True
-            if reactions and reactions[1] == 0:
-                # d_new = intercept(d, i, reactions)
-                ds_new.append(play_action(d, (reactions[0], i, reactions[2])))
-                #ds_new.append(intercept(d, i, reactions))
-            else:
-                ds_new.append(play_action(d, reactions))
-            dodge_found = True
+            if reactions:
+                if reactions[0][2] == 'self':
+                    ds_new.extend(play_action(d, (reactions[0][0], i, reactions[0][2])))
+                else:
+                    ds_new.extend(play_action(d, reactions))
+            # dodge_found = True
 
     # Continue collecting new deck outcomes by applying hit_card(), if it is a monster's turn,
     # or it is a hero's turn and no shield or no dodge has been found.
@@ -656,12 +655,10 @@ def arrow_deck(d, n=1, e=-3):
             # also consider 'dodge' as a reaction
             reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
             if reactions:
-                if reactions[1] == 0:
-                    # d_new = intercept(d, i, reactions)
-                    d_new = play_action(d, (reactions[0], i, reactions[2]))
-                    # ds_new.append(intercept(d, i, reactions))
+                if reactions[0][2] == 'self':
+                    d_new = play_action(d, (reactions[0][0], i, reactions[0][2]))[0]
                 else:
-                    d_new = play_action(d, reactions)
+                    d_new = play_action(d, reactions)[0]
             else:
                 d_new = hit_card(d_new[:], i)
             if n == 2:  # double arrow
@@ -670,12 +667,10 @@ def arrow_deck(d, n=1, e=-3):
                             and cards[d.cards[j][0]]['header']['type'] == 'monster':
                         reactions = cards[d.cards[j][0]][d.cards[j][1]][0].get('shield')
                         if reactions:
-                            if reactions[1] == 0:
-                                # d_new = intercept(d, i, reactions)
-                                d_new = play_action(d, (reactions[0], i, reactions[2]))
-                                # ds_new.append(intercept(d, i, reactions))
+                            if reactions[0][2] == 'self':
+                                d_new = play_action(d, (reactions[0][0], i, reactions[0][2]))[0]
                             else:
-                                d_new = play_action(d, reactions)
+                                d_new = play_action(d, reactions)[0]
                         else:
                             d_new = hit_card(d_new, j)
                         ds_new.append(d_new)
@@ -909,7 +904,7 @@ def play_action(deck, action):
         'pull': lambda d, a: move_deck(d, r=-a[1], t=a[2]),  # deck, range, target
         'delay': lambda d, a: adjust_deck(d, p=a[1], t=a[2]),  # deck, by positions, target
         'quicken': lambda d, a: adjust_deck(d, p=-a[1], t=a[2]),  # deck, by positions, target
-        'rotate': lambda d, a: rotate_card(d),  # deck
+        'rotate': lambda d, a: rotate_card(d, i=a[1]),  # deck
         'heal': lambda d, a: revive_deck(d, a[0]),  # deck, action
         'resurrect': lambda d, a: revive_deck(d, a[0]),  # deck, action
         'arrow': lambda d, a: arrow_deck(d, n=a[1]),  # deck, number of targets
@@ -923,6 +918,8 @@ def play_action(deck, action):
         'claws': lambda d, a: claws_deck(d, r=a[1], t=a[2]),  # deck, range, target
     }
 
+    if action is None:
+        pass
     return switcher.get(action[0])(deck, action)
 
 
