@@ -245,8 +245,12 @@ def move_deck(d, r, t):
             end_position = 1 if r < 1 else len(d) - 1
             ds_new.append(move_card(d, i, end_position))
             reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
-            if reactions:
-                ds_new.append(intercept(d, i, reactions))
+            if reactions and reactions[1] == 0:
+                # d_new = intercept(d, i, reactions)
+                ds_new.append(play_action(d, (reactions[0], i, reactions[2])))
+                #ds_new.append(intercept(d, i, reactions))
+            else:
+                ds_new.append(play_action(d, reactions))
             if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 break
     return ds_new if ds_new != [d] else []
@@ -336,8 +340,12 @@ def hit_deck(d, r=0):
         reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
         if cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i][0]]['header']['type'] \
                 and reactions:
-            d_new = intercept(d, i, reactions)
-            ds_new.append(d_new)
+            if reactions and reactions[1] == 0:
+                # d_new = intercept(d, i, reactions)
+                ds_new.append(play_action(d, (reactions[0], i, reactions[2])))
+                #ds_new.append(intercept(d, i, reactions))
+            else:
+                ds_new.append(play_action(d, reactions))
             shield_found = True
             # if monster's shield has been found and activated, break
             if cards[d.cards[0][0]]['header']['type'] == 'hero':
@@ -352,8 +360,12 @@ def hit_deck(d, r=0):
                 and reactions:
             if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 found_hero = True
-            d_new = intercept(d, i, reactions)
-            ds_new.append(d_new)
+            if reactions and reactions[1] == 0:
+                # d_new = intercept(d, i, reactions)
+                ds_new.append(play_action(d, (reactions[0], i, reactions[2])))
+                #ds_new.append(intercept(d, i, reactions))
+            else:
+                ds_new.append(play_action(d, reactions))
             dodge_found = True
 
     # Continue collecting new deck outcomes by applying hit_card(), if it is a monster's turn,
@@ -644,7 +656,12 @@ def arrow_deck(d, n=1, e=-3):
             # also consider 'dodge' as a reaction
             reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
             if reactions:
-                d_new = intercept(d_new[:], i, reactions)
+                if reactions[1] == 0:
+                    # d_new = intercept(d, i, reactions)
+                    d_new = play_action(d, (reactions[0], i, reactions[2]))
+                    # ds_new.append(intercept(d, i, reactions))
+                else:
+                    d_new = play_action(d, reactions)
             else:
                 d_new = hit_card(d_new[:], i)
             if n == 2:  # double arrow
@@ -653,7 +670,12 @@ def arrow_deck(d, n=1, e=-3):
                             and cards[d.cards[j][0]]['header']['type'] == 'monster':
                         reactions = cards[d.cards[j][0]][d.cards[j][1]][0].get('shield')
                         if reactions:
-                            d_new = intercept(d_new, j, reactions)
+                            if reactions[1] == 0:
+                                # d_new = intercept(d, i, reactions)
+                                d_new = play_action(d, (reactions[0], i, reactions[2]))
+                                # ds_new.append(intercept(d, i, reactions))
+                            else:
+                                d_new = play_action(d, reactions)
                         else:
                             d_new = hit_card(d_new, j)
                         ds_new.append(d_new)
@@ -705,7 +727,7 @@ def teleport_deck(d, t):
     return ds_new
 
 
-def inspire_deck(d):
+def inspire_deck(d, t='enemy'):
     """
     Apply play_card() for the part of the deck and concatenate results with the origin
 
@@ -714,6 +736,7 @@ def inspire_deck(d):
             Treat all the cards above it as if they didn't exist.
 
     :param d: the current deck
+    :param t: target
     """
     ds_new = []
     is_monster_turn = cards[d.cards[0][0]]['header']['type'] == 'monster'
@@ -856,6 +879,22 @@ def play_card(deck):
     return decks_new_i
 
 
+def condition(d, c, a):
+    pass
+
+
+def death_deck(d, t):
+    pass
+
+
+def void_deck(d, t):
+    pass
+
+
+def claws_deck(d, r, t):
+    pass
+
+
 def play_action(deck, action):
     """
 
@@ -884,7 +923,7 @@ def play_action(deck, action):
         'claws': lambda d, a: claws_deck(d, r=a[1], t=a[2]),  # deck, range, target
     }
 
-    return switcher.get(a[0])(deck, action)
+    return switcher.get(action[0])(deck, action)
 
 
 def colour_card_hash(c):
