@@ -783,12 +783,12 @@ def report_game_status(game):
           'length of game:', len(game) - 1)
 
 
-def play_card(deck):
+def play_card(d):
     """
     Activate all icons/action on the top card of the deck.
     Manipulate all the possible cards and collect every possible optional result (new decks).
 
-    :param deck: input deck
+    :param d: input deck
     :return: list of decks
     """
     # todo:
@@ -803,11 +803,11 @@ def play_card(deck):
     decks_new_i = []
     decks_new_i_prev_unchanged_rows = []
 
-    for i, row in enumerate(cards[deck.cards[0][0]][deck.cards[0][1]][1:]):
-        decks = [deck]
+    for i, row in enumerate(cards[d.cards[0][0]][d.cards[0][1]][1:]):
+        decks = [d]
         decks_new_j = []
         for j, action in enumerate(row):
-            if cards[deck.cards[0][0]]['header']['type'] == 'hero':
+            if cards[d.cards[0][0]]['header']['type'] == 'hero':
                 # for the hero, it is allowed not make some actions,
                 # we will drop decks which have not changed at the end of the action row
                 decks.extend(decks_new_j[:])
@@ -826,7 +826,7 @@ def play_card(deck):
             # check, whether outcomes are generated with and without the last action, for hero only
             decks_new_j = get_unique_items(decks_new_j)
         # collect deck_changed bools
-        decks_new_j_changed = [deck_changed(d, deck) for d in decks_new_j]
+        decks_new_j_changed = [deck_changed(d_j, d) for d_j in decks_new_j]
         # decks_new_i = [m for m in decks_new_j if deck_changed(m, deck)]
 
         # if any deck changed
@@ -835,26 +835,26 @@ def play_card(deck):
                 decks_new_j = [deck_new_j for m, deck_new_j in enumerate(decks_new_j) if decks_new_j_changed[m]]
             decks_new_i.extend(decks_new_j)
             decks_new_i = get_unique_items(decks_new_i[:])
-            if cards[deck.cards[0][0]]['header']['type'] == 'monster':
+            if cards[d.cards[0][0]]['header']['type'] == 'monster':
                 break
         # all the decks stale, no new deck show new configuration
         else:
             decks_new_i_prev_unchanged_rows.extend(decks_new_j)
         # if the last row has been reached
-        if not decks_new_i and i == len(cards[deck.cards[0][0]][deck.cards[0][1]][1:]) - 1:
+        if not decks_new_i and i == len(cards[d.cards[0][0]][d.cards[0][1]][1:]) - 1:
             if decks_new_i_prev_unchanged_rows:
                 decks_new_i = get_unique_items(decks_new_i_prev_unchanged_rows[:])
             else:
                 # when no row generated a valid results, turn back to the original deck, the input
                 # todo: check on the algo
-                decks_new_i = [deck]
+                decks_new_i = [d]
 
     # sort results by their decreasing her status, and increasing monster status
-    decks_new_i.sort(key=lambda d: (get_status(d).get('hero'), -get_status(d).get('monster')), reverse=True)
+    decks_new_i.sort(key=lambda d_i: (get_status(d_i).get('hero'), -get_status(d_i).get('monster')), reverse=True)
 
     # the hero has an option not to apply any action and do nothing
     # if cards[deck.cards[0][0]]['header']['type'] == 'hero':
-    d_new = make_next(deck)
+    d_new = make_next(d)
     d_new.add_action([(None,)])
     decks_new_i.append(d_new)
 
@@ -865,8 +865,8 @@ def play_card(deck):
         game = deck_new_i.game()
         if len(game) > 0:
             try:
-                deck_new_i.add_action([actions for pointer in game[:game.index(deck)] for actions in pointer.actions])
-                deck_new_i.prev = deck
+                deck_new_i.add_action([actions for pointer in game[:game.index(d)] for actions in pointer.actions])
+                deck_new_i.prev = d
             except ValueError:
                 pass
 
@@ -874,18 +874,43 @@ def play_card(deck):
 
 
 def condition(d, c):
+    """
+
+    :param d:
+    :param c:
+    :return:
+    """
     pass
 
 
 def death_deck(d, t):
+    """
+
+    :param d:
+    :param t:
+    :return:
+    """
     pass
 
 
 def void_deck(d, t):
+    """
+
+    :param d:
+    :param t:
+    :return:
+    """
     pass
 
 
 def claws_deck(d, r, t):
+    """
+
+    :param d:
+    :param r:
+    :param t:
+    :return:
+    """
     pass
 
 

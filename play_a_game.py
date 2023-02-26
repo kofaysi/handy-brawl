@@ -229,9 +229,6 @@ while True:
     s = build_graphical_representation_to_deck(new)
     print(' '*6 + s)
 
-    if hb.get_deck_hash(new) == '6A3A9A8A5A7A1A2A4A':
-        pass
-
     status = hb.get_status(new)
     print(status)
     if new.hash_str not in hb.game_turns:
