@@ -345,7 +345,6 @@ def hit_deck(d, r=0):
                     ds_new.extend(play_action(d, (reactions[0][0], i, reactions[0][2])))
                 else:
                     ds_new.extend(play_action(d, reactions))
-            # shield_found = True
             # if monster's shield has been found and activated, break
             if cards[d.cards[0][0]]['header']['type'] == 'hero':
                 break
@@ -365,7 +364,6 @@ def hit_deck(d, r=0):
                     ds_new.extend(play_action(d, (reactions[0][0], i, reactions[0][2])))
                 else:
                     ds_new.extend(play_action(d, reactions))
-            # dodge_found = True
 
     # Continue collecting new deck outcomes by applying hit_card(), if it is a monster's turn,
     # or it is a hero's turn and no shield or no dodge has been found.
@@ -651,8 +649,6 @@ def arrow_deck(d, n=1, e=-3):
     for i in target_list:
         d_new = make_next(d)
         if cards[d.cards[i][0]]['header']['type'] == 'monster':
-            # todo: rewrite using check for 'reaction' existence
-            # also consider 'dodge' as a reaction
             reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('shield')
             if reactions:
                 if reactions[0][2] == 'self':
@@ -736,13 +732,16 @@ def inspire_deck(d, t='enemy'):
     ds_new = []
     is_monster_turn = cards[d.cards[0][0]]['header']['type'] == 'monster'
     for i, _ in enumerate(d):
-        ds_new_i = play_card(d[i:])
-        for d_new_i in ds_new_i:
-            d_new = d[:i] + d_new_i
-            if d_new != d:
-                ds_new.append(d_new)
-        if is_monster_turn:
-            return ds_new
+        if (t == 'ally' and cards[d.cards[0][0]]['header']['type'] == cards[d.cards[i][0]]['header']['type']) or \
+                (t == 'enemy' and cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i][0]]['header']['type']) or \
+                t == 'any':
+            ds_new_i = play_card(d[i:])
+            for d_new_i in ds_new_i:
+                d_new = d[:i] + d_new_i
+                if d_new != d:
+                    ds_new.append(d_new)
+            if is_monster_turn:
+                return ds_new
     return ds_new
 
 
@@ -874,7 +873,7 @@ def play_card(deck):
     return decks_new_i
 
 
-def condition(d, c, a):
+def condition(d, c):
     pass
 
 
@@ -911,15 +910,13 @@ def play_action(deck, action):
         'maneuver': lambda d, a: maneuver_deck(d),  # deck
         'inspire': lambda d, a: inspire_deck(d, t=a[2]),  # deck, target
         'teleport': lambda d, a: teleport_deck(d, t=a[2]),  # deck, target
-        'count rage': lambda d, a: condition(d, c=a[1], a=a[2]),  # deck, count, actions
-        'pay fire': lambda d, a: condition(d, c=a[1], a=a[2]),  # deck, count, actions
+        'count rage': lambda d, a: condition(d, c=a),  # deck, condition with actions
+        'pay fire': lambda d, a: condition(d, c=a),  # deck, condition with actions
         'death': lambda d, a: death_deck(d, t=a[2]),  # deck, target
         'void': lambda d, a: void_deck(d, t=a[2]),  # deck, target
         'claws': lambda d, a: claws_deck(d, r=a[1], t=a[2]),  # deck, range, target
     }
 
-    if action is None:
-        pass
     return switcher.get(action[0])(deck, action)
 
 
