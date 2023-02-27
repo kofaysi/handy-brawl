@@ -242,7 +242,7 @@ def move_deck(d, r, t):
                          and r < 0
                          and cards[d.cards[i][0]][d.cards[i][1]][0]['life'] == 'exhausted')
         ):
-            end_position = 1 if r < 1 else len(d) - 1
+            end_position = 1 if r < 0 else len(d) - 1
             ds_new.append(move_card(d, i, end_position))
             reactions = cards[d.cards[i][0]][d.cards[i][1]][0].get('dodge')
             if reactions:
