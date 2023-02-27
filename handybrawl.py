@@ -823,19 +823,16 @@ def play_card(d):
             decks_new_j = [d
                            for deck_j in decks
                            for d in play_action(deck_j, action)]
-            # if no valid result has been generated, use the input as the outcome
-            # todo: check on the following algo
-            if not decks_new_j:
-                decks_new_j = decks
-                for d in decks_new_j:
-                    d.add_action([(None,)])
-
             # todo: the rotate is mandatory, but not all last actions are mandatory;
             # check, whether outcomes are generated with and without the last action, for hero only
-            decks_new_j = get_unique_items(decks_new_j)
+            if decks_new_j:
+                decks_new_j = get_unique_items(decks_new_j)
+        # if no valid result has been generated, use the input as the outcome and set the empty actions to [(None,)]
+        if not decks_new_j:
+            decks_new_j = decks
+            [d.add_action([(None,)]) for d in decks_new_j if d.actions == []]
         # collect deck_changed bools
         decks_new_j_changed = [deck_changed(d_j, d) for d_j in decks_new_j]
-        # decks_new_i = [m for m in decks_new_j if deck_changed(m, deck)]
 
         # if any deck changed
         if any(decks_new_j_changed):
