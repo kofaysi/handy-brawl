@@ -163,9 +163,8 @@ def adjust_deck(d, p, t):
     if first_card_type == 'hero' and is_venom:
         return []
 
-    # t = a.split()[1] if ' ' in a else 'any'
     ds_new = []
-    # adjust_list = list(range(1, abs(p) + 1))
+    # todo: do not step by value 1/-1, but check for existence of traps in the path and chop up the path accordingly
     step_j = 1 if p > 0 else -1
     for i in range(1, len(d.cards)):
         if ((t == 'ally' or t == 'any')
