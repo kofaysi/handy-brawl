@@ -860,7 +860,7 @@ def play_card(d):
                 decks_new_i = [d]
 
     # sort results by their decreasing her status, and increasing monster status
-    decks_new_i.sort(key=lambda d_i: (get_status(d_i).get('hero'), -get_status(d_i).get('monster')), reverse=True)
+    decks_new_i.sort(key=lambda d_i: (get_status(d_i).get('hero'), -get_status(d_i).get('monster'), d_i.hash_str), reverse=True)
 
     # the hero has an option not to apply any action and do nothing
     # if cards[deck.cards[0][0]]['header']['type'] == 'hero':
