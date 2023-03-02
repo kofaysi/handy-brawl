@@ -191,10 +191,23 @@ while True:
         decks_new = [prev]
         new = decks_new[0]
         print("Welcome to the new game with the following deck.")
-        symbol_description = "Each colour represents one of the characters.\n" \
-                             "The life status is represented by square symbols:"
-        print(symbol_description)
+        life_description = "Each colour represents one of the characters.\n" \
+                           "The life status is represented by square symbols:"
+        print(life_description)
         print(hb.card_status_symbols)
+        action_description = "The action is described by card indexes (0, 1,...) and symbols at the and of the line:"
+        print(action_description)
+        card_action_symbols = dict(
+            damage='✱',
+            rotate='⟳',
+            delay='<-',
+            quicken='->',
+            flip='↩',
+            shield="⛨",
+            dodge='X',
+            revive='+'
+        )
+        print(card_action_symbols)
     else:
         decks_new.sort(key=lambda dx: (hb.get_status(dx).get("hero"), -hb.get_status(dx).get("monster")), reverse=True)
 
