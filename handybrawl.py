@@ -164,49 +164,28 @@ def adjust_deck(d, p, t):
         return []
 
     ds_new = []
-    # todo: do not step by value 1/-1, but check for existence of traps in the path and chop up the path accordingly
-    # step_j = 1 if p > 0 else -1
-    # for i in range(1, len(d.cards)):
-    #     if ((t == 'ally' or t == 'any')
-    #         and cards[d.cards[0][0]]['header']['type'] == cards[d.cards[i][0]]['header']['type']) \
-    #             or ((t == 'enemy' or t == 'any')
-    #                 and cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i][0]]['header']['type']
-    #                 and not ('heavy' in cards[d.cards[i][0]][d.cards[i][1]][0].get('feature', {}))):
-    #         d_new = make_next(d)
-    #         j = i
-    #         for _ in range(1, abs(p) + 1):
-    #             if 0 < j + step_j < len(d.cards):
-    #                 # d_new = make_next(d_new)
-    #                 d_new = move_card(d_new, j, j + step_j)
-    #                 trap_exists = 'traps' in cards[d.cards[j][0]][d.cards[j][1]][0].get('feature', {})
-    #                 if cards[d.cards[0][0]]['header']['type'] != cards[d.cards[j][0]]['header']['type'] and trap_exists:
-    #                     d_new = hit_card(d_new, j+step_j)
-    #                 ds_new.append(d_new)
-    #             j += step_j
-    # ds_new = get_unique_items(ds_new)
-
     if p < 0:
         adjust_range = range(p, 0)  # negative index changes, quicken
     else:
         adjust_range = range(1, p+1)  # positive index changes, delay
 
     for i in range(1, len(d.cards)):
-        d_new = make_next(d)
+        d_adjusted = make_next(d)
         i_adjusted = i
-        for adjust_j in adjust_range:
-            j = i + adjust_j
+        for j_step in adjust_range:
+            j = i + j_step
             if i != j and 0 < j < len(d.cards):
                 if ((t == 'ally' or t == 'any')
                     and cards[d.cards[0][0]]['header']['type'] == cards[d.cards[i_adjusted][0]]['header']['type']) \
                         or ((t == 'enemy' or t == 'any')
                             and cards[d.cards[0][0]]['header']['type'] != cards[d.cards[i_adjusted][0]]['header']['type']
                             and not ('heavy' in cards[d.cards[i_adjusted][0]][d.cards[i_adjusted][1]][0].get('feature', {}))):
-                    d_new = move_card(d_new, i_adjusted, j)
+                    d_new = move_card(d_adjusted, i_adjusted, j)
                     trap_exists = 'traps' in cards[d.cards[j][0]][d.cards[j][1]][0].get('feature', {})
                     if cards[d.cards[0][0]]['header']['type'] != cards[d.cards[j][0]]['header']['type'] and trap_exists:
                         d_new = hit_card(d_new, j)
                         i_adjusted = j
-                        d_new_adjusted = make_next(d_new)
+                        d_adjusted = make_next(d_new)
                     ds_new.append(d_new)
                     if 'heavy' in cards[d.cards[j][0]][d.cards[j][1]][0].get('feature', {}):  # card j is heavy now
                         break
