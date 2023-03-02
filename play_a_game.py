@@ -94,6 +94,8 @@ def request_deck():
         s_hash = re.sub(r'(\d)\s+(?=\d)', r'\1A', s_hash)
         # add section A to the number without chars by char 'A' and at the end of the string
         s_hash = re.sub(r'(\d)$', r'\1A', s_hash)
+        # extend numbers to double digits, precede by a zero, if single digit number is captured, for sorting purpose
+        s_hash = re.sub(r'(\b\d\b)', r'0\g<1>', s_hash)
         # remove spaces
         s_hash = re.sub(r'([ABCD])\s*(?=\d)', r'\1', s_hash)
         return s_hash
