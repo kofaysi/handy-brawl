@@ -179,7 +179,7 @@ def build_actions_to_deck(d):
     :param d: A deck object
     :return: A string representing the actions in the deck
     """
-    return ''.join(' (' + ', '.join(map(str, action)) + ')' for action in reversed(d.actions))
+    return ''.join(' (' + str(action) + ')' for action in reversed(d.actions))
 
 
 while True:
@@ -200,7 +200,7 @@ while True:
 
         # place the "no change, no action, do nothing" deck first
         for i, deck_new_i in enumerate(decks_new):
-            if deck_new_i.actions[0][0] is None:
+            if deck_new_i.actions[0] is None:
                 decks_new.insert(0, decks_new.pop(i))
                 break
 

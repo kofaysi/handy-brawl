@@ -94,6 +94,11 @@ def rotate(f):
     return sections_rotated[sections.index(f)]
 
 
+def flip(f):
+    pass
+    # ↩
+
+
 # @CountCalls
 def back_shift(tup, n=1):
     """
@@ -278,10 +283,10 @@ def move_card(d, i, j):
 
     if i < j:
         d_new.cards[i:j + 1] = back_shift(d_new.cards[i:j + 1])
-        d_new.add_action([('move down', str(j) + "<-" + str(i))])
+        d_new.add_action([str(j) + "<-" + str(i)])
     else:
         d_new.cards[j:i + 1] = back_shift(d.cards[j:i + 1], len(d_new.cards[j:i + 1]) - 1)
-        d_new.add_action([('move up', str(i) + "->" + str(j))])
+        d_new.add_action([str(i) + "->" + str(j)])
     return d_new
 
 
@@ -299,7 +304,7 @@ def rotate_card(d, i=0):
     """
     d_new = make_next(d)
     d_new.cards[i][1] = rotate(d_new.cards[i][1])
-    d_new.add_action([('rotate', i)])
+    d_new.add_action([' ⟳ ' + str(i)])
     return d_new
 
 
@@ -433,8 +438,11 @@ def intercept(d, i, reactions):
     # a switcher construction used for multiple possible shield or dodge reactions
     for reaction in reactions:
         d_new.cards[i][1] = switcher.get(reaction)(d.cards[i][1])
-        d_new.add_action([(reaction, i)])
-
+        if reaction == 'shield':
+            symbol = '⛨'
+        elif reaction == 'dodge':
+            symbol = 'X'
+        d_new.add_action([' ' + symbol + ' ' + str(i)])
     return d_new
 
 
@@ -459,7 +467,7 @@ def hit_card(d, i):
 
     d_new = make_next(d)
     d_new.cards[i][1] = sections[[cards[d.cards[i][0]][f][0]['life'] for f in sections].index(expected_life)]
-    d_new.add_action([('damage', i)])
+    d_new.add_action([' ✱ ' + str(i)])
     return d_new
     # expected_card = rotate_card_to_section(d[i][:], expected_section)
 
@@ -494,7 +502,7 @@ def revive_deck(d, a):
         if cards[d.cards[0][0]]['header']['type'] == cards[d.cards[i][0]]['header']['type']:
             if (a == 'heal' and cards[d.cards[i][0]][d.cards[i][1]][0]['life'] == 'wounded') \
                     or (a == 'resurrect' and cards[d.cards[i][0]][d.cards[i][1]][0]['life'] == 'exhausted'):
-                d_new = revive_card(a, d, i)
+                d_new = revive_card(d, i, a)
                 ds_new.append(d_new)
                 if cards[d.cards[0][0]]['header']['type'] == 'monster':
                     break
@@ -502,7 +510,7 @@ def revive_deck(d, a):
     return ds_new
 
 
-def revive_card(a, d, i):
+def revive_card(d, i, a):
     """
     Turn the i-th card in the deck to its starting ('A') position.
 
@@ -517,7 +525,7 @@ def revive_card(a, d, i):
     """
     d_new = make_next(d)
     d_new.cards[i][1] = 'A'
-    d_new.add_action([(a, i)])
+    d_new.add_action([' + ' + str(i)])
     return d_new
 
 
@@ -865,7 +873,7 @@ def play_card(d):
     # the hero has an option not to apply any action and do nothing
     # if cards[deck.cards[0][0]]['header']['type'] == 'hero':
     d_new = make_next(d)
-    d_new.add_action([(None,)])
+    d_new.add_action([None])
     decks_new_i.append(d_new)
 
     decks_new_i = get_unique_items(decks_new_i[:])
