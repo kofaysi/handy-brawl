@@ -283,10 +283,10 @@ def move_card(d, i, j):
 
     if i < j:
         d_new.cards[i:j + 1] = back_shift(d_new.cards[i:j + 1])
-        d_new.add_action([str(j) + "<-" + str(i)])
+        d_new.add_action([str(j) + "<-" + str(i) + '   '])
     else:
         d_new.cards[j:i + 1] = back_shift(d.cards[j:i + 1], len(d_new.cards[j:i + 1]) - 1)
-        d_new.add_action([str(i) + "->" + str(j)])
+        d_new.add_action(['   ' + str(i) + "->" + str(j)])
     return d_new
 
 
