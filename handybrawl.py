@@ -510,7 +510,7 @@ def revive_deck(d, a):
     return ds_new
 
 
-def revive_card(d, i, a):
+def revive_card(d, i):
     """
     Turn the i-th card in the deck to its starting ('A') position.
 
@@ -520,7 +520,6 @@ def revive_card(d, i, a):
 
     :param d: the current deck
     :param i: the index of the card to be revived
-    :param a: the action to be logged with the deck
     :return: a new card
     """
     d_new = make_next(d)
