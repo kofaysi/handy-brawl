@@ -502,7 +502,7 @@ def revive_deck(d, a):
         if cards[d.cards[0][0]]['header']['type'] == cards[d.cards[i][0]]['header']['type']:
             if (a == 'heal' and cards[d.cards[i][0]][d.cards[i][1]][0]['life'] == 'wounded') \
                     or (a == 'resurrect' and cards[d.cards[i][0]][d.cards[i][1]][0]['life'] == 'exhausted'):
-                d_new = revive_card(d, i, a)
+                d_new = revive_card(d, i)
                 ds_new.append(d_new)
                 if cards[d.cards[0][0]]['header']['type'] == 'monster':
                     break

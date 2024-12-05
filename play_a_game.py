@@ -86,7 +86,7 @@ def request_deck():
     def corrections(s_hash: str) -> str:
         # make the hash uppercase
         s_hash = s_hash.strip().upper()
-        # remove other then [A, B, C, D] chars
+        # remove other than [A, B, C, D] chars
         s_hash = re.sub(r'[E-Z]', '', s_hash)
         # replace spaces between numbers and following chars
         s_hash = re.sub(r'(\d)\s+(?=[ABCD])', r'\1', s_hash)
@@ -130,7 +130,7 @@ def request_deck():
                       "Other characters are coming soon.")
                 continue
             print("If the hash has been parsed incorrectly, start the application over.")
-            break
+            exit()
         except ValueError:
             print("The supplied input is not following the the suggested structure.")
             print("The hash cannot be converted to its deck representation.")
